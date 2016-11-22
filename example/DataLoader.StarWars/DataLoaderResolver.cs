@@ -1,12 +1,10 @@
-﻿using DataLoader;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace StarWarsApp
+namespace DataLoader.StarWars
 {
     public class DataLoaderResolver<TSource, TValue> : DataLoaderResolver<TSource, int, TValue>
     {
@@ -14,13 +12,13 @@ namespace StarWarsApp
         {
         }
 
-        public DataLoaderResolver(Func<TSource, int> keySelector, Func<IEnumerable<int>, ILookup<int, TValue>> fetch) : base(keySelector, fetch)
+        public DataLoaderResolver(Func<TSource, int> keySelector, FetchDelegate<int, TValue> fetch) : base(keySelector, fetch)
         {
         }
     }
 
     /// <summary>
-    /// Collect the key for each source item so that they may be processed as a batch.
+    /// Collects the key for each source item so that they may be processed as a batch.
     /// </summary>
     public class DataLoaderResolver<TSource, TKey, TValue> : IFieldResolver<Task<IEnumerable<TValue>>>
     {
@@ -33,8 +31,8 @@ namespace StarWarsApp
             _loader = loader;
         }
 
-        public DataLoaderResolver(Func<TSource, TKey> keySelector, Func<IEnumerable<TKey>, ILookup<TKey, TValue>> fetch)
-            : this(keySelector, new BatchLoader<TKey, TValue>(fetch))
+        public DataLoaderResolver(Func<TSource, TKey> keySelector, FetchDelegate<TKey, TValue> fetchDelegate)
+            : this(keySelector, new DataLoader<TKey, TValue>(fetchDelegate))
         {
         }
 

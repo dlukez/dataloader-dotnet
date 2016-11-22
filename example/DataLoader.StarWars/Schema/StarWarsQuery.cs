@@ -1,8 +1,8 @@
 using System.Linq;
+using DataLoader.StarWars.Data;
 using GraphQL.Types;
-using StarWarsApp.Data;
 
-namespace StarWarsApp.Schema
+namespace DataLoader.StarWars.Schema
 {
     public class StarWarsQuery : ObjectGraphType
     {
@@ -24,6 +24,14 @@ namespace StarWarsApp.Schema
                 {
                     using (var db = new StarWarsContext())
                         return db.Droids.ToList();
+                });
+
+            Field<ListGraphType<EpisodeType>>()
+                .Name("episodes")
+                .Resolve(ctx =>
+                {
+                    using (var db = new StarWarsContext())
+                        return db.Episodes.ToList();
                 });
         }
     }

@@ -1,14 +1,17 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "GraphQL": "0.13.1.601"
+    "GraphQL": "0.14.0.633"
   },
   "frameworks": {
-    "netstandard1.1": {
+    "netstandard1.3": {
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
+        "NETStandard.Library": "1.6.0",
+        "System.Threading.Thread": "4.3.0"
       },
-      "imports": "dnxcore50"
+      "imports": [
+        "dnxcore50"
+      ]
     }
   }
 }

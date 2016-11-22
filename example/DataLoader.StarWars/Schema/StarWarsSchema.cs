@@ -1,4 +1,4 @@
-﻿namespace StarWarsApp.Schema
+﻿namespace DataLoader.StarWars.Schema
 {
     public class StarWarsSchema : GraphQL.Types.Schema
     {

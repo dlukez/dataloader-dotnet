@@ -8,14 +8,14 @@
     "tasks": [
         {
             "taskName": "build",
-            "args": [ "example/StarWarsApp" ],
+            "args": [ "src/DataLoader", "tests/DataLoader.Tests", "example/DataLoader.StarWars" ],
             "isBuildCommand": true,
             "showOutput": "silent",
             "problemMatcher": "$msCompile"
         },
         {
             "taskName": "test",
-            "args": [ "test/DataLoader.Tests" ],
+            "args": [ "tests/DataLoader.Tests" ],
             "isTestCommand": true
         }
     ]

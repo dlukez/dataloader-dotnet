@@ -1,19 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DataLoader
 {
     public interface IDataLoader
     {
-        Task<IEnumerable> LoadAsync(object key);
+        Task ExecuteAsync();
     }
 
-    public interface IDataLoader<TValue> : IDataLoader<object, TValue>
-    {
-    }
-
-    public interface IDataLoader<TKey, TValue>
+    public interface IDataLoader<TKey, TValue> : IDataLoader
     {
         Task<IEnumerable<TValue>> LoadAsync(TKey key);
     }

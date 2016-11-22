@@ -1,0 +1,27 @@
+Thread 24 (ThreadPoolTaskScheduler) ====================================
+Thread 24 (ThreadPoolTaskScheduler) -   Fetching friends of droids 1,2
+Thread 24 (ThreadPoolTaskScheduler) -   Fetch complete - got 4 items
+Thread 24 (ThreadPoolTaskScheduler) -   Loader finished
+Thread 24 (ThreadPoolTaskScheduler) - Task status = WaitingForActivation
+Thread 25 (ThreadPoolTaskScheduler) -   Fetch complete - got 6 items
+Thread 25 (ThreadPoolTaskScheduler) -   Loader finished
+Thread 40 (ThreadPoolTaskScheduler) -     Fetch complete - got 2 items
+Thread 40 (ThreadPoolTaskScheduler) -     Loader finished
+Thread  4 (ThreadPoolTaskScheduler) -     Fetch complete - got 4 items
+Thread  4 (ThreadPoolTaskScheduler) -     Loader finished
+Thread 39 (ThreadPoolTaskScheduler) -       Fetching friends of droids 1,2
+Thread 39 (ThreadPoolTaskScheduler) -       Fetch complete - got 4 items
+Thread 39 (ThreadPoolTaskScheduler) -       Loader finished
+Thread  4 (ThreadPoolTaskScheduler) -       Fetch complete - got 3 items
+Thread  4 (ThreadPoolTaskScheduler) -       Loader finished
+Thread  4 (ThreadPoolTaskScheduler) -         Fetching episodes appeared in by droids 2,1
+Thread  4 (ThreadPoolTaskScheduler) -         Fetch complete - got 1 items
+Thread  4 (ThreadPoolTaskScheduler) -         Loader finished
+Thread 25 (ThreadPoolTaskScheduler) -         Fetching friends of droids 
+Thread 25 (ThreadPoolTaskScheduler) -         Fetch complete - got 0 items
+Thread 25 (ThreadPoolTaskScheduler) -         Loader finished
+Thread 25 (ThreadPoolTaskScheduler) -         Fetch complete - got 2 items
+Thread 25 (ThreadPoolTaskScheduler) -         Loader finished
+Thread 25 (ThreadPoolTaskScheduler) -         Fetch complete - got 4 items
+Thread 25 (ThreadPoolTaskScheduler) -         Loader finished
+Thread 17 (ThreadPoolTaskScheduler) - Total time: 2456ms

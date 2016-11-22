@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Threading;
+using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 
@@ -12,47 +17,129 @@ namespace DataLoader.Tests
         {
             DataLoaderContext.Current.ShouldBeNull();
 
-            DataLoaderContext.Run(ctx =>
+            DataLoaderContext.Run(_ =>
             {
                 DataLoaderContext.Current.ShouldNotBeNull();
+                return Task.FromResult(1);
             });
 
             DataLoaderContext.Current.ShouldBeNull();
         }
 
         [Fact]
-        public void DataLoaderContext_Run_ThrowsWhenCalledTwice()
+        public void DataLoaderContext_Run_CanBeNested()
         {
-            DataLoaderContext.Run(() =>
+            DataLoaderContext.Run(_ =>
             {
-                Should.Throw<InvalidOperationException>(() =>
+                var lastCtx = DataLoaderContext.Current;
+                return DataLoaderContext.Run(__ =>
                 {
-                    DataLoaderContext.Run(() => { });
+                    DataLoaderContext.Current.ShouldNotBe(lastCtx);
+                    return Task.FromResult(1);
                 });
             });
         }
 
         [Fact]
+        public async Task DataLoaderContext_Run_FlowsCurrentContext()
+        {
+            await DataLoaderContext.Run(async _ =>
+            {
+                var ctx = DataLoaderContext.Current;
+                var threadId = Thread.CurrentThread.ManagedThreadId;
+
+                // Test with `await`.
+                await Task.Yield(); 
+                Debug.Assert(threadId != Thread.CurrentThread.ManagedThreadId);
+                DataLoaderContext.Current.ShouldBe(ctx);
+
+                // Test with `Task.Run`.
+                await Task.Run(() =>
+                {
+                    Debug.Assert(threadId != Thread.CurrentThread.ManagedThreadId);
+                    DataLoaderContext.Current.ShouldBe(ctx);
+                });
+
+                // Test with `Thread`.
+                var thread = new Thread(() =>
+                {
+                    Debug.Assert(threadId != Thread.CurrentThread.ManagedThreadId);
+                    DataLoaderContext.Current.ShouldBe(ctx);
+                });
+                thread.Start();
+                thread.Join();
+
+                return true;
+            });
+        }
+
+        [Fact]
+        public void DataLoaderContext_Run_AllowsParallelContexts()
+        {
+            List<DataLoaderContext> contexts = new List<DataLoaderContext>();
+
+            const int participants = 2;
+
+            var barrier = new Barrier(participants);
+
+            Action action = () =>
+            {
+                DataLoaderContext.Run(_ =>
+                {
+                    barrier.SignalAndWait();
+
+                    lock (contexts)
+                    {
+                        contexts.Add(DataLoaderContext.Current);
+                    }
+
+                    return Task.FromResult(true);
+                });
+            };
+
+            Parallel.For(0, participants, _ => action());
+
+            contexts.Count.ShouldBe(participants);
+            contexts.ShouldBeUnique();
+        }
+
+        [Fact]
         public void DataLoaderContext_Flush_CanHandleMultipleLevelsOfNestedFetches()
         {
-            var count = 0;
+            var limit = 4;
+            var count = 1;
 
-            Should.CompleteIn(() =>
+            Should.CompleteIn(async () =>
             {
-                DataLoaderContext.Run(async ctx =>
+                await DataLoaderContext.Run(ctx =>
                 {
-                    var loader = new BatchLoader<int, string>(ctx, ids => {
+                    var loader = new DataLoader<int, int>(ids =>
+                    {
                         count++;
-                        return ids.ToLookup(x => x, x => $"hi there x {x}");
-                    });
-                    await loader.LoadAsync(1);
-                    await loader.LoadAsync(2);
-                    await loader.LoadAsync(3);
-                    await loader.LoadAsync(4);
-                });
-            }, TimeSpan.FromSeconds(3));
+                        return ids.SelectMany(x => new[]
+                        {
+                            new KeyValuePair<int, int>(x, x * 2),
+                            new KeyValuePair<int, int>(x, x * 2 + 1)
+                        }).ToLookup(x => x.Key, x => x.Value);
+                    }, ctx);
 
-            count.ShouldBe(4);
+                    Func<int, Task<object>> resolve = null;
+
+                    resolve = async x =>
+                    {
+                        Debug.WriteLine($"x: {x}");
+                        if (x >= (2 ^ limit)) return x;
+                        var items = await loader.LoadAsync(x);
+                        var tasks = items.Select(resolve);
+                        var nested = await Task.WhenAll(tasks);
+                        return nested;
+                    };
+
+                    return resolve(1);
+                });
+            }, TimeSpan.FromSeconds(5));
+
+            count.ShouldBe(limit);
         }
     }
 }

@@ -1,6 +1,6 @@
 using GraphQL.Types;
 
-namespace StarWarsApp.Schema
+namespace DataLoader.StarWars.Schema
 {
     public class CharacterInterface : InterfaceGraphType
     {
@@ -9,6 +9,7 @@ namespace StarWarsApp.Schema
             Name = "Character";
             Field<StringGraphType>("name", "The name of the character.");
             Field<ListGraphType<CharacterInterface>>("friends");
+            Field<ListGraphType<EpisodeType>>("appearsIn");
         }
     }
 }
