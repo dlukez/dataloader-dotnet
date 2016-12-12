@@ -14,17 +14,25 @@ namespace DataLoader.StarWars.Controllers
         [HttpPost]
         public Task<ExecutionResult> Post([FromBody] GraphQLRequest request)
         {
-            return RunQuery(request.Query);
+            return RunQuery(request.Query, false);
         }
 
-        public static async Task<ExecutionResult> RunQuery(string query)
+        [HttpPost]
+        [Route("custom")]
+        public Task<ExecutionResult> PostCustom([FromBody] GraphQLRequest request)
         {
+            return RunQuery(request.Query, true);
+        }
+
+        public static async Task<ExecutionResult> RunQuery(string query, bool usePrototypeLoader)
+        {
+            var type = usePrototypeLoader ? "prototype" : "task-based";
             var executer = new DocumentExecuter();
             var schema = new StarWarsSchema();
 
             var sw = Stopwatch.StartNew();
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) ====================================");
-            var task = DataLoaderContext.Run(ctx => executer.ExecuteAsync(schema, ctx, query, null));
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) ========={type}=========");
+            var task = DataLoaderContext.Run(ctx => executer.ExecuteAsync(schema, ctx, query, null), usePrototypeLoader);
             Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) - Task status = {Enum.GetName(typeof(TaskStatus), task.Status)}");
             var result = await task;
             Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) - Total time: {sw.ElapsedMilliseconds}ms");

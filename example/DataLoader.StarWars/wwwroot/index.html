@@ -112,6 +112,27 @@
           } catch (error) {
             return result;
           }
+        }).then(function () {
+          return fetch('/api/graphql/custom', {
+            method: 'post',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              query: graphQLParams.query,
+              variables: variables
+            }),
+            credentials: 'include',
+          }).then(function (response) {
+            return response.text();
+          }).then(function (result) {
+            try {
+              return JSON.parse(result);
+            } catch (error) {
+              return result;
+            }
+          })
         })
       }
 

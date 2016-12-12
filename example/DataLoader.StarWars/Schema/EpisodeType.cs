@@ -21,11 +21,12 @@ namespace DataLoader.StarWars.Schema
                 .Name("characters")
                 .Resolve(ctx =>
                 {
-                    return ((DataLoaderContext) ctx.RootValue).GetDataLoader<int, ICharacter>(
+                    return ((DataLoaderContext) ctx.RootValue).GetCachedLoader<int, ICharacter>(
                         ctx.FieldDefinition,
-                        ids =>
+                        async ids =>
                         {
-                            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) - {new String(' ', 2  * DataLoaderContext.Current.Level)}Characters of episodes " + string.Join(",", ids));
+                            await Task.Delay(10);
+                            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) - {new String(' ', 2  * DataLoaderContext.Current.Level)}Fetching characters of episodes " + string.Join(",", ids));
                             using (var db = new StarWarsContext())
                             {
                                 var humans = db.HumanAppearances

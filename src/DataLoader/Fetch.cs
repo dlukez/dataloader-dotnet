@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DataLoader
 {
@@ -21,31 +22,28 @@ namespace DataLoader
     {
         private readonly FetchDelegate<TKey, TValue> _fetchDelegate;
         private readonly Queue<Action> _continuations = new Queue<Action>();
-        private readonly bool _isAutoResetEnabled;
         private ILookup<TKey, TValue> _result;
 
         // TODO - add cancellation token support
-        public Fetch(FetchDelegate<TKey, TValue> fetchDelegate, bool resetAutomatically = true)
+        public Fetch(FetchDelegate<TKey, TValue> fetchDelegate)
         {
             _fetchDelegate = fetchDelegate;
-            _isAutoResetEnabled = resetAutomatically;
         }
 
-        public void Execute(IEnumerable<TKey> keys)
+        public async Task ExecuteAsync(IEnumerable<TKey> keys)
         {
-            _result = _fetchDelegate(keys);
+            _result = await _fetchDelegate(keys);
 
             // Allow continuations to be attached for the next run
-            var remaining = _continuations.Count;
+            int remaining;
+            lock (_continuations) remaining = _continuations.Count;
             while (remaining > 0)
             {
-                _continuations.Dequeue().Invoke();
+                Action continuation;
+                lock (_continuations) continuation = _continuations.Dequeue();
+                continuation.Invoke();
                 remaining--;
             }
-
-            // Allows this object to be reused
-            if (_isAutoResetEnabled)
-                _result = null;
         }
 
         public Fetch<TKey, TValue> GetAwaiter()
@@ -53,10 +51,7 @@ namespace DataLoader
             return this;
         }
 
-        // If auto-reset is turned on, always return false so that any `await`s
-        // that occur in a continuation are queued for the next fetch
-        // rather than immediately returning the result from the current one.
-        public bool IsCompleted => !_isAutoResetEnabled && _result != null;
+        public bool IsCompleted => false;
 
         public void OnCompleted(Action continuation)
         {

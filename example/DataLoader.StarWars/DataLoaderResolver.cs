@@ -32,7 +32,7 @@ namespace DataLoader.StarWars
         }
 
         public DataLoaderResolver(Func<TSource, TKey> keySelector, FetchDelegate<TKey, TValue> fetchDelegate)
-            : this(keySelector, new DataLoader<TKey, TValue>(fetchDelegate))
+            : this(keySelector, new TaskBasedDataLoader<TKey, TValue>(fetchDelegate))
         {
         }
 

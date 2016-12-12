@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,10 +39,11 @@ namespace DataLoader.StarWars.Schema
 //                .Resolve(ctx => friendsLoader.LoadAsync(ctx.Source.DroidId));
             Field<ListGraphType<CharacterInterface>>()
                 .Name("friends")
-                .Resolve(ctx => ((DataLoaderContext)ctx.RootValue).GetDataLoader<int, Human>(
+                .Resolve(ctx => ((DataLoaderContext) ctx.RootValue).GetCachedLoader<int, Human>(
                     ctx.FieldDefinition,
-                    ids =>
+                    async ids =>
                     {
+                        await Task.Delay(10);
                         Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) - {new String(' ', 2  * DataLoaderContext.Current.Level)}Fetching friends of droids " + string.Join(",", ids));
                         using (var db = new StarWarsContext())
                             return db.Friendships
@@ -58,10 +60,11 @@ namespace DataLoader.StarWars.Schema
              */
             Field<ListGraphType<EpisodeType>>()
                 .Name("appearsIn")
-                .Resolve(ctx => ((DataLoaderContext) ctx.RootValue).GetDataLoader<int, Episode>(
+                .Resolve(ctx => ((DataLoaderContext) ctx.RootValue).GetCachedLoader<int, Episode>(
                     ctx.FieldDefinition,
-                    ids =>
+                    async ids =>
                     {
+                        await Task.Delay(10);
                         Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) - {new String(' ', 2  * DataLoaderContext.Current.Level)}Fetching episodes appeared in by droids " + string.Join(",", ids));
                         using (var db = new StarWarsContext())
                             return db.HumanAppearances

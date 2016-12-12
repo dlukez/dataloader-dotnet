@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DataLoader.StarWars.Data;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace DataLoader.StarWars.Schema
@@ -40,10 +39,11 @@ namespace DataLoader.StarWars.Schema
 
             Field<ListGraphType<CharacterInterface>>()
                 .Name("friends")
-                .Resolve(ctx => ((DataLoaderContext)ctx.RootValue).GetDataLoader<int, Droid>(
+                .Resolve(ctx => ((DataLoaderContext) ctx.RootValue).GetCachedLoader<int, Droid>(
                     ctx.FieldDefinition,
-                    ids =>
+                    async ids =>
                     {
+                        await Task.Delay(10);
                         Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) - {new String(' ', 2  * DataLoaderContext.Current.Level)}Fetching friends of humans " + string.Join(",", ids));
                         using (var db = new StarWarsContext())
                             return db.Friendships
@@ -60,10 +60,11 @@ namespace DataLoader.StarWars.Schema
              */
             Field<ListGraphType<EpisodeType>>()
                 .Name("appearsIn")
-                .Resolve(ctx => ((DataLoaderContext)ctx.RootValue).GetDataLoader<int, Episode>(
+                .Resolve(ctx => ((DataLoaderContext)ctx.RootValue).GetCachedLoader<int, Episode>(
                     ctx.FieldDefinition,
-                    ids =>
+                    async ids =>
                     {
+                        await Task.Delay(10);
                         Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} ({TaskScheduler.Current.GetType().Name}) - {new String(' ', 2  * DataLoaderContext.Current.Level)}Fetching episodes appeared in by humans " + string.Join(",", ids));
                         using (var db = new StarWarsContext())
                             return db.HumanAppearances

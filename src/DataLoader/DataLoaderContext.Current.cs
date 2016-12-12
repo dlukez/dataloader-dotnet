@@ -1,10 +1,15 @@
-﻿using System.Runtime.Remoting.Messaging;
+﻿#if FEATURE_ASYNC_LOCAL
+using System.Threading;
+#else
+using System.Runtime.Remoting.Messaging;
+#endif
 
 namespace DataLoader
 {
     public partial class DataLoaderContext
     {
 #if FEATURE_ASYNC_LOCAL
+
         private static readonly AsyncLocal<DataLoaderContext> _localContext = new AsyncLocal<DataLoaderContext>();
 
         /// <summary>
@@ -20,7 +25,9 @@ namespace DataLoader
         {
             _localContext.Value = context;
         }
+
 #else
+
         private const string CallContextStorageId = "DataLoaderContext.Current";
 
         /// <summary>
@@ -54,6 +61,7 @@ namespace DataLoader
                 Context = context;
             }
         }
+
 #endif
     }
 }

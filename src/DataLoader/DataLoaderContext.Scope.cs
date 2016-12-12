@@ -16,6 +16,7 @@ namespace DataLoader
         {
             if (DataLoaderContext.Current != this)
                 throw new InvalidOperationException($"{nameof(DataLoaderContext.Current)} has changed");
+
             DataLoaderContext.SetContext(_previousContext);
         }
     }

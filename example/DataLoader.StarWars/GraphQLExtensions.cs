@@ -16,7 +16,7 @@ namespace DataLoader.StarWars
 
         public static IDataLoader<int, TValue> GetDataLoader<TValue>(this ResolveFieldContext context, FetchDelegate<int, TValue> fetchDelegate)
         {
-            return ((DataLoaderContext) context.RootValue).GetDataLoader(context.FieldDefinition, fetchDelegate);
+            return ((DataLoaderContext) context.RootValue).GetCachedLoader(context.FieldDefinition, fetchDelegate);
         }
     }
 }

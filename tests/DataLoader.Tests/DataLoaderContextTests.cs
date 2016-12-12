@@ -113,8 +113,9 @@ namespace DataLoader.Tests
             {
                 await DataLoaderContext.Run(ctx =>
                 {
-                    var loader = new DataLoader<int, int>(ids =>
+                    var loader = new TaskBasedDataLoader<int, int>(async ids =>
                     {
+                        await Task.Delay(10);
                         count++;
                         return ids.SelectMany(x => new[]
                         {
