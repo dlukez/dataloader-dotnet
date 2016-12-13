@@ -21,10 +21,10 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-// Make internals available to unit tests.
-
-[assembly: InternalsVisibleTo("DataLoader.Tests")]
-
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
 [assembly: Guid("8E469F11-59AE-40C6-8EC0-27D387C8C0E8")]
+
+// Make internals available to unit tests.
+
+[assembly: InternalsVisibleTo("DataLoader.Tests")]

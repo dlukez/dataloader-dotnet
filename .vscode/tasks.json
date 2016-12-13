@@ -8,9 +8,8 @@
     "tasks": [
         {
             "taskName": "build",
-            "args": [ "src/DataLoader", "tests/DataLoader.Tests", "example/DataLoader.StarWars" ],
+            "args": [ "src/DataLoader", "example/DataLoader.StarWars" ],
             "isBuildCommand": true,
-            "showOutput": "silent",
             "problemMatcher": "$msCompile"
         },
         {

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using Shouldly;
@@ -13,12 +11,13 @@ namespace DataLoader.Tests
     public class DataLoaderContextTests
     {
         [Fact]
-        public void DataLoaderContext_Run_SetsContext()
+        public async void DataLoaderContext_Run_SetsCurrentContext()
         {
             DataLoaderContext.Current.ShouldBeNull();
 
-            DataLoaderContext.Run(_ =>
+            await DataLoaderContext.Run(ctx =>
             {
+                DataLoaderContext.Current.ShouldBe(ctx);
                 DataLoaderContext.Current.ShouldNotBeNull();
                 return Task.FromResult(1);
             });
@@ -27,17 +26,15 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public void DataLoaderContext_Run_CanBeNested()
+        public async void DataLoaderContext_Run_CanBeNested()
         {
-            DataLoaderContext.Run(_ =>
-            {
-                var lastCtx = DataLoaderContext.Current;
-                return DataLoaderContext.Run(__ =>
+            await DataLoaderContext.Run(outerCtx =>
+                DataLoaderContext.Run(innerCtx =>
                 {
-                    DataLoaderContext.Current.ShouldNotBe(lastCtx);
+                    innerCtx.ShouldNotBe(outerCtx);
+                    DataLoaderContext.Current.ShouldNotBe(outerCtx);
                     return Task.FromResult(1);
-                });
-            });
+                }));
         }
 
         [Fact]
@@ -50,20 +47,20 @@ namespace DataLoader.Tests
 
                 // Test with `await`.
                 await Task.Yield(); 
-                Debug.Assert(threadId != Thread.CurrentThread.ManagedThreadId);
+                threadId.ShouldNotBe(Thread.CurrentThread.ManagedThreadId);
                 DataLoaderContext.Current.ShouldBe(ctx);
 
                 // Test with `Task.Run`.
                 await Task.Run(() =>
                 {
-                    Debug.Assert(threadId != Thread.CurrentThread.ManagedThreadId);
+                    threadId.ShouldNotBe(Thread.CurrentThread.ManagedThreadId);
                     DataLoaderContext.Current.ShouldBe(ctx);
                 });
 
                 // Test with `Thread`.
                 var thread = new Thread(() =>
                 {
-                    Debug.Assert(threadId != Thread.CurrentThread.ManagedThreadId);
+                    threadId.ShouldNotBe(Thread.CurrentThread.ManagedThreadId);
                     DataLoaderContext.Current.ShouldBe(ctx);
                 });
                 thread.Start();
@@ -82,9 +79,9 @@ namespace DataLoader.Tests
 
             var barrier = new Barrier(participants);
 
-            Action action = () =>
+            Action action = async () =>
             {
-                DataLoaderContext.Run(_ =>
+                await DataLoaderContext.Run(_ =>
                 {
                     barrier.SignalAndWait();
 
@@ -113,9 +110,9 @@ namespace DataLoader.Tests
             {
                 await DataLoaderContext.Run(ctx =>
                 {
-                    var loader = new TaskBasedDataLoader<int, int>(async ids =>
+                    var loader = new DataLoader<int, int>(async ids =>
                     {
-                        await Task.Delay(10);
+                        await Task.Delay(50);
                         count++;
                         return ids.SelectMany(x => new[]
                         {
@@ -128,7 +125,6 @@ namespace DataLoader.Tests
 
                     resolve = async x =>
                     {
-                        Debug.WriteLine($"x: {x}");
                         if (x >= (2 ^ limit)) return x;
                         var items = await loader.LoadAsync(x);
                         var tasks = items.Select(resolve);

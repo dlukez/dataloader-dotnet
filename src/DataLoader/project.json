@@ -1,22 +1,14 @@
-{
+﻿{
   "version": "1.0.0-*",
-  "dependencies": {
-    "GraphQL": "0.14.0.633"
-  },
+  "dependencies": {},
   "frameworks": {
     "netstandard1.3": {
-      "buildOptions": {
-        "define": [ "FEATURE_ASYNC_LOCAL" ] 
-      },
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "System.Diagnostics.TraceSource": "4.3.0",
         "System.Threading.Thread": "4.3.0"
-      },
-      "imports": [
-        "dnxcore50"
-      ]
+      }
     },
+    "net46": {},
     "net45": {}
   }
 }

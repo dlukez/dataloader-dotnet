@@ -8,7 +8,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B42AB90F-276B-478F-B04C-1DDD8DD1933D}</ProjectGuid>
     <ProjectTypeGuids>{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}</ProjectTypeGuids>
-    <RootNamespace>GraphQL.DataLoader.Tests</RootNamespace>
+    <RootNamespace>DataLoader.Core.Tests</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
   </PropertyGroup>
