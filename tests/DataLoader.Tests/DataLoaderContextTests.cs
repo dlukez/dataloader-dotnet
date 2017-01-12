@@ -107,7 +107,6 @@ namespace DataLoader.Tests
 
             var loader = new DataLoader<int, Node>(async ids =>
             {
-                Console.WriteLine($"Loader {loadCount}, ids = {ids.Count()}");
                 await Task.Delay(50);
                 loadCount++;
                 return ids.Select(x => new Node {Id = x}).ToLookup(x => x.Id);

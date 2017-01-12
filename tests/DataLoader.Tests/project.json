@@ -1,21 +1,26 @@
 {
-  "testRunner": "xunit",
   "buildOptions": {
     "debugType": "portable"
   },
   "dependencies": {
     "DataLoader": { "target": "project" },
-    "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.0"
-    },
     "Shouldly": "2.8.2",
-    "xunit": "2.1.0"
+    "xunit": "2.1.0",
+    "dotnet-test-xunit": "1.0.0-rc2-*"
   },
+  "testRunner": "xunit",
   "frameworks": {
     "netcoreapp1.0": {
-      "imports": ["dotnet"]
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.1"
+        }
+      },
+      "imports": [
+        "dotnet5.4",
+        "portable-net451+win8"
+      ]
     }
   }
 }
