@@ -1,5 +1,9 @@
 ﻿{
   "version": "0.1.0-*",
+
+  "name": "DataLoader",
+  "description": "A port of Facebook's DataLoader for .NET",
+
   "dependencies": {},
   "packOptions": {
     "authors": [
