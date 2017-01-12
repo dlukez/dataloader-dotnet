@@ -1,6 +1,18 @@
 ﻿{
-  "version": "1.0.0-*",
+  "version": "0.1.0-*",
   "dependencies": {},
+  "packOptions": {
+    "authors": [
+      "Daniel Zimmermann"
+    ],
+    "tags": [
+      "dataloader",
+      "batch",
+      "future"
+    ],
+    "projectUrl": "https://github.com/dlukez/dataloader-dotnet",
+    "licenseUrl": "https://github.com/dlukez/dataloader-dotnet/blob/master/LICENSE.md"
+  },
   "frameworks": {
     "netstandard1.3": {
       "dependencies": {

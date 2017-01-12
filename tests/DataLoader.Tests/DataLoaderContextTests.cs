@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using Microsoft.DotNet.ProjectModel;
 using Shouldly;
 using Xunit;
 
@@ -74,69 +76,52 @@ namespace DataLoader.Tests
         public void DataLoaderContext_Run_AllowsParallelContexts()
         {
             List<DataLoaderContext> contexts = new List<DataLoaderContext>();
-
             const int participants = 2;
-
             var barrier = new Barrier(participants);
-
             Action action = async () =>
             {
                 await DataLoaderContext.Run(_ =>
                 {
                     barrier.SignalAndWait();
-
-                    lock (contexts)
-                    {
-                        contexts.Add(DataLoaderContext.Current);
-                    }
-
+                    lock (contexts) contexts.Add(DataLoaderContext.Current);
                     return Task.FromResult(true);
                 });
             };
 
-            Parallel.For(0, participants, _ => action());
-
+            var result = Parallel.For(0, participants, _ => action());
+            result.IsCompleted.ShouldBeTrue();
             contexts.Count.ShouldBe(participants);
             contexts.ShouldBeUnique();
         }
 
-        [Fact]
-        public void DataLoaderContext_Flush_CanHandleMultipleLevelsOfNestedFetches()
+        private class Node
         {
-            var limit = 4;
-            var count = 1;
+            public int Id { get; set; }
+            public IEnumerable<Node> Children { get; set; }
+        }
 
-            Should.CompleteIn(async () =>
+        [Fact]
+        public async void DataLoaderContext_Run_PumpsContinuations()
+        {
+            var loadCount = 0;
+
+            var loader = new DataLoader<int, Node>(async ids =>
             {
-                await DataLoaderContext.Run(ctx =>
-                {
-                    var loader = new DataLoader<int, int>(async ids =>
-                    {
-                        await Task.Delay(50);
-                        count++;
-                        return ids.SelectMany(x => new[]
-                        {
-                            new KeyValuePair<int, int>(x, x * 2),
-                            new KeyValuePair<int, int>(x, x * 2 + 1)
-                        }).ToLookup(x => x.Key, x => x.Value);
-                    }, ctx);
+                Console.WriteLine($"Loader {loadCount}, ids = {ids.Count()}");
+                await Task.Delay(50);
+                loadCount++;
+                return ids.Select(x => new Node {Id = x}).ToLookup(x => x.Id);
+            });
 
-                    Func<int, Task<object>> resolve = null;
+            await DataLoaderContext.Run(async ctx =>
+            {
+                await loader.LoadAsync(1);
+                await loader.LoadAsync(2);
+                await loader.LoadAsync(3);
+                return await loader.LoadAsync(4);
+            });
 
-                    resolve = async x =>
-                    {
-                        if (x >= (2 ^ limit)) return x;
-                        var items = await loader.LoadAsync(x);
-                        var tasks = items.Select(resolve);
-                        var nested = await Task.WhenAll(tasks);
-                        return nested;
-                    };
-
-                    return resolve(1);
-                });
-            }, TimeSpan.FromSeconds(5));
-
-            count.ShouldBe(limit);
+            loadCount.ShouldBe(4);
         }
     }
 }

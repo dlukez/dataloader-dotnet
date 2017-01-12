@@ -11,7 +11,7 @@ namespace DataLoader
     /// Collects keys into a batch to fetch in one request.
     /// </summary>
     /// <remarks>
-    /// When a call is made to <see cref="LoadAsync"/>/<see cref="LoadManyAsync"/>, each key is stored and a
+    /// When a call is made to one of the <see cref="LoadAsync"/> methods, each key is stored and a
     /// promise task is handed back that represents the future result of the deferred request. The request
     /// is deferred (and keys are collected) until the loader is invoked via one of the following means:
     /// <list type="bullet">
@@ -93,7 +93,7 @@ namespace DataLoader
         /// <summary>
         /// Loads many items.
         /// </summary>
-        public async Task<IDictionary<TKey, IEnumerable<TReturn>>> LoadManyAsync(params TKey[] keys)
+        public async Task<IDictionary<TKey, IEnumerable<TReturn>>> LoadAsync(params TKey[] keys)
         {
             var tasks = keys.Select(async key =>
                 new KeyValuePair<TKey, IEnumerable<TReturn>>(

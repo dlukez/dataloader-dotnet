@@ -8,13 +8,10 @@ namespace DataLoader
     /// <summary>
     /// Defines a context for <see cref="DataLoader"/> instances.
     /// </summary>
-    public sealed class DataLoaderContext : IDisposable
+    public sealed class DataLoaderContext
     {
-        private readonly TaskCompletionSource<object> _trigger;
+        private TaskCompletionSource<object> _trigger;
         private Task _promiseChain;
-        // private CancellationTokenSource _disposalSignal = new CancellationTokenSource();
-        // private CancellationToken _cancellationToken;
-
         private int _nextCacheId = 1;
 
         /// <summary>
@@ -29,16 +26,14 @@ namespace DataLoader
         /// <summary>
         /// Stores loaders attached to this context.
         /// </summary>
-        private readonly ConcurrentDictionary<object, IDataLoader> Cache = new ConcurrentDictionary<object, IDataLoader>();
+        private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
 
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
         /// </summary>
         public IDataLoader<TKey, TValue> GetLoader<TKey, TValue>(object key, FetchDelegate<TKey, TValue> fetch)
         {
-            CheckDisposed();
-
-            return (IDataLoader<TKey, TValue>) Cache.GetOrAdd(key, _ =>
+            return (IDataLoader<TKey, TValue>) _cache.GetOrAdd(key, _ =>
                 new DataLoader<TKey, TValue>(fetch, this));
         }
 
@@ -47,10 +42,8 @@ namespace DataLoader
         /// </summary>
         internal void AddPending(IDataLoader loader)
         {
-            CheckDisposed();
-
-            if (!Cache.Values.Contains(loader))
-                Cache.TryAdd(_nextCacheId++, loader);
+            if (!_cache.Values.Contains(loader))
+                _cache.TryAdd(_nextCacheId++, loader);
 
             _promiseChain = ContinueWith(loader.ExecuteAsync);
         }
@@ -61,28 +54,16 @@ namespace DataLoader
         private async Task ContinueWith(Func<Task> func)
         {
             await _promiseChain.ConfigureAwait(false);
-            // _cancellationToken.ThrowIfCancellationRequested();
-            await func();
+            await func().ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Triggers pending loaders.
+        /// Starts firing pending loaders asynchronously.
         /// </summary>
         public void Start()
         {
-            if (_trigger.Task.IsCompleted) throw new InvalidOperationException();
             _trigger.SetResult(null);
         }
-
-        /// <summary>
-        /// Triggers pending loaders.
-        /// </summary>
-        // public void Start(CancellationToken token)
-        // {
-        //     if (_trigger.Task.IsCompleted) throw new InvalidOperationException();
-        //     _cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(_disposalSignal.Token, token).Token;
-        //     _trigger.SetResult(null);
-        // }
 
         #region Ambient context
 
@@ -96,7 +77,8 @@ namespace DataLoader
         private static readonly AsyncLocal<DataLoaderContext> _localContext = new AsyncLocal<DataLoaderContext>();
 
         /// <summary>
-        /// Represents ambient data local to a given load operation started using the static <see cref="Run"/> method.
+        /// Represents ambient data local to the current load operation.
+        /// <seealso cref="DataLoaderContext.Run{T}"/>
         /// </summary>
         public static DataLoaderContext Current => _localContext.Value;
 
@@ -104,14 +86,14 @@ namespace DataLoader
         /// Sets the <see cref="DataLoaderContext"/> visible from the <see cref="Current"/> Current property.
         /// </summary>
         /// <param name="context"></param>
-        private static void SetCurrentContext(DataLoaderContext context)
+        internal static void SetCurrentContext(DataLoaderContext context)
         {
             _localContext.Value = context;
         }
 
 #endif
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Runs code within a new loader context before firing any pending
@@ -132,31 +114,9 @@ namespace DataLoader
 
                 loadCtx.Start();
 
-                // TODO - Add a unit test verifying this.
-                // Need to await here to prevent the context from being reset prematurely.
                 return await task.ConfigureAwait(false);
             }
             finally { SetCurrentContext(prevCtx); }
         }
-
-        #region IDisposable
-
-        public bool IsDisposed { get; set; }
-
-        public void Dispose()
-        {
-            if (!IsDisposed)
-            {
-                IsDisposed = true;
-                // _disposalSignal.Cancel();
-            }
-        }
-
-        private void CheckDisposed()
-        {
-            if (IsDisposed) throw new ObjectDisposedException(GetType().Name);
-        }
-
-        #endregion
     }
 }
