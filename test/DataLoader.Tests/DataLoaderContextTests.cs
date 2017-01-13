@@ -46,8 +46,7 @@ namespace DataLoader.Tests
                 var threadId = Thread.CurrentThread.ManagedThreadId;
 
                 // Test with `await`.
-                await Task.Yield(); 
-                threadId.ShouldNotBe(Thread.CurrentThread.ManagedThreadId);
+                await Task.Yield();
                 DataLoaderContext.Current.ShouldBe(ctx);
 
                 // Test with `Task.Run`.
