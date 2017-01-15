@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace DataLoader
 {
-    public interface IDataLoader<TKey, TValue> : IDataLoader
+    public interface IDataLoader<TKey, TReturn> : IDataLoader
     {
-        Task<IEnumerable<TValue>> LoadAsync(TKey key);
+        Task<IEnumerable<TReturn>> LoadAsync(TKey key);
     }
 
     public interface IDataLoader

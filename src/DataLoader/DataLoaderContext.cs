@@ -31,10 +31,10 @@ namespace DataLoader
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
         /// </summary>
-        public IDataLoader<TKey, TValue> GetLoader<TKey, TValue>(object key, FetchDelegate<TKey, TValue> fetch)
+        public IDataLoader<TKey, TReturn> GetLoader<TKey, TReturn>(object key, FetchDelegate<TKey, TReturn> fetch)
         {
-            return (IDataLoader<TKey, TValue>) _cache.GetOrAdd(key, _ =>
-                new DataLoader<TKey, TValue>(fetch, this));
+            return (IDataLoader<TKey, TReturn>) _cache.GetOrAdd(key, _ =>
+                new DataLoader<TKey, TReturn>(fetch, this));
         }
 
         /// <summary>
@@ -65,12 +65,17 @@ namespace DataLoader
             _trigger.SetResult(null);
         }
 
+        /// <summary>
+        /// Indicates whether loaders in this context are being executed.
+        /// </summary>
+        public bool IsRunning => _trigger.Task.IsCompleted;
+
         #region Ambient context
 
 #if NET45
 
-        public static DataLoaderContext Current => null;
-        private static void SetCurrentContext(DataLoaderContext context) {}
+        internal static DataLoaderContext Current => null;
+        internal static void SetCurrentContext(DataLoaderContext context) {}
 
 #else
 
@@ -83,7 +88,7 @@ namespace DataLoader
         public static DataLoaderContext Current => _localContext.Value;
 
         /// <summary>
-        /// Sets the <see cref="DataLoaderContext"/> visible from the <see cref="Current"/> Current property.
+        /// Sets the <see cref="DataLoaderContext"/> visible from the <see cref="DataLoaderContext.Current"/> Current property.
         /// </summary>
         /// <param name="context"></param>
         internal static void SetCurrentContext(DataLoaderContext context)
@@ -99,24 +104,35 @@ namespace DataLoader
         /// Runs code within a new loader context before firing any pending
         /// <see cref="DataLoader{TKey,TReturn}"/> requests.
         /// </summary>
+        public static Task<T> Run<T>(Func<Task<T>> func)
+        {
+            if (func == null) throw new ArgumentNullException(nameof(func));
+
+            using (var scope = new DataLoaderScope())
+            {
+                var task = func();
+                if (task == null) throw new InvalidOperationException("No task provided");
+                return task;
+            }
+        }
+
+        /// <summary>
+        /// Runs code within a new loader context before firing any pending
+        /// <see cref="DataLoader{TKey,TReturn}"/> requests.
+        /// </summary>
         public static async Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
-            var prevCtx = DataLoaderContext.Current;
-            try
+            using (var scope = new DataLoaderScope())
             {
-                var loadCtx = new DataLoaderContext();
-                SetCurrentContext(loadCtx);
-
-                var task = func(loadCtx);
+                var task = func(scope.Context);
                 if (task == null) throw new InvalidOperationException("No task provided.");
-
-                loadCtx.Start();
-
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - before start");
+                scope.Context.Start();
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - after start");
                 return await task.ConfigureAwait(false);
             }
-            finally { SetCurrentContext(prevCtx); }
         }
     }
 }

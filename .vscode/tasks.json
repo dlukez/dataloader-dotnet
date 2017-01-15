@@ -8,13 +8,13 @@
     "tasks": [
         {
             "taskName": "build",
-            "args": [ "src/DataLoader", "tests/DataLoader.Tests" ],
+            "args": [ "src/DataLoader", "test/DataLoader.Tests" ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
         },
         {
             "taskName": "test",
-            "args": [ "tests/DataLoader.Tests" ],
+            "args": [ "test/DataLoader.Tests" ],
             "isTestCommand": true
         }
     ]
