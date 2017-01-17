@@ -26,21 +26,51 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public async void DataLoaderContext_Run_CanBeNested()
+        public async void DataLoaderContext_Run_CanBeNested_Explicit()
         {
-            await DataLoaderContext.Run(outerCtx =>
-                DataLoaderContext.Run(innerCtx =>
+            await DataLoaderContext.Run(async (outerCtx) =>
+            {
+                DataLoaderContext.Current.ShouldBe(outerCtx);
+                await DataLoaderContext.Run(innerCtx =>
                 {
                     innerCtx.ShouldNotBe(outerCtx);
                     DataLoaderContext.Current.ShouldNotBe(outerCtx);
+                    DataLoaderContext.Current.ShouldBe(innerCtx);
                     return Task.FromResult(1);
-                }));
+                });
+                DataLoaderContext.Current.ShouldBe(outerCtx);
+                return 2;
+            });
+            
+            DataLoaderContext.Current.ShouldBeNull();
+        }
+
+        [Fact]
+        public async void DataLoaderContext_Run_CanBeNested_Implicit()
+        {
+            await DataLoaderContext.Run(async () =>
+            {
+                var outerCtx = DataLoaderContext.Current;
+                outerCtx.ShouldNotBe(null);
+                await DataLoaderContext.Run(() =>
+                {
+                    var innerCtx = DataLoaderContext.Current;
+                    innerCtx.ShouldNotBeNull();
+                    DataLoaderContext.Current.ShouldNotBe(outerCtx);
+                    return Task.FromResult(1);
+                });
+                outerCtx.ShouldNotBeNull();
+                DataLoaderContext.Current.ShouldBe(outerCtx);
+                return 2;
+            });
+
+            DataLoaderContext.Current.ShouldBeNull();
         }
 
         [Fact]
         public async Task DataLoaderContext_Run_FlowsCurrentContext()
         {
-            await DataLoaderContext.Run(async _ =>
+            await DataLoaderContext.Run(async (_) =>
             {
                 var ctx = DataLoaderContext.Current;
                 var threadId = Thread.CurrentThread.ManagedThreadId;

@@ -128,9 +128,7 @@ namespace DataLoader
             {
                 var task = func(scope.Context);
                 if (task == null) throw new InvalidOperationException("No task provided.");
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - before start");
                 scope.Context.Start();
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - after start");
                 return await task.ConfigureAwait(false);
             }
         }
