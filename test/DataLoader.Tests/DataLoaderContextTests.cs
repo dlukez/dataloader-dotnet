@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -11,7 +12,7 @@ namespace DataLoader.Tests
     public class DataLoaderContextTests
     {
         [Fact]
-        public async void DataLoaderContext_Run_SetsCurrentContext()
+        public async Task DataLoaderContext_Run_SetsCurrentContext()
         {
             DataLoaderContext.Current.ShouldBeNull();
 
@@ -26,7 +27,7 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public async void DataLoaderContext_Run_CanBeNested_Explicit()
+        public async Task DataLoaderContext_Run_CanBeNested_Explicit()
         {
             await DataLoaderContext.Run(async (outerCtx) =>
             {
@@ -46,17 +47,17 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public async void DataLoaderContext_Run_CanBeNested_Implicit()
+        public async Task DataLoaderContext_Run_CanBeNested_Implicit()
         {
             await DataLoaderContext.Run(async () =>
             {
                 var outerCtx = DataLoaderContext.Current;
-                outerCtx.ShouldNotBe(null);
-                await DataLoaderContext.Run(() =>
+                outerCtx.ShouldNotBeNull();
+                await DataLoaderContext.Run(ctx =>
                 {
                     var innerCtx = DataLoaderContext.Current;
                     innerCtx.ShouldNotBeNull();
-                    DataLoaderContext.Current.ShouldNotBe(outerCtx);
+                    innerCtx.ShouldNotBe(outerCtx);
                     return Task.FromResult(1);
                 });
                 outerCtx.ShouldNotBeNull();
@@ -70,7 +71,7 @@ namespace DataLoader.Tests
         [Fact]
         public async Task DataLoaderContext_Run_FlowsCurrentContext()
         {
-            await DataLoaderContext.Run(async (_) =>
+            await DataLoaderContext.Run(async () =>
             {
                 var ctx = DataLoaderContext.Current;
                 var threadId = Thread.CurrentThread.ManagedThreadId;
@@ -102,7 +103,7 @@ namespace DataLoader.Tests
         [Fact]
         public void DataLoaderContext_Run_AllowsParallelContexts()
         {
-            List<DataLoaderContext> contexts = new List<DataLoaderContext>();
+            var contexts = new ConcurrentBag<DataLoaderContext>();
             const int participants = 2;
             var barrier = new Barrier(participants);
             Action action = async () =>
@@ -110,7 +111,7 @@ namespace DataLoader.Tests
                 await DataLoaderContext.Run(_ =>
                 {
                     barrier.SignalAndWait();
-                    lock (contexts) contexts.Add(DataLoaderContext.Current);
+                    contexts.Add(DataLoaderContext.Current);
                     return Task.FromResult(true);
                 });
             };
@@ -124,30 +125,75 @@ namespace DataLoader.Tests
         private class Node
         {
             public int Id { get; set; }
-            public IEnumerable<Node> Children { get; set; }
         }
 
         [Fact]
-        public async void DataLoaderContext_Run_PumpsContinuations()
+        public void DataLoaderContext_PumpsDependentLoads()
         {
+            var context = new DataLoaderContext();
+
             var loadCount = 0;
 
-            var loader = new DataLoader<int, Node>(async ids =>
+            var loader = new DataLoader<int, Node>(async (ids) =>
             {
                 await Task.Delay(50);
                 loadCount++;
                 return ids.Select(x => new Node {Id = x}).ToLookup(x => x.Id);
-            });
+            }, context);
 
-            await DataLoaderContext.Run(async ctx =>
+            var task = new Func<Task<int>>(async () =>
             {
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - 1");
                 await loader.LoadAsync(1);
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - 2");
                 await loader.LoadAsync(2);
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - 3");
                 await loader.LoadAsync(3);
-                return await loader.LoadAsync(4);
-            });
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - 4,5");
+                await Task.WhenAll(loader.LoadAsync(4), loader.LoadAsync(5));
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - ️✓");
+                return 0;
+            })();
 
+            context.StartLoading();
+            Should.CompleteIn(task, TimeSpan.FromSeconds(2));
             loadCount.ShouldBe(4);
+        }
+
+        [Fact]
+        public void DataLoaderContext_Completes()
+        {
+            Should.CompleteIn(async () =>
+            {
+                var ctx = new DataLoaderContext();
+                var loadCount = 0;
+
+                FetchDelegate<int, Node> fetch = async (ids) =>
+                {
+                    await Task.Delay(100);
+                    loadCount++;
+                    return ids.Select(x => new Node { Id = x }).ToLookup(x => x.Id);
+                };
+
+                var loader1 = new DataLoader<int, Node>(fetch, ctx);
+
+                var loader2 = new DataLoader<int, Node>(fetch, ctx);
+
+                var tasks = new[]
+                {
+                    loader1.LoadAsync(1),
+                    loader1.LoadAsync(2),
+                    loader2.LoadAsync(1),
+                    loader2.LoadAsync(2)
+                };
+
+                ctx.StartLoading();
+
+                await Task.WhenAll(tasks);
+                await ctx.Completion;
+
+                loadCount.ShouldBe(2);
+            }, TimeSpan.FromSeconds(2));
         }
     }
 }
