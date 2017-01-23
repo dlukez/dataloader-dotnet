@@ -23,12 +23,6 @@
             "suppressTaskName": true,
             "args": [ "build", "--no-incremental", "src/DataLoader" ],
             "problemMatcher": "$msCompile"
-        },
-        {
-            "taskName": "sample",
-            "suppressTaskName": true,
-            "args": [ "build", "samples/DataLoader.GraphQL.StarWars" ],
-            "problemMatcher": "$msCompile"
         }
     ]
 }

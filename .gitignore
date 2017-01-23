@@ -12,8 +12,6 @@ packages/
 [Oo]bj/
 
 # Project files
-.vs/
-.idea/
 project.lock.json
 _ReSharper*/
 *.[Rr]e[Ss]harper
