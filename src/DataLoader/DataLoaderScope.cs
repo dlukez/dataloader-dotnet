@@ -12,35 +12,34 @@ namespace DataLoader
     /// </remarks>
     public class DataLoaderScope : IDisposable
     {
-        private DataLoaderContext _thisCtx;
 #if !NET45
-        private DataLoaderContext _prevCtx;
+        private readonly DataLoaderContext _prevCtx;
 #endif
 
         /// <summary>
-        /// Creates a new scope with a new <see cref="DataLoaderContext"/>
+        /// Creates a new scope for a new <see cref="DataLoaderContext"/>
         /// </summary>
         public DataLoaderScope() : this(new DataLoaderContext())
         {
         }
 
         /// <summary>
-        /// Creates a new scope attached to the given <see cref="DataLoaderContext"/>.
+        /// Creates a new scope for the given <see cref="DataLoaderContext"/>.
         /// </summary>
         public DataLoaderScope(DataLoaderContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            _thisCtx = context;
+            Context = context;
 #if !NET45
             _prevCtx = DataLoaderContext.Current;
-            DataLoaderContext.SetCurrentContext(_thisCtx);
+            DataLoaderContext.SetCurrentContext(Context);
 #endif
         }
 
         /// <summary>
-        /// The context reflected by this scope. Contains data relevant to the current load operation.
+        /// The context contained in this scope. Contains data relevant to the current load operation.
         /// </summary>
-        public DataLoaderContext Context => _thisCtx;
+        public DataLoaderContext Context { get; }
 
         /// <summary>
         /// Marks the end of this scope and the point at which pending loaders will be fired.
@@ -48,11 +47,12 @@ namespace DataLoader
         public void Dispose()
         {
 #if !NET45
-            if (_thisCtx != DataLoaderContext.Current)
+            if (Context != DataLoaderContext.Current)
                 throw new InvalidOperationException("This context for this scope does not match the current context");
+            
             DataLoaderContext.SetCurrentContext(_prevCtx);
 #endif
-            if (!_thisCtx.IsRunning) _thisCtx.Start();
+            if (!Context.IsLoading) Context.StartLoading();
         }
     }
 }

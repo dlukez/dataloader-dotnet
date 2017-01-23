@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.1.1-*",
+  "version": "0.1.2-*",
 
   "name": "DataLoader",
   "description": "A port of Facebook's DataLoader for .NET",
@@ -17,7 +17,9 @@
     "licenseUrl": "https://github.com/dlukez/dataloader-dotnet/blob/master/LICENSE.md"
   },
 
-  "dependencies": {},
+  "dependencies": {
+    "Nito.AsyncEx.Coordination": "1.0.2"
+  },
 
   "frameworks": {
     "netstandard1.3": {
@@ -26,7 +28,6 @@
         "System.Threading.Thread": "4.3.0"
       }
     },
-    "net46": {},
-    "net45": {}
+    "net46": {}
   }
 }

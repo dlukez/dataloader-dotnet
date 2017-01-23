@@ -16,7 +16,7 @@ namespace DataLoader
     /// is deferred (and keys are collected) until the loader is invoked via one of the following means:
     /// <list type="bullet">
     /// <item>The user-supplied delegate for <see cref="DataLoaderContext.Run{T}"/> returned and a Load* method was called.</item>
-    /// <item><see cref="DataLoaderContext.Start">Start</see> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
+    /// <item><see cref="DataLoaderContext.StartLoading">StartLoading</see> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
     /// <item>The loader was invoked explicitly by calling <see cref="ExecuteAsync"/>.</item>
     /// </list>
     /// </remarks>
@@ -25,11 +25,11 @@ namespace DataLoader
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
         private readonly FetchDelegate<TKey, TReturn> _fetchDelegate;
 
-        private DataLoaderContext _boundContext;
-
         private readonly HashSet<TKey> _keys = new HashSet<TKey>();
-        private TaskCompletionSource<ILookup<TKey, TReturn>> _nextCompletion =
+        private TaskCompletionSource<ILookup<TKey, TReturn>> _completion =
             new TaskCompletionSource<ILookup<TKey, TReturn>>();
+
+        private DataLoaderContext _boundContext;
 
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/>.
@@ -60,7 +60,11 @@ namespace DataLoader
         /// <summary>
         /// Indicates the loader's current status.
         /// </summary>
-        public DataLoaderStatus Status => (_keys.Count == 0 ? DataLoaderStatus.Idle : (_lock.CurrentCount > 0 ? DataLoaderStatus.WaitingToExecute : DataLoaderStatus.Executing));
+        public DataLoaderStatus Status => _keys.Count == 0
+            ? DataLoaderStatus.Idle
+            : (_lock.CurrentCount > 0
+                ? DataLoaderStatus.WaitingToExecute
+                : DataLoaderStatus.Executing);
 
         /// <summary>
         /// Binds an instance to a particular loading context.
@@ -68,7 +72,7 @@ namespace DataLoader
         public void SetContext(DataLoaderContext context)
         {
             if (Status != DataLoaderStatus.Idle)
-                throw new InvalidOperationException("Cannot set context - loader must be idle");
+                throw new InvalidOperationException("Cannot set context - loader must be not be queued or executing");
 
             _boundContext = context;
         }
@@ -82,9 +86,9 @@ namespace DataLoader
             await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (_keys.Count == 0) Context?.AddPending(this);
+                if (_keys.Count == 0) Context?.AddPendingLoader(this);
                 _keys.Add(key);
-                task = _nextCompletion.Task;
+                task = _completion.Task;
             }
             finally { _lock.Release(); }
             return (await task.ConfigureAwait(false))[key];
@@ -100,7 +104,6 @@ namespace DataLoader
                     key, await LoadAsync(key).ConfigureAwait(false)));
 
             var results = await Task.WhenAll(tasks).ConfigureAwait(false);
-
             return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
@@ -113,8 +116,8 @@ namespace DataLoader
             try
             {
                 var lookup = await _fetchDelegate(_keys).ConfigureAwait(false);
-                _nextCompletion.SetResult(lookup);
-                _nextCompletion = new TaskCompletionSource<ILookup<TKey, TReturn>>();
+                _completion.SetResult(lookup);
+                _completion = new TaskCompletionSource<ILookup<TKey, TReturn>>();
                 _keys.Clear();
             }
             finally { _lock.Release(); }
