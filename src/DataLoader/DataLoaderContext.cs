@@ -11,9 +11,7 @@ namespace DataLoader
     /// </summary>
     public sealed class DataLoaderContext
     {
-        private int _nextCacheId = 1;
-        private PromiseChain _chain = new PromiseChain();
-        private AsyncAutoResetEvent _signal = new AsyncAutoResetEvent();
+        private readonly AsyncAutoResetEvent _signal = new AsyncAutoResetEvent();
         private readonly ConcurrentDictionary<object, IDataLoader> _cache =
             new ConcurrentDictionary<object, IDataLoader>();
 
@@ -21,8 +19,8 @@ namespace DataLoader
         /// Creates a new <see cref="DataLoaderContext"/>. 
         /// </summary>
         public DataLoaderContext()
-        {   
-        }        
+        {
+        }
 
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
@@ -34,40 +32,34 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Queues a loader to be executed.
-        /// </summary>
-        internal void AddPendingLoader(IDataLoader loader)
-        {
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Adding loader...");
-            
-            if (!_cache.Values.Contains(loader))
-                _cache.TryAdd(_nextCacheId++, loader);
-
-            _chain.Append(loader.ExecuteAsync);
-            // await _signal.WaitAsync().ConfigureAwait(false);
-            // await loader.ExecuteAsync();
-        }
-
-        /// <summary>
         /// Indicates whether loaders have been started.
         /// </summary>
-        public bool IsLoading => _chain.IsExecuting;
-
-        /// <summary>
-        /// Starts firing pending loaders to fulfil any previously handed out promises.
-        /// </summary>
-        public void StartLoading()
-        {
-            _chain.Trigger();
-            // _signal.Set();
-        }
+        public bool IsLoading => true;
 
         /// <summary>
         /// Represents whether this context has finished executing loaders.
         /// </summary>
-        public Task Completion => _chain.Completion;
+        public Task Completion => Task.CompletedTask;
 
-#region Ambient context
+        /// <summary>
+        /// Starts firing pending loaders.
+        /// </summary>
+        public void Execute()
+        {
+            _signal.Set();
+        }
+
+        /// <summary>
+        /// Queues a loader to be executed.
+        /// </summary>
+        internal void AddToQueue(IDataLoader loader)
+        {
+            _signal.WaitAsync().ContinueWith(_
+                => loader.ExecuteAsync().ContinueWith(__
+                    => _signal.Set()));
+        }
+
+        #region Ambient context
 
 #if NET45
 

@@ -128,7 +128,7 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public void DataLoaderContext_PumpsDependentLoads()
+        public void DataLoaderContext_TriggersConsecutiveLoads()
         {
             var context = new DataLoaderContext();
 
@@ -162,37 +162,34 @@ namespace DataLoader.Tests
         [Fact]
         public void DataLoaderContext_Completes()
         {
-            Should.CompleteIn(async () =>
+            var ctx = new DataLoaderContext();
+            var loadCount = 0;
+
+            FetchDelegate<int, Node> fetch = async (ids) =>
             {
-                var ctx = new DataLoaderContext();
-                var loadCount = 0;
+                await Task.Delay(100);
+                loadCount++;
+                return ids.Select(x => new Node { Id = x }).ToLookup(x => x.Id);
+            };
 
-                FetchDelegate<int, Node> fetch = async (ids) =>
-                {
-                    await Task.Delay(100);
-                    loadCount++;
-                    return ids.Select(x => new Node { Id = x }).ToLookup(x => x.Id);
-                };
+            var loader1 = new DataLoader<int, Node>(fetch, ctx);
 
-                var loader1 = new DataLoader<int, Node>(fetch, ctx);
+            var loader2 = new DataLoader<int, Node>(fetch, ctx);
 
-                var loader2 = new DataLoader<int, Node>(fetch, ctx);
+            var tasks = new[]
+            {
+                loader1.LoadAsync(1),
+                loader1.LoadAsync(2),
+                loader2.LoadAsync(1),
+                loader2.LoadAsync(2),
+                ctx.Completion
+            };
 
-                var tasks = new[]
-                {
-                    loader1.LoadAsync(1),
-                    loader1.LoadAsync(2),
-                    loader2.LoadAsync(1),
-                    loader2.LoadAsync(2)
-                };
+            ctx.Execute();
 
-                ctx.StartLoading();
+            Should.CompleteIn(Task.WhenAll(tasks), TimeSpan.FromSeconds(3));
 
-                await Task.WhenAll(tasks);
-                await ctx.Completion;
-
-                loadCount.ShouldBe(2);
-            }, TimeSpan.FromSeconds(2));
+            loadCount.ShouldBe(2);
         }
     }
 }

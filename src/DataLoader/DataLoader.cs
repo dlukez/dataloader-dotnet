@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Nito.AsyncEx;
 
 namespace DataLoader
 {
@@ -16,7 +18,7 @@ namespace DataLoader
     /// is deferred (and keys are collected) until the loader is invoked, which can occur in the following circumstances:
     /// <list type="bullet">
     /// <item>The delegate supplied to <see cref="DataLoaderContext.Run{T}"/> returned.</item>
-    /// <item><see cref="DataLoaderContext.StartLoading">StartLoading</see> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
+    /// <item><see cref="DataLoaderContext.Execute">StartLoading</see> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
     /// <item>The loader was invoked explicitly by calling <see cref="ExecuteAsync"/>.</item>
     /// </list>
     /// </remarks>
@@ -26,7 +28,7 @@ namespace DataLoader
         private readonly FetchDelegate<TKey, TReturn> _fetchDelegate;
 
         private HashSet<TKey> _keys = new HashSet<TKey>();
-        private TaskCompletionSource<ILookup<TKey, TReturn>> _completion =
+        private TaskCompletionSource<ILookup<TKey, TReturn>> _completionSource =
             new TaskCompletionSource<ILookup<TKey, TReturn>>();
 
         private DataLoaderContext _boundContext;
@@ -86,9 +88,9 @@ namespace DataLoader
             await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (_keys.Count == 0) Context?.AddPendingLoader(this);
+                if (_keys.Count == 0) Context?.AddToQueue(this);
                 _keys.Add(key);
-                task = _completion.Task;
+                task = _completionSource.Task;
             }
             finally { _lock.Release(); }
             return (await task.ConfigureAwait(false))[key];
@@ -108,24 +110,24 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Triggers the load and fulfils any handed out promises.
+        /// Triggers the fetch callback and fulfils any promises.
         /// </summary>
         public async Task ExecuteAsync()
         {
-            HashSet<TKey> keysToFetch;
-            TaskCompletionSource<ILookup<TKey, TReturn>> lastCompletion;
-
             await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
-                lastCompletion = Interlocked.Exchange(ref _completion, new TaskCompletionSource<ILookup<TKey, TReturn>>());
-                keysToFetch = Interlocked.Exchange(ref _keys, new HashSet<TKey>());
+                var lookup = await _fetchDelegate(_keys.ToList()).ConfigureAwait(false);
+                _completionSource.SetResult(lookup);
+                _completionSource = new TaskCompletionSource<ILookup<TKey, TReturn>>();
+                _keys.Clear();
             }
             finally { _lock.Release(); }
 
-            var lookup = await _fetchDelegate(keysToFetch).ConfigureAwait(false);
-            lastCompletion.SetResult(lookup);
-            await lastCompletion.Task.ConfigureAwait(false);
+            await _lock.WaitAsync().ConfigureAwait(false);
+            var task = _keys.Count > 0 ? Task.Run(ExecuteAsync) : null;
+            _lock.Release();
+            if (task != null) await task.ConfigureAwait(false);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace DataLoader
             
             DataLoaderContext.SetCurrentContext(_prevCtx);
 #endif
-            if (!Context.IsLoading) Context.StartLoading();
+            if (!Context.IsLoading) Context.Execute();
         }
     }
 }
