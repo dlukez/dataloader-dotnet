@@ -143,15 +143,15 @@ namespace DataLoader.Tests
 
             var task = new Func<Task<int>>(async () =>
             {
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - 1");
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Before 1");
                 await loader.LoadAsync(1);
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - 2");
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Before 2");
                 await loader.LoadAsync(2);
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - 3");
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Before 3");
                 await loader.LoadAsync(3);
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - 4,5");
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Before 4,5");
                 await Task.WhenAll(loader.LoadAsync(4), loader.LoadAsync(5));
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - ️✓");
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - ️✓ Done");
                 return 0;
             })();
 

@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Nito.AsyncEx;
 
 namespace DataLoader
 {
@@ -12,6 +13,7 @@ namespace DataLoader
     {
         private int _nextCacheId = 1;
         private PromiseChain _chain = new PromiseChain();
+        private AsyncAutoResetEvent _signal = new AsyncAutoResetEvent();
         private readonly ConcurrentDictionary<object, IDataLoader> _cache =
             new ConcurrentDictionary<object, IDataLoader>();
 
@@ -36,10 +38,14 @@ namespace DataLoader
         /// </summary>
         internal void AddPendingLoader(IDataLoader loader)
         {
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Adding loader...");
+            
             if (!_cache.Values.Contains(loader))
                 _cache.TryAdd(_nextCacheId++, loader);
 
             _chain.Append(loader.ExecuteAsync);
+            // await _signal.WaitAsync().ConfigureAwait(false);
+            // await loader.ExecuteAsync();
         }
 
         /// <summary>
@@ -53,6 +59,7 @@ namespace DataLoader
         public void StartLoading()
         {
             _chain.Trigger();
+            // _signal.Set();
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Nito.AsyncEx;
 
@@ -6,22 +7,23 @@ namespace DataLoader
 {
     internal class PromiseChain
     {
-        private readonly AsyncAutoResetEvent _next = new AsyncAutoResetEvent();
-        private readonly AsyncCountdownEvent _countdown = new AsyncCountdownEvent(0);
-        private readonly TaskCompletionSource<object> _completionSource = new TaskCompletionSource<object>();
+        private readonly TaskCompletionSource<object> _completion = new TaskCompletionSource<object>();
+        private readonly AsyncAutoResetEvent _signal = new AsyncAutoResetEvent();
         private int _pendingCount;
+        private Task _tail;
 
         /// <summary>
         /// Creates a new <see cref="PromiseChain"/>.
         /// </summary>
         public PromiseChain()
         {
+            _tail = _signal.WaitAsync();
         }
 
         /// <summary>
         /// Completes when execution has reached the end of the chain.
         /// </summary>
-        public Task Completion => _completionSource.Task;
+        public Task Completion => _completion.Task;
 
         /// <summary>
         /// Indicates whether this chain is currently being executed.
@@ -31,14 +33,16 @@ namespace DataLoader
         /// <summary>
         /// Begins executing the tasks in the chain.
         /// </summary>
-        public async void Trigger()
+        public void Trigger()
         {
-            Console.WriteLine($"Triggering chain (items: {_countdown.CurrentCount})");
-            _next.Set();
-            Console.WriteLine($"Chain triggered (remaining: {_countdown.CurrentCount})");
+            _tail = _tail.ContinueWith(async delegate
+            {
+                Console.WriteLine($"Pending count = {_pendingCount}");
+                if (_pendingCount == 0) _completion.SetResult(null);
+                else await _signal.WaitAsync().ConfigureAwait(false);
+            }).Unwrap();
 
-            await _next.WaitAsync().ConfigureAwait(false);
-            _completionSource.SetResult(null);
+            _signal.Set();
         }
 
         /// <summary>
@@ -52,20 +56,20 @@ namespace DataLoader
         /// <summary>
         /// Appends a callback to run after the last promise in the chain has been fulfilled.
         /// </summary>
-        public async void Append(Func<Task> func)
+        public void Append(Func<Task> func)
         {
-            Console.WriteLine($"Adding link to chain (total: {_countdown.CurrentCount+1})");
-            _countdown.AddCount();
-            
-            await _next.WaitAsync().ConfigureAwait(false);
-            Console.WriteLine($"Running delegate...");
+            _tail = ContinueWith(func);
+        }
+
+        /// <summary>
+        /// Returns a continuation that runs after the last task in the chain.
+        /// </summary>
+        private async Task ContinueWith(Func<Task> func)
+        {
+            Interlocked.Increment(ref _pendingCount);
+            await _tail.ConfigureAwait(false);
             await func().ConfigureAwait(false);
-
-            Console.WriteLine($"Triggering next item...");
-            _next.Set();
-
-            Console.WriteLine($"Signaling the countdown (total: {_countdown.CurrentCount-1})");
-            _countdown.Signal();
+            Interlocked.Decrement(ref _pendingCount);
         }
     }
 }

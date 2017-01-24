@@ -25,7 +25,7 @@ namespace DataLoader
         private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
         private readonly FetchDelegate<TKey, TReturn> _fetchDelegate;
 
-        private readonly HashSet<TKey> _keys = new HashSet<TKey>();
+        private HashSet<TKey> _keys = new HashSet<TKey>();
         private TaskCompletionSource<ILookup<TKey, TReturn>> _completion =
             new TaskCompletionSource<ILookup<TKey, TReturn>>();
 
@@ -112,15 +112,20 @@ namespace DataLoader
         /// </summary>
         public async Task ExecuteAsync()
         {
+            HashSet<TKey> keysToFetch;
+            TaskCompletionSource<ILookup<TKey, TReturn>> lastCompletion;
+
             await _lock.WaitAsync().ConfigureAwait(false);
             try
             {
-                var lookup = await _fetchDelegate(_keys).ConfigureAwait(false);
-                _completion.SetResult(lookup);
-                _completion = new TaskCompletionSource<ILookup<TKey, TReturn>>();
-                _keys.Clear();
+                lastCompletion = Interlocked.Exchange(ref _completion, new TaskCompletionSource<ILookup<TKey, TReturn>>());
+                keysToFetch = Interlocked.Exchange(ref _keys, new HashSet<TKey>());
             }
             finally { _lock.Release(); }
+
+            var lookup = await _fetchDelegate(keysToFetch).ConfigureAwait(false);
+            lastCompletion.SetResult(lookup);
+            await lastCompletion.Task.ConfigureAwait(false);
         }
     }
 }

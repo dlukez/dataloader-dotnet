@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -33,7 +34,6 @@ namespace DataLoader.Tests
         [Fact]
         public void DataLoader_CanSetExplicitContext()
         {
-
             var loader = new DataLoader<object, object>(_ => null);
             loader.Context.ShouldBeNull();
             
@@ -47,6 +47,33 @@ namespace DataLoader.Tests
 
             loader.SetContext(null);
             loader.Context.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task DataLoader_ConsecutiveLoadsWork()
+        {
+            var loader = new DataLoader<int, object>(async (ids) =>
+            {
+                await Task.Delay(150);
+                return ids.ToLookup(id => id, id => new object());
+            });
+
+            var awaits = 0;
+            var func = new Func<Task>(async () =>
+            {
+                awaits++;
+                var a = await loader.LoadAsync(1);
+                awaits++;
+                var b = await loader.LoadAsync(2);
+                awaits++;
+                var c = await loader.LoadAsync(3);
+            });
+
+            var task = func();
+            await loader.ExecuteAsync();
+            Console.WriteLine($"Total: {awaits}");
+            task.IsCompleted.ShouldBeTrue();
+            // Should.CompleteIn(task, TimeSpan.FromSeconds(3));
         }
     }
 }
