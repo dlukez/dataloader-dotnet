@@ -13,9 +13,9 @@ namespace DataLoader
     /// <remarks>
     /// When a call is made to one of the <see cref="LoadAsync"/> methods, each key is stored and a
     /// promise task is handed back that represents the future result of the deferred request. The request
-    /// is deferred (and keys are collected) until the loader is invoked via one of the following means:
+    /// is deferred (and keys are collected) until the loader is invoked, which can occur in the following circumstances:
     /// <list type="bullet">
-    /// <item>The user-supplied delegate for <see cref="DataLoaderContext.Run{T}"/> returned and a Load* method was called.</item>
+    /// <item>The delegate supplied to <see cref="DataLoaderContext.Run{T}"/> returned.</item>
     /// <item><see cref="DataLoaderContext.StartLoading">StartLoading</see> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
     /// <item>The loader was invoked explicitly by calling <see cref="ExecuteAsync"/>.</item>
     /// </list>

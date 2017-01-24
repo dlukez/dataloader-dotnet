@@ -141,7 +141,7 @@ namespace DataLoader.Tests
                 return ids.Select(x => new Node {Id = x}).ToLookup(x => x.Id);
             }, context);
 
-            var task = new Func<Task<int>>(async () =>
+            var task = DataLoaderContext.Run(async () =>
             {
                 Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Before 1");
                 await loader.LoadAsync(1);
@@ -153,9 +153,8 @@ namespace DataLoader.Tests
                 await Task.WhenAll(loader.LoadAsync(4), loader.LoadAsync(5));
                 Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - ️✓ Done");
                 return 0;
-            })();
+            });
 
-            context.StartLoading();
             Should.CompleteIn(task, TimeSpan.FromSeconds(2));
             loadCount.ShouldBe(4);
         }

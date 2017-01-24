@@ -106,7 +106,7 @@ namespace DataLoader
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
-            using (var scope = new DataLoaderScope())
+            using (new DataLoaderScope())
             {
                 var task = func();
                 if (task == null) throw new InvalidOperationException("No task provided");
