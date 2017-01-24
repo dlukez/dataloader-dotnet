@@ -12,6 +12,7 @@ packages/
 [Oo]bj/
 
 # Project files
+.vs/
 project.lock.json
 _ReSharper*/
 *.[Rr]e[Ss]harper
