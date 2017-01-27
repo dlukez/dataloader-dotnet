@@ -58,7 +58,6 @@ namespace DataLoader
         /// </summary>
         internal void AddToQueue(IDataLoader loader)
         {
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Queueing loader");
             _queue.Enqueue(loader);
         }
 
