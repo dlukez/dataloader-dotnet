@@ -1,7 +1,7 @@
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace GraphQL.DataLoader.StarWars.Schema
+namespace DataLoader.GraphQL.StarWars.Schema
 {
     public class StarWarsQuery : ObjectGraphType
     {

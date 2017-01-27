@@ -1,4 +1,4 @@
-﻿namespace GraphQL.DataLoader.StarWars.Schema
+﻿namespace DataLoader.GraphQL.StarWars.Schema
 {
     public class StarWarsSchema : global::GraphQL.Types.Schema
     {

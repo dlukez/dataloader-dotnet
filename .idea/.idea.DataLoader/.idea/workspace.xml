@@ -2,7 +2,41 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="621f5ad4-a0f4-47bc-a040-863608234fe9" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/DataLoader/PromiseChain.cs" afterPath="$PROJECT_DIR$/src/DataLoader/PromiseChain.cs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/DataLoader/DataLoaderContextThread.cs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/DataLoader/DataLoaderSynchronizationContext.cs" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/DataLoader.GraphQL/GraphQL.DataLoader.xproj" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoader.GraphQL.xproj" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.idea.DataLoader/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/.idea.DataLoader/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.idea.DataLoader/riderModule.iml" afterPath="$PROJECT_DIR$/.idea/.idea.DataLoader/riderModule.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.vscode/tasks.json" afterPath="$PROJECT_DIR$/.vscode/tasks.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/DataLoader.sln" afterPath="$PROJECT_DIR$/DataLoader.sln" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Controllers/GraphQLController.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Controllers/GraphQLController.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/GraphQLUserContext.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/GraphQLUserContext.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/20161125230846_Create.Designer.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/20161125230846_Create.Designer.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/20161125230846_Create.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/20161125230846_Create.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/20170105035954_Initial.Designer.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/20170105035954_Initial.Designer.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/20170105035954_Initial.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/20170105035954_Initial.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/StarWarsContextModelSnapshot.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Migrations/StarWarsContextModelSnapshot.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Program.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Program.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/CharacterInterface.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/CharacterInterface.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/DroidType.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/DroidType.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/EpisodeType.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/EpisodeType.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/HumanType.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/HumanType.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/StarWarsQuery.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/StarWarsQuery.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/StarWarsSchema.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Schema/StarWarsSchema.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/StarWarsContext.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/StarWarsContext.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Startup.cs" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/Startup.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/wwwroot/index.html" afterPath="$PROJECT_DIR$/samples/DataLoader.GraphQL.StarWars/wwwroot/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderListener.cs" afterPath="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderListener.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderResolver.cs" afterPath="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderResolver.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderResolverDelegate.cs" afterPath="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderResolverDelegate.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/DataLoader.GraphQL/GraphQLExtensions.cs" afterPath="$PROJECT_DIR$/src/DataLoader.GraphQL/GraphQLExtensions.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/DataLoader/DataLoader.cs" afterPath="$PROJECT_DIR$/src/DataLoader/DataLoader.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs" afterPath="$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/DataLoader/DataLoaderScope.cs" afterPath="$PROJECT_DIR$/src/DataLoader/DataLoaderScope.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/DataLoader/IDataLoader.cs" afterPath="$PROJECT_DIR$/src/DataLoader/IDataLoader.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs" afterPath="$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderTests.cs" afterPath="$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderTests.cs" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -14,44 +48,40 @@
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
-  <component name="ErrorTreeViewConfiguration">
-    <option name="hideWarnings" value="true" />
-    <option name="HIDE_WARNINGS" value="true" />
-  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="DataLoaderContext.cs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="53" column="9" lean-forward="false" selection-start-line="53" selection-start-column="9" selection-end-line="53" selection-end-column="9" />
+            <state relative-caret-position="272">
+              <caret line="49" column="9" lean-forward="false" selection-start-line="49" selection-start-column="9" selection-end-line="49" selection-end-column="9" />
               <folding>
-                <marker date="1485186525000" expanded="true" signature="6:104" ph="..." />
-                <marker date="1485186525000" expanded="true" signature="126:4089" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="133:231" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
-                <marker date="1485186525000" expanded="true" signature="273:4087" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="522:618" ph="/// Creates a new &lt;see cref=&quot;DataLoaderContext&quot;/&gt;.  ... " />
-                <marker date="1485186525000" expanded="true" signature="653:676" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="694:818" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
-                <marker date="1485186525000" expanded="true" signature="933:1088" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="1098:1178" ph="/// Queues a loader to be executed. ... " />
-                <marker date="1485186525000" expanded="true" signature="1237:1410" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="1420:1513" ph="/// Indicates whether loaders have been started. ... " />
-                <marker date="1485186525000" expanded="true" signature="1576:1700" ph="/// Starts firing pending loaders to fulfil any previously handed out promises. ... " />
-                <marker date="1485186525000" expanded="true" signature="1735:1785" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="1795:1907" ph="/// Represents whether this context has finished executing loaders. ... " />
-                <marker date="1485186525000" expanded="true" signature="1962:2882" ph="Ambient context" />
-                <marker date="1485186525000" expanded="true" signature="2266:2445" ph="/// Represents ambient data local to the current load operation. ... " />
-                <marker date="1485186525000" expanded="true" signature="2526:2726" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
-                <marker date="1485186525000" expanded="true" signature="2800:2862" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="2892:3081" ph="/// Runs code within a new loader context before firing any pending ... " />
-                <marker date="1485186525000" expanded="true" signature="3138:3473" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="3280:3463" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="3483:3656" ph="/// Runs code within a new loader context before firing any pending ... " />
-                <marker date="1485186525000" expanded="true" signature="3732:4081" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="4056:4071" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="4056:4081" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="6:170" ph="..." />
+                <marker date="1485482274000" expanded="true" signature="192:5736" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="199:297" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
+                <marker date="1485482274000" expanded="true" signature="339:5734" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="669:793" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
+                <marker date="1485482274000" expanded="true" signature="908:1063" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="1073:1166" ph="/// Indicates whether loaders have been started. ... " />
+                <marker date="1485482274000" expanded="true" signature="1228:1340" ph="/// Represents whether this context has finished executing loaders. ... " />
+                <marker date="1485482274000" expanded="true" signature="1408:1487" ph="/// Starts firing pending loaders. ... " />
+                <marker date="1485482274000" expanded="true" signature="1528:2065" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="2075:2155" ph="/// Queues a loader to be executed. ... " />
+                <marker date="1485482274000" expanded="true" signature="2208:2385" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="2387:3214" ph="/* internal void AddToQueue(IDataLoader loader) ... */" />
+                <marker date="1485482274000" expanded="true" signature="3224:3699" ph="/* Perform some action when the signal fires next. ... */" />
+                <marker date="1485482274000" expanded="true" signature="3224:3888" ph="/// Perform some action when the signal fires next. ... " />
+                <marker date="1485482274000" expanded="true" signature="4013:4192" ph="/// Represents ambient data local to the current load operation. ... " />
+                <marker date="1485482274000" expanded="true" signature="4273:4473" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
+                <marker date="1485482274000" expanded="true" signature="4547:4609" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="4639:4828" ph="/// Runs code within a new loader context before firing any pending ... " />
+                <marker date="1485482274000" expanded="true" signature="4932:4942" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="4932:5734" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="4952:5125" ph="/// Runs code within a new loader context before firing any pending ... " />
+                <marker date="1485482274000" expanded="true" signature="5201:5728" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="5683:5702" ph="{...}" />
+                <marker date="1485482274000" expanded="true" signature="5683:5728" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -60,30 +90,119 @@
       <file leaf-file-name="DataLoader.cs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoader.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="393">
-              <caret line="123" column="0" lean-forward="false" selection-start-line="123" selection-start-column="0" selection-end-line="123" selection-end-column="0" />
+            <state relative-caret-position="313">
+              <caret line="114" column="13" lean-forward="false" selection-start-line="114" selection-start-column="13" selection-end-line="114" selection-end-column="13" />
               <folding>
-                <marker date="1485186525000" expanded="true" signature="6:158" ph="..." />
-                <marker date="1485186525000" expanded="true" signature="187:818" ph="/// Collects keys into a batch to fetch in one request. ... " />
-                <marker date="1485186525000" expanded="true" signature="4698:4806" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="4698:4857" ph="{...}" />
-                <marker date="1485186525000" expanded="true" signature="4698:4863" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="6:204" ph="..." />
+                <marker date="1485485699000" expanded="true" signature="226:5765" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="233:1080" ph="/// Collects keys into a batch to fetch in one request. ... " />
+                <marker date="1485485699000" expanded="true" signature="1152:5763" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="1365:1467" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt;. ... " />
+                <marker date="1485485699000" expanded="true" signature="1529:1577" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="1587:1720" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt; bound to the specified context. ... " />
+                <marker date="1485485699000" expanded="true" signature="1823:1876" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="1886:2004" ph="/// Gets the bound context if set, otherwise the current ambient context. ... " />
+                <marker date="1485485699000" expanded="true" signature="2102:2195" ph="/// Gets the keys to retrieve in the next batch. ... " />
+                <marker date="1485485699000" expanded="true" signature="2263:2350" ph="/// Indicates the loader's current status. ... " />
+                <marker date="1485485699000" expanded="true" signature="2421:2520" ph="/// Binds an instance to a particular loading context. ... " />
+                <marker date="1485485699000" expanded="true" signature="2578:2804" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="2814:2877" ph="/// Loads an item. ... " />
+                <marker date="1485485699000" expanded="true" signature="2939:3469" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="3087:3338" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="3479:3545" ph="/// Loads many items. ... " />
+                <marker date="1485485699000" expanded="true" signature="3642:3995" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="4005:4107" ph="/// Triggers the fetch callback and fulfils any promises. ... " />
+                <marker date="1485485699000" expanded="true" signature="4148:4911" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="4550:4740" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="4949:5064" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="5154:5239" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="5249:5377" ph="/// Provides a new &lt;see cref=&quot;TaskCompletionSource{T}&quot;/&gt; paired with the given key. ... " />
+                <marker date="1485485699000" expanded="true" signature="5420:5757" ph="{...}" />
+                <marker date="1485485699000" expanded="true" signature="5607:5747" ph="{...}" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PromiseChain.cs" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/DataLoader/PromiseChain.cs">
+      <file leaf-file-name="DataLoaderListener.cs" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderListener.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="17" column="34" lean-forward="true" selection-start-line="17" selection-start-column="34" selection-end-line="17" selection-end-column="34" />
-              <folding />
+            <state relative-caret-position="258">
+              <caret line="18" column="9" lean-forward="true" selection-start-line="18" selection-start-column="9" selection-end-line="18" selection-end-column="9" />
+              <folding>
+                <marker date="1485486156000" expanded="true" signature="6:131" ph="..." />
+                <marker date="1485486156000" expanded="true" signature="161:1126" ph="{...}" />
+                <marker date="1485486156000" expanded="true" signature="239:1124" ph="{...}" />
+                <marker date="1485486156000" expanded="true" signature="493:650" ph="{...}" />
+                <marker date="1485486156000" expanded="true" signature="759:1118" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DataLoaderResolver.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderResolver.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="17" column="46" lean-forward="false" selection-start-line="17" selection-start-column="46" selection-end-line="17" selection-end-column="46" />
+              <folding>
+                <marker date="1485485983000" expanded="true" signature="6:147" ph="..." />
+                <marker date="1485485983000" expanded="true" signature="177:1965" ph="{...}" />
+                <marker date="1485485983000" expanded="true" signature="284:1963" ph="{...}" />
+                <marker date="1485485983000" expanded="true" signature="659:791" ph="{...}" />
+                <marker date="1485485983000" expanded="true" signature="903:1073" ph="{...}" />
+                <marker date="1485485983000" expanded="true" signature="1201:1405" ph="{...}" />
+                <marker date="1485485983000" expanded="true" signature="1485:1728" ph="{...}" />
+                <marker date="1485485983000" expanded="true" signature="1796:1853" ph="{...}" />
+                <marker date="1485485983000" expanded="true" signature="1895:1957" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DataLoaderContextTests.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2055">
+              <caret line="137" column="44" lean-forward="false" selection-start-line="137" selection-start-column="44" selection-end-line="137" selection-end-column="44" />
+              <folding>
+                <marker date="1485480037000" expanded="true" signature="6:188" ph="..." />
+                <marker date="1485480037000" expanded="true" signature="258:6813" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="348:716" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="460:649" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="794:1378" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="862:1299" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="994:1195" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="1464:2436" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="1526:2424" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="1873:2050" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="2138:2315" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="2519:3229" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="2706:3038" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="2765:3015" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="3310:5888" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="3415:3558" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="3603:5814" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="3673:5681" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="4709:4877" ph="/* Console.WriteLine($&quot;Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Delay...&quot;); ... */" />
+                <marker date="1485480037000" expanded="true" signature="5960:6807" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="6108:6274" ph="{...}" />
+                <marker date="1485480037000" expanded="true" signature="6447:6645" ph="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>Debug.WriteLine</find>
+      <find>ThreadId} -</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>ThreadId} task {Task.CurrentId} -</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -91,16 +210,28 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs" />
         <option value="$PROJECT_DIR$/.idea/.idea.DataLoader/riderModule.iml" />
-        <option value="$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs" />
         <option value="$PROJECT_DIR$/src/DataLoader/PromiseChain.cs" />
+        <option value="$PROJECT_DIR$/src/DataLoader/DataLoaderScope.cs" />
+        <option value="$PROJECT_DIR$/src/DataLoader/IDataLoader.cs" />
+        <option value="$PROJECT_DIR$/src/DataLoader/DataLoaderSynchronizationContext.cs" />
+        <option value="$PROJECT_DIR$/src/DataLoader/DataLoaderContextThread.cs" />
+        <option value="$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderTests.cs" />
+        <option value="$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs" />
+        <option value="$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs" />
+        <option value="$PROJECT_DIR$/src/DataLoader/DataLoader.cs" />
+        <option value="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoader.GraphQL.xproj" />
+        <option value="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderResolver.cs" />
+        <option value="$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderListener.cs" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="width" value="1440" />
     <option name="height" value="900" />
+  </component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectView">
     <navigator currentView="SolutionExplorer" proportions="" version="1">
@@ -139,21 +270,7 @@
               <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="DataLoader.GraphQL.StarWars" />
-              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" />
-              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DataLoader (3 projects)" />
-              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="DataLoader" />
+              <option name="myItemId" value="DataLoader.GraphQL" />
               <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
             </PATH_ELEMENT>
           </PATH>
@@ -164,7 +281,9 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
     <property name="FullScreen" value="true" />
+    <property name="SearchEverywhereHistoryKey" value="dataloadercontext&#9;FILE&#9;file:///Users/dan/Projects/dataloader-dotnet/src/DataLoader/DataLoaderContext.cs" />
   </component>
   <component name="RunManager" selected=".NET Project.Default">
     <configuration default="true" type="DotNetProject" factoryName=".NET Project">
@@ -219,28 +338,28 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Change Signature" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2532189" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Change Signature" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2639485" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Errors in solution" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3287841" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32893" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="UnitTesting" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32893" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3287841" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287841" sideWeight="0.50572246" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287841" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="UnitTesting" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287841" sideWeight="0.49427754" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287841" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="NuGet" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287841" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="NuGet" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287841" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3989432" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39826304" sideWeight="0.49713877" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -248,41 +367,225 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="7" />
+      <option name="time" value="16" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="720">
+          <caret line="48" column="26" lean-forward="false" selection-start-line="48" selection-start-column="26" selection-end-line="48" selection-end-column="26" />
+          <folding>
+            <marker date="1485482274000" expanded="true" signature="6:170" ph="..." />
+            <marker date="1485482274000" expanded="true" signature="192:5736" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="199:297" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
+            <marker date="1485482274000" expanded="true" signature="339:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="669:793" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
+            <marker date="1485482274000" expanded="true" signature="908:1063" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="1073:1166" ph="/// Indicates whether loaders have been started. ... " />
+            <marker date="1485482274000" expanded="true" signature="1228:1340" ph="/// Represents whether this context has finished executing loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1408:1487" ph="/// Starts firing pending loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1528:2065" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2075:2155" ph="/// Queues a loader to be executed. ... " />
+            <marker date="1485482274000" expanded="true" signature="2208:2385" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2387:3214" ph="/* internal void AddToQueue(IDataLoader loader) ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3699" ph="/* Perform some action when the signal fires next. ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3888" ph="/// Perform some action when the signal fires next. ... " />
+            <marker date="1485482274000" expanded="true" signature="4013:4192" ph="/// Represents ambient data local to the current load operation. ... " />
+            <marker date="1485482274000" expanded="true" signature="4273:4473" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
+            <marker date="1485482274000" expanded="true" signature="4547:4609" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4639:4828" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="4932:4942" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4932:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4952:5125" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="5201:5728" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5702" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5728" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderScope.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="810">
+          <caret line="54" column="27" lean-forward="false" selection-start-line="54" selection-start-column="27" selection-end-line="54" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2055">
+          <caret line="137" column="28" lean-forward="false" selection-start-line="137" selection-start-column="28" selection-end-line="137" selection-end-column="28" />
+          <folding>
+            <marker date="1485480037000" expanded="true" signature="6:188" ph="..." />
+            <marker date="1485480037000" expanded="true" signature="258:6813" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="348:716" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="460:649" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="794:1378" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="862:1299" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="994:1195" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1464:2436" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1526:2424" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1873:2050" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2138:2315" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2519:3229" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2706:3038" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2765:3015" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3310:5888" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3415:3558" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3603:5814" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3673:5681" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="4709:4877" ph="/* Console.WriteLine($&quot;Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Delay...&quot;); ... */" />
+            <marker date="1485480037000" expanded="true" signature="5960:6807" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6108:6274" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6447:6645" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="855">
+          <caret line="57" column="66" lean-forward="false" selection-start-line="57" selection-start-column="66" selection-end-line="57" selection-end-column="66" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoader.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1485485699000" expanded="true" signature="6:204" ph="..." />
+            <marker date="1485485699000" expanded="true" signature="226:5765" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="233:1080" ph="/// Collects keys into a batch to fetch in one request. ... " />
+            <marker date="1485485699000" expanded="true" signature="1152:5763" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1365:1467" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt;. ... " />
+            <marker date="1485485699000" expanded="true" signature="1529:1577" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1587:1720" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt; bound to the specified context. ... " />
+            <marker date="1485485699000" expanded="true" signature="1823:1876" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1886:2004" ph="/// Gets the bound context if set, otherwise the current ambient context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2102:2195" ph="/// Gets the keys to retrieve in the next batch. ... " />
+            <marker date="1485485699000" expanded="true" signature="2263:2350" ph="/// Indicates the loader's current status. ... " />
+            <marker date="1485485699000" expanded="true" signature="2421:2520" ph="/// Binds an instance to a particular loading context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2578:2804" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="2814:2877" ph="/// Loads an item. ... " />
+            <marker date="1485485699000" expanded="true" signature="2939:3469" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3087:3338" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3479:3545" ph="/// Loads many items. ... " />
+            <marker date="1485485699000" expanded="true" signature="3642:3995" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4005:4107" ph="/// Triggers the fetch callback and fulfils any promises. ... " />
+            <marker date="1485485699000" expanded="true" signature="4148:4911" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4550:4740" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4949:5064" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5154:5239" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5249:5377" ph="/// Provides a new &lt;see cref=&quot;TaskCompletionSource{T}&quot;/&gt; paired with the given key. ... " />
+            <marker date="1485485699000" expanded="true" signature="5420:5757" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5607:5747" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="795">
+          <caret line="53" column="9" lean-forward="false" selection-start-line="53" selection-start-column="9" selection-end-line="53" selection-end-column="9" />
+          <folding>
+            <marker date="1485482274000" expanded="true" signature="6:170" ph="..." />
+            <marker date="1485482274000" expanded="true" signature="192:5736" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="199:297" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
+            <marker date="1485482274000" expanded="true" signature="339:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="669:793" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
+            <marker date="1485482274000" expanded="true" signature="908:1063" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="1073:1166" ph="/// Indicates whether loaders have been started. ... " />
+            <marker date="1485482274000" expanded="true" signature="1228:1340" ph="/// Represents whether this context has finished executing loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1408:1487" ph="/// Starts firing pending loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1528:2065" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2075:2155" ph="/// Queues a loader to be executed. ... " />
+            <marker date="1485482274000" expanded="true" signature="2208:2385" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2387:3214" ph="/* internal void AddToQueue(IDataLoader loader) ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3699" ph="/* Perform some action when the signal fires next. ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3888" ph="/// Perform some action when the signal fires next. ... " />
+            <marker date="1485482274000" expanded="true" signature="4013:4192" ph="/// Represents ambient data local to the current load operation. ... " />
+            <marker date="1485482274000" expanded="true" signature="4273:4473" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
+            <marker date="1485482274000" expanded="true" signature="4547:4609" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4639:4828" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="4932:4942" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4932:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4952:5125" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="5201:5728" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5702" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5728" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/PromiseChain.cs" />
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoader.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1845">
+          <caret line="123" column="0" lean-forward="false" selection-start-line="123" selection-start-column="0" selection-end-line="123" selection-end-column="0" />
+          <folding>
+            <marker date="1485485699000" expanded="true" signature="6:204" ph="..." />
+            <marker date="1485485699000" expanded="true" signature="226:5765" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="233:1080" ph="/// Collects keys into a batch to fetch in one request. ... " />
+            <marker date="1485485699000" expanded="true" signature="1152:5763" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1365:1467" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt;. ... " />
+            <marker date="1485485699000" expanded="true" signature="1529:1577" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1587:1720" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt; bound to the specified context. ... " />
+            <marker date="1485485699000" expanded="true" signature="1823:1876" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1886:2004" ph="/// Gets the bound context if set, otherwise the current ambient context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2102:2195" ph="/// Gets the keys to retrieve in the next batch. ... " />
+            <marker date="1485485699000" expanded="true" signature="2263:2350" ph="/// Indicates the loader's current status. ... " />
+            <marker date="1485485699000" expanded="true" signature="2421:2520" ph="/// Binds an instance to a particular loading context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2578:2804" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="2814:2877" ph="/// Loads an item. ... " />
+            <marker date="1485485699000" expanded="true" signature="2939:3469" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3087:3338" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3479:3545" ph="/// Loads many items. ... " />
+            <marker date="1485485699000" expanded="true" signature="3642:3995" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4005:4107" ph="/// Triggers the fetch callback and fulfils any promises. ... " />
+            <marker date="1485485699000" expanded="true" signature="4148:4911" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4550:4740" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4949:5064" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5154:5239" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5249:5377" ph="/// Provides a new &lt;see cref=&quot;TaskCompletionSource{T}&quot;/&gt; paired with the given key. ... " />
+            <marker date="1485485699000" expanded="true" signature="5420:5757" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5607:5747" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
           <caret line="40" column="0" lean-forward="false" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
           <folding>
-            <marker date="1485186525000" expanded="true" signature="6:104" ph="..." />
-            <marker date="1485186525000" expanded="true" signature="126:4089" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="133:231" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
-            <marker date="1485186525000" expanded="true" signature="273:4087" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="522:618" ph="/// Creates a new &lt;see cref=&quot;DataLoaderContext&quot;/&gt;.  ... " />
-            <marker date="1485186525000" expanded="true" signature="653:676" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="694:818" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
-            <marker date="1485186525000" expanded="true" signature="933:1088" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1098:1178" ph="/// Queues a loader to be executed. ... " />
-            <marker date="1485186525000" expanded="true" signature="1237:1410" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1420:1513" ph="/// Indicates whether loaders have been started. ... " />
-            <marker date="1485186525000" expanded="true" signature="1576:1700" ph="/// Starts firing pending loaders to fulfil any previously handed out promises. ... " />
-            <marker date="1485186525000" expanded="true" signature="1735:1785" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1795:1907" ph="/// Represents whether this context has finished executing loaders. ... " />
-            <marker date="1485186525000" expanded="true" signature="1962:2882" ph="Ambient context" />
-            <marker date="1485186525000" expanded="true" signature="2266:2445" ph="/// Represents ambient data local to the current load operation. ... " />
-            <marker date="1485186525000" expanded="true" signature="2526:2726" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
-            <marker date="1485186525000" expanded="true" signature="2800:2862" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2892:3081" ph="/// Runs code within a new loader context before firing any pending ... " />
-            <marker date="1485186525000" expanded="true" signature="3138:3473" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3280:3463" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3483:3656" ph="/// Runs code within a new loader context before firing any pending ... " />
-            <marker date="1485186525000" expanded="true" signature="3732:4081" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4056:4071" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4056:4081" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="6:170" ph="..." />
+            <marker date="1485482274000" expanded="true" signature="192:5736" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="199:297" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
+            <marker date="1485482274000" expanded="true" signature="339:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="669:793" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
+            <marker date="1485482274000" expanded="true" signature="908:1063" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="1073:1166" ph="/// Indicates whether loaders have been started. ... " />
+            <marker date="1485482274000" expanded="true" signature="1228:1340" ph="/// Represents whether this context has finished executing loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1408:1487" ph="/// Starts firing pending loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1528:2065" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2075:2155" ph="/// Queues a loader to be executed. ... " />
+            <marker date="1485482274000" expanded="true" signature="2208:2385" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2387:3214" ph="/* internal void AddToQueue(IDataLoader loader) ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3699" ph="/* Perform some action when the signal fires next. ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3888" ph="/// Perform some action when the signal fires next. ... " />
+            <marker date="1485482274000" expanded="true" signature="4013:4192" ph="/// Represents ambient data local to the current load operation. ... " />
+            <marker date="1485482274000" expanded="true" signature="4273:4473" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
+            <marker date="1485482274000" expanded="true" signature="4547:4609" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4639:4828" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="4932:4942" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4932:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4952:5125" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="5201:5728" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5702" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5728" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -292,30 +595,28 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1485186525000" expanded="true" signature="6:186" ph="..." />
-            <marker date="1485186525000" expanded="true" signature="256:6572" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="346:714" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="458:647" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="801:1456" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="871:1377" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1003:1273" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1543:2232" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1605:2165" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1772:2017" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2318:3290" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2380:3278" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2727:2904" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2992:3169" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3373:4074" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3583:3854" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3646:3838" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4102:4162" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4238:5496" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="5308:5348" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="5562:6566" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="5614:6529" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="5779:5976" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="6169:6355" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6:188" ph="..." />
+            <marker date="1485480037000" expanded="true" signature="258:6813" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="348:716" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="460:649" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="794:1378" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="862:1299" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="994:1195" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1464:2436" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1526:2424" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1873:2050" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2138:2315" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2519:3229" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2706:3038" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2765:3015" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3310:5888" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3415:3558" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3603:5814" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3673:5681" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="4709:4877" ph="/* Console.WriteLine($&quot;Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Delay...&quot;); ... */" />
+            <marker date="1485480037000" expanded="true" signature="5960:6807" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6108:6274" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6447:6645" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -325,11 +626,32 @@
         <state relative-caret-position="1800">
           <caret line="120" column="0" lean-forward="false" selection-start-line="120" selection-start-column="0" selection-end-line="120" selection-end-column="0" />
           <folding>
-            <marker date="1485186525000" expanded="true" signature="6:158" ph="..." />
-            <marker date="1485186525000" expanded="true" signature="187:818" ph="/// Collects keys into a batch to fetch in one request. ... " />
-            <marker date="1485186525000" expanded="true" signature="4698:4806" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4698:4857" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4698:4863" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="6:204" ph="..." />
+            <marker date="1485485699000" expanded="true" signature="226:5765" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="233:1080" ph="/// Collects keys into a batch to fetch in one request. ... " />
+            <marker date="1485485699000" expanded="true" signature="1152:5763" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1365:1467" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt;. ... " />
+            <marker date="1485485699000" expanded="true" signature="1529:1577" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1587:1720" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt; bound to the specified context. ... " />
+            <marker date="1485485699000" expanded="true" signature="1823:1876" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1886:2004" ph="/// Gets the bound context if set, otherwise the current ambient context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2102:2195" ph="/// Gets the keys to retrieve in the next batch. ... " />
+            <marker date="1485485699000" expanded="true" signature="2263:2350" ph="/// Indicates the loader's current status. ... " />
+            <marker date="1485485699000" expanded="true" signature="2421:2520" ph="/// Binds an instance to a particular loading context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2578:2804" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="2814:2877" ph="/// Loads an item. ... " />
+            <marker date="1485485699000" expanded="true" signature="2939:3469" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3087:3338" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3479:3545" ph="/// Loads many items. ... " />
+            <marker date="1485485699000" expanded="true" signature="3642:3995" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4005:4107" ph="/// Triggers the fetch callback and fulfils any promises. ... " />
+            <marker date="1485485699000" expanded="true" signature="4148:4911" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4550:4740" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4949:5064" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5154:5239" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5249:5377" ph="/// Provides a new &lt;see cref=&quot;TaskCompletionSource{T}&quot;/&gt; paired with the given key. ... " />
+            <marker date="1485485699000" expanded="true" signature="5420:5757" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5607:5747" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -341,92 +663,659 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs">
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/PromiseChain.cs" />
+    <entry file="file://$USER_HOME$/.local/share/JetBrains/Shared/v08/DecompilerCache/decompiler/7CB17ADC-0AB1-454D-9BC7-41833F50EB29/57/31e86a35/Task`1.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="122" column="44" lean-forward="false" selection-start-line="122" selection-start-column="44" selection-end-line="122" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderScope.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/IDataLoader.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
-          <caret line="20" column="39" lean-forward="false" selection-start-line="20" selection-start-column="39" selection-end-line="20" selection-end-column="39" />
+          <caret line="12" column="40" lean-forward="false" selection-start-line="12" selection-start-column="40" selection-end-line="12" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderSynchronizationContext.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="86" lean-forward="false" selection-start-line="10" selection-start-column="86" selection-end-line="10" selection-end-column="86" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContextThread.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="262">
+          <caret line="45" column="0" lean-forward="true" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="49" column="9" lean-forward="false" selection-start-line="49" selection-start-column="9" selection-end-line="49" selection-end-column="9" />
           <folding>
-            <marker date="1485186525000" expanded="true" signature="6:186" ph="..." />
-            <marker date="1485186525000" expanded="true" signature="256:6572" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="346:714" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="458:647" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="801:1456" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="871:1377" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1003:1273" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1543:2232" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1605:2165" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1772:2017" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2318:3290" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2380:3278" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2727:2904" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2992:3169" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3373:4074" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3583:3854" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3646:3838" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4102:4162" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4238:5496" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="5308:5348" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="5562:6566" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="5614:6529" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="5779:5976" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="6169:6355" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="6:170" ph="..." />
+            <marker date="1485482274000" expanded="true" signature="192:5736" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="199:297" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
+            <marker date="1485482274000" expanded="true" signature="339:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="669:793" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
+            <marker date="1485482274000" expanded="true" signature="908:1063" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="1073:1166" ph="/// Indicates whether loaders have been started. ... " />
+            <marker date="1485482274000" expanded="true" signature="1228:1340" ph="/// Represents whether this context has finished executing loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1408:1487" ph="/// Starts firing pending loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1528:2065" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2075:2155" ph="/// Queues a loader to be executed. ... " />
+            <marker date="1485482274000" expanded="true" signature="2208:2385" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2387:3214" ph="/* internal void AddToQueue(IDataLoader loader) ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3699" ph="/* Perform some action when the signal fires next. ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3888" ph="/// Perform some action when the signal fires next. ... " />
+            <marker date="1485482274000" expanded="true" signature="4013:4192" ph="/// Represents ambient data local to the current load operation. ... " />
+            <marker date="1485482274000" expanded="true" signature="4273:4473" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
+            <marker date="1485482274000" expanded="true" signature="4547:4609" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4639:4828" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="4932:4942" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4932:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4952:5125" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="5201:5728" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5702" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5728" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2055">
+          <caret line="137" column="44" lean-forward="false" selection-start-line="137" selection-start-column="44" selection-end-line="137" selection-end-column="44" />
+          <folding>
+            <marker date="1485480037000" expanded="true" signature="6:188" ph="..." />
+            <marker date="1485480037000" expanded="true" signature="258:6813" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="348:716" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="460:649" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="794:1378" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="862:1299" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="994:1195" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1464:2436" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1526:2424" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1873:2050" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2138:2315" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2519:3229" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2706:3038" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2765:3015" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3310:5888" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3415:3558" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3603:5814" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3673:5681" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="4709:4877" ph="/* Console.WriteLine($&quot;Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Delay...&quot;); ... */" />
+            <marker date="1485480037000" expanded="true" signature="5960:6807" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6108:6274" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6447:6645" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader.GraphQL/GraphQL.DataLoader.xproj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="37" lean-forward="false" selection-start-line="9" selection-start-column="37" selection-end-line="9" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoader.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="114" column="13" lean-forward="false" selection-start-line="114" selection-start-column="13" selection-end-line="114" selection-end-column="13" />
+          <folding>
+            <marker date="1485485699000" expanded="true" signature="6:204" ph="..." />
+            <marker date="1485485699000" expanded="true" signature="226:5765" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="233:1080" ph="/// Collects keys into a batch to fetch in one request. ... " />
+            <marker date="1485485699000" expanded="true" signature="1152:5763" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1365:1467" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt;. ... " />
+            <marker date="1485485699000" expanded="true" signature="1529:1577" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1587:1720" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt; bound to the specified context. ... " />
+            <marker date="1485485699000" expanded="true" signature="1823:1876" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1886:2004" ph="/// Gets the bound context if set, otherwise the current ambient context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2102:2195" ph="/// Gets the keys to retrieve in the next batch. ... " />
+            <marker date="1485485699000" expanded="true" signature="2263:2350" ph="/// Indicates the loader's current status. ... " />
+            <marker date="1485485699000" expanded="true" signature="2421:2520" ph="/// Binds an instance to a particular loading context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2578:2804" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="2814:2877" ph="/// Loads an item. ... " />
+            <marker date="1485485699000" expanded="true" signature="2939:3469" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3087:3338" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3479:3545" ph="/// Loads many items. ... " />
+            <marker date="1485485699000" expanded="true" signature="3642:3995" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4005:4107" ph="/// Triggers the fetch callback and fulfils any promises. ... " />
+            <marker date="1485485699000" expanded="true" signature="4148:4911" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4550:4740" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4949:5064" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5154:5239" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5249:5377" ph="/// Provides a new &lt;see cref=&quot;TaskCompletionSource{T}&quot;/&gt; paired with the given key. ... " />
+            <marker date="1485485699000" expanded="true" signature="5420:5757" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5607:5747" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderResolver.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="46" lean-forward="false" selection-start-line="17" selection-start-column="46" selection-end-line="17" selection-end-column="46" />
+          <folding>
+            <marker date="1485485983000" expanded="true" signature="6:147" ph="..." />
+            <marker date="1485485983000" expanded="true" signature="177:1965" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="284:1963" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="659:791" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="903:1073" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="1201:1405" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="1485:1728" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="1796:1853" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="1895:1957" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderListener.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="348">
+          <caret line="24" column="133" lean-forward="false" selection-start-line="24" selection-start-column="133" selection-end-line="24" selection-end-column="133" />
+          <folding>
+            <marker date="1485486156000" expanded="true" signature="6:131" ph="..." />
+            <marker date="1485486156000" expanded="true" signature="161:1126" ph="{...}" />
+            <marker date="1485486156000" expanded="true" signature="239:1124" ph="{...}" />
+            <marker date="1485486156000" expanded="true" signature="493:650" ph="{...}" />
+            <marker date="1485486156000" expanded="true" signature="759:1118" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
+        <state relative-caret-position="720">
+          <caret line="48" column="26" lean-forward="false" selection-start-line="48" selection-start-column="26" selection-end-line="48" selection-end-column="26" />
+          <folding>
+            <marker date="1485482274000" expanded="true" signature="6:170" ph="..." />
+            <marker date="1485482274000" expanded="true" signature="192:5736" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="199:297" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
+            <marker date="1485482274000" expanded="true" signature="339:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="669:793" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
+            <marker date="1485482274000" expanded="true" signature="908:1063" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="1073:1166" ph="/// Indicates whether loaders have been started. ... " />
+            <marker date="1485482274000" expanded="true" signature="1228:1340" ph="/// Represents whether this context has finished executing loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1408:1487" ph="/// Starts firing pending loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1528:2065" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2075:2155" ph="/// Queues a loader to be executed. ... " />
+            <marker date="1485482274000" expanded="true" signature="2208:2385" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2387:3214" ph="/* internal void AddToQueue(IDataLoader loader) ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3699" ph="/* Perform some action when the signal fires next. ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3888" ph="/// Perform some action when the signal fires next. ... " />
+            <marker date="1485482274000" expanded="true" signature="4013:4192" ph="/// Represents ambient data local to the current load operation. ... " />
+            <marker date="1485482274000" expanded="true" signature="4273:4473" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
+            <marker date="1485482274000" expanded="true" signature="4547:4609" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4639:4828" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="4932:4942" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4932:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4952:5125" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="5201:5728" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5702" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5728" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderScope.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="810">
+          <caret line="54" column="27" lean-forward="false" selection-start-line="54" selection-start-column="27" selection-end-line="54" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2055">
+          <caret line="137" column="28" lean-forward="false" selection-start-line="137" selection-start-column="28" selection-end-line="137" selection-end-column="28" />
+          <folding>
+            <marker date="1485480037000" expanded="true" signature="6:188" ph="..." />
+            <marker date="1485480037000" expanded="true" signature="258:6813" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="348:716" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="460:649" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="794:1378" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="862:1299" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="994:1195" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1464:2436" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1526:2424" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1873:2050" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2138:2315" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2519:3229" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2706:3038" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2765:3015" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3310:5888" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3415:3558" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3603:5814" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3673:5681" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="4709:4877" ph="/* Console.WriteLine($&quot;Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Delay...&quot;); ... */" />
+            <marker date="1485480037000" expanded="true" signature="5960:6807" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6108:6274" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6447:6645" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="855">
+          <caret line="57" column="66" lean-forward="false" selection-start-line="57" selection-start-column="66" selection-end-line="57" selection-end-column="66" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoader.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1485485699000" expanded="true" signature="6:204" ph="..." />
+            <marker date="1485485699000" expanded="true" signature="226:5765" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="233:1080" ph="/// Collects keys into a batch to fetch in one request. ... " />
+            <marker date="1485485699000" expanded="true" signature="1152:5763" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1365:1467" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt;. ... " />
+            <marker date="1485485699000" expanded="true" signature="1529:1577" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1587:1720" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt; bound to the specified context. ... " />
+            <marker date="1485485699000" expanded="true" signature="1823:1876" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1886:2004" ph="/// Gets the bound context if set, otherwise the current ambient context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2102:2195" ph="/// Gets the keys to retrieve in the next batch. ... " />
+            <marker date="1485485699000" expanded="true" signature="2263:2350" ph="/// Indicates the loader's current status. ... " />
+            <marker date="1485485699000" expanded="true" signature="2421:2520" ph="/// Binds an instance to a particular loading context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2578:2804" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="2814:2877" ph="/// Loads an item. ... " />
+            <marker date="1485485699000" expanded="true" signature="2939:3469" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3087:3338" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3479:3545" ph="/// Loads many items. ... " />
+            <marker date="1485485699000" expanded="true" signature="3642:3995" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4005:4107" ph="/// Triggers the fetch callback and fulfils any promises. ... " />
+            <marker date="1485485699000" expanded="true" signature="4148:4911" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4550:4740" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4949:5064" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5154:5239" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5249:5377" ph="/// Provides a new &lt;see cref=&quot;TaskCompletionSource{T}&quot;/&gt; paired with the given key. ... " />
+            <marker date="1485485699000" expanded="true" signature="5420:5757" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5607:5747" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="795">
           <caret line="53" column="9" lean-forward="false" selection-start-line="53" selection-start-column="9" selection-end-line="53" selection-end-column="9" />
           <folding>
-            <marker date="1485186525000" expanded="true" signature="6:104" ph="..." />
-            <marker date="1485186525000" expanded="true" signature="126:4089" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="133:231" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
-            <marker date="1485186525000" expanded="true" signature="273:4087" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="522:618" ph="/// Creates a new &lt;see cref=&quot;DataLoaderContext&quot;/&gt;.  ... " />
-            <marker date="1485186525000" expanded="true" signature="653:676" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="694:818" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
-            <marker date="1485186525000" expanded="true" signature="933:1088" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1098:1178" ph="/// Queues a loader to be executed. ... " />
-            <marker date="1485186525000" expanded="true" signature="1237:1410" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1420:1513" ph="/// Indicates whether loaders have been started. ... " />
-            <marker date="1485186525000" expanded="true" signature="1576:1700" ph="/// Starts firing pending loaders to fulfil any previously handed out promises. ... " />
-            <marker date="1485186525000" expanded="true" signature="1735:1785" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="1795:1907" ph="/// Represents whether this context has finished executing loaders. ... " />
-            <marker date="1485186525000" expanded="true" signature="1962:2882" ph="Ambient context" />
-            <marker date="1485186525000" expanded="true" signature="2266:2445" ph="/// Represents ambient data local to the current load operation. ... " />
-            <marker date="1485186525000" expanded="true" signature="2526:2726" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
-            <marker date="1485186525000" expanded="true" signature="2800:2862" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="2892:3081" ph="/// Runs code within a new loader context before firing any pending ... " />
-            <marker date="1485186525000" expanded="true" signature="3138:3473" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3280:3463" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="3483:3656" ph="/// Runs code within a new loader context before firing any pending ... " />
-            <marker date="1485186525000" expanded="true" signature="3732:4081" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4056:4071" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4056:4081" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="6:170" ph="..." />
+            <marker date="1485482274000" expanded="true" signature="192:5736" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="199:297" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
+            <marker date="1485482274000" expanded="true" signature="339:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="669:793" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
+            <marker date="1485482274000" expanded="true" signature="908:1063" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="1073:1166" ph="/// Indicates whether loaders have been started. ... " />
+            <marker date="1485482274000" expanded="true" signature="1228:1340" ph="/// Represents whether this context has finished executing loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1408:1487" ph="/// Starts firing pending loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1528:2065" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2075:2155" ph="/// Queues a loader to be executed. ... " />
+            <marker date="1485482274000" expanded="true" signature="2208:2385" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2387:3214" ph="/* internal void AddToQueue(IDataLoader loader) ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3699" ph="/* Perform some action when the signal fires next. ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3888" ph="/// Perform some action when the signal fires next. ... " />
+            <marker date="1485482274000" expanded="true" signature="4013:4192" ph="/// Represents ambient data local to the current load operation. ... " />
+            <marker date="1485482274000" expanded="true" signature="4273:4473" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
+            <marker date="1485482274000" expanded="true" signature="4547:4609" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4639:4828" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="4932:4942" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4932:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4952:5125" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="5201:5728" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5702" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5728" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/PromiseChain.cs" />
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoader.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1845">
+          <caret line="123" column="0" lean-forward="false" selection-start-line="123" selection-start-column="0" selection-end-line="123" selection-end-column="0" />
+          <folding>
+            <marker date="1485485699000" expanded="true" signature="6:204" ph="..." />
+            <marker date="1485485699000" expanded="true" signature="226:5765" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="233:1080" ph="/// Collects keys into a batch to fetch in one request. ... " />
+            <marker date="1485485699000" expanded="true" signature="1152:5763" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1365:1467" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt;. ... " />
+            <marker date="1485485699000" expanded="true" signature="1529:1577" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1587:1720" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt; bound to the specified context. ... " />
+            <marker date="1485485699000" expanded="true" signature="1823:1876" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1886:2004" ph="/// Gets the bound context if set, otherwise the current ambient context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2102:2195" ph="/// Gets the keys to retrieve in the next batch. ... " />
+            <marker date="1485485699000" expanded="true" signature="2263:2350" ph="/// Indicates the loader's current status. ... " />
+            <marker date="1485485699000" expanded="true" signature="2421:2520" ph="/// Binds an instance to a particular loading context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2578:2804" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="2814:2877" ph="/// Loads an item. ... " />
+            <marker date="1485485699000" expanded="true" signature="2939:3469" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3087:3338" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3479:3545" ph="/// Loads many items. ... " />
+            <marker date="1485485699000" expanded="true" signature="3642:3995" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4005:4107" ph="/// Triggers the fetch callback and fulfils any promises. ... " />
+            <marker date="1485485699000" expanded="true" signature="4148:4911" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4550:4740" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4949:5064" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5154:5239" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5249:5377" ph="/// Provides a new &lt;see cref=&quot;TaskCompletionSource{T}&quot;/&gt; paired with the given key. ... " />
+            <marker date="1485485699000" expanded="true" signature="5420:5757" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5607:5747" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="600">
+          <caret line="40" column="0" lean-forward="false" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
+          <folding>
+            <marker date="1485482274000" expanded="true" signature="6:170" ph="..." />
+            <marker date="1485482274000" expanded="true" signature="192:5736" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="199:297" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
+            <marker date="1485482274000" expanded="true" signature="339:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="669:793" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
+            <marker date="1485482274000" expanded="true" signature="908:1063" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="1073:1166" ph="/// Indicates whether loaders have been started. ... " />
+            <marker date="1485482274000" expanded="true" signature="1228:1340" ph="/// Represents whether this context has finished executing loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1408:1487" ph="/// Starts firing pending loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1528:2065" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2075:2155" ph="/// Queues a loader to be executed. ... " />
+            <marker date="1485482274000" expanded="true" signature="2208:2385" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2387:3214" ph="/* internal void AddToQueue(IDataLoader loader) ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3699" ph="/* Perform some action when the signal fires next. ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3888" ph="/// Perform some action when the signal fires next. ... " />
+            <marker date="1485482274000" expanded="true" signature="4013:4192" ph="/// Represents ambient data local to the current load operation. ... " />
+            <marker date="1485482274000" expanded="true" signature="4273:4473" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
+            <marker date="1485482274000" expanded="true" signature="4547:4609" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4639:4828" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="4932:4942" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4932:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4952:5125" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="5201:5728" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5702" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5728" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1485480037000" expanded="true" signature="6:188" ph="..." />
+            <marker date="1485480037000" expanded="true" signature="258:6813" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="348:716" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="460:649" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="794:1378" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="862:1299" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="994:1195" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1464:2436" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1526:2424" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1873:2050" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2138:2315" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2519:3229" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2706:3038" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2765:3015" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3310:5888" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3415:3558" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3603:5814" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3673:5681" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="4709:4877" ph="/* Console.WriteLine($&quot;Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Delay...&quot;); ... */" />
+            <marker date="1485480037000" expanded="true" signature="5960:6807" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6108:6274" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6447:6645" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoader.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="393">
-          <caret line="123" column="0" lean-forward="false" selection-start-line="123" selection-start-column="0" selection-end-line="123" selection-end-column="0" />
+        <state relative-caret-position="1800">
+          <caret line="120" column="0" lean-forward="false" selection-start-line="120" selection-start-column="0" selection-end-line="120" selection-end-column="0" />
           <folding>
-            <marker date="1485186525000" expanded="true" signature="6:158" ph="..." />
-            <marker date="1485186525000" expanded="true" signature="187:818" ph="/// Collects keys into a batch to fetch in one request. ... " />
-            <marker date="1485186525000" expanded="true" signature="4698:4806" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4698:4857" ph="{...}" />
-            <marker date="1485186525000" expanded="true" signature="4698:4863" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="6:204" ph="..." />
+            <marker date="1485485699000" expanded="true" signature="226:5765" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="233:1080" ph="/// Collects keys into a batch to fetch in one request. ... " />
+            <marker date="1485485699000" expanded="true" signature="1152:5763" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1365:1467" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt;. ... " />
+            <marker date="1485485699000" expanded="true" signature="1529:1577" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1587:1720" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt; bound to the specified context. ... " />
+            <marker date="1485485699000" expanded="true" signature="1823:1876" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1886:2004" ph="/// Gets the bound context if set, otherwise the current ambient context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2102:2195" ph="/// Gets the keys to retrieve in the next batch. ... " />
+            <marker date="1485485699000" expanded="true" signature="2263:2350" ph="/// Indicates the loader's current status. ... " />
+            <marker date="1485485699000" expanded="true" signature="2421:2520" ph="/// Binds an instance to a particular loading context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2578:2804" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="2814:2877" ph="/// Loads an item. ... " />
+            <marker date="1485485699000" expanded="true" signature="2939:3469" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3087:3338" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3479:3545" ph="/// Loads many items. ... " />
+            <marker date="1485485699000" expanded="true" signature="3642:3995" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4005:4107" ph="/// Triggers the fetch callback and fulfils any promises. ... " />
+            <marker date="1485485699000" expanded="true" signature="4148:4911" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4550:4740" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4949:5064" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5154:5239" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5249:5377" ph="/// Provides a new &lt;see cref=&quot;TaskCompletionSource{T}&quot;/&gt; paired with the given key. ... " />
+            <marker date="1485485699000" expanded="true" signature="5420:5757" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5607:5747" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/DataLoader/PromiseChain.cs">
+    <entry file="file://$PROJECT_DIR$/.idea/.idea.DataLoader/riderModule.iml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="17" column="34" lean-forward="true" selection-start-line="17" selection-start-column="34" selection-end-line="17" selection-end-column="34" />
-          <folding />
+        <state relative-caret-position="120">
+          <caret line="8" column="112" lean-forward="false" selection-start-line="8" selection-start-column="112" selection-end-line="8" selection-end-column="112" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/PromiseChain.cs" />
+    <entry file="file://$USER_HOME$/.local/share/JetBrains/Shared/v08/DecompilerCache/decompiler/7CB17ADC-0AB1-454D-9BC7-41833F50EB29/57/31e86a35/Task`1.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="122" column="44" lean-forward="false" selection-start-line="122" selection-start-column="44" selection-end-line="122" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderScope.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="37" column="0" lean-forward="false" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/IDataLoader.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="40" lean-forward="false" selection-start-line="12" selection-start-column="40" selection-end-line="12" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderSynchronizationContext.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="86" lean-forward="false" selection-start-line="10" selection-start-column="86" selection-end-line="10" selection-end-column="86" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContextThread.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="262">
+          <caret line="45" column="0" lean-forward="true" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoaderContext.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="272">
+          <caret line="49" column="9" lean-forward="false" selection-start-line="49" selection-start-column="9" selection-end-line="49" selection-end-column="9" />
+          <folding>
+            <marker date="1485482274000" expanded="true" signature="6:170" ph="..." />
+            <marker date="1485482274000" expanded="true" signature="192:5736" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="199:297" ph="/// Defines a context for &lt;see cref=&quot;DataLoader&quot;/&gt; instances. ... " />
+            <marker date="1485482274000" expanded="true" signature="339:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="669:793" ph="/// Retrieves a cached loader for the given key, creating one if none is found. ... " />
+            <marker date="1485482274000" expanded="true" signature="908:1063" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="1073:1166" ph="/// Indicates whether loaders have been started. ... " />
+            <marker date="1485482274000" expanded="true" signature="1228:1340" ph="/// Represents whether this context has finished executing loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1408:1487" ph="/// Starts firing pending loaders. ... " />
+            <marker date="1485482274000" expanded="true" signature="1528:2065" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2075:2155" ph="/// Queues a loader to be executed. ... " />
+            <marker date="1485482274000" expanded="true" signature="2208:2385" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="2387:3214" ph="/* internal void AddToQueue(IDataLoader loader) ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3699" ph="/* Perform some action when the signal fires next. ... */" />
+            <marker date="1485482274000" expanded="true" signature="3224:3888" ph="/// Perform some action when the signal fires next. ... " />
+            <marker date="1485482274000" expanded="true" signature="4013:4192" ph="/// Represents ambient data local to the current load operation. ... " />
+            <marker date="1485482274000" expanded="true" signature="4273:4473" ph="/// Sets the &lt;see cref=&quot;DataLoaderContext&quot;/&gt; visible from the &lt;see cref=&quot;DataLoaderContext.Current&quot;/&gt;  property. ... " />
+            <marker date="1485482274000" expanded="true" signature="4547:4609" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4639:4828" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="4932:4942" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4932:5734" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="4952:5125" ph="/// Runs code within a new loader context before firing any pending ... " />
+            <marker date="1485482274000" expanded="true" signature="5201:5728" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5702" ph="{...}" />
+            <marker date="1485482274000" expanded="true" signature="5683:5728" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/DataLoader.Tests/DataLoaderContextTests.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2055">
+          <caret line="137" column="44" lean-forward="false" selection-start-line="137" selection-start-column="44" selection-end-line="137" selection-end-column="44" />
+          <folding>
+            <marker date="1485480037000" expanded="true" signature="6:188" ph="..." />
+            <marker date="1485480037000" expanded="true" signature="258:6813" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="348:716" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="460:649" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="794:1378" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="862:1299" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="994:1195" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1464:2436" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1526:2424" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="1873:2050" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2138:2315" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2519:3229" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2706:3038" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="2765:3015" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3310:5888" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3415:3558" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3603:5814" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="3673:5681" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="4709:4877" ph="/* Console.WriteLine($&quot;Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Delay...&quot;); ... */" />
+            <marker date="1485480037000" expanded="true" signature="5960:6807" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6108:6274" ph="{...}" />
+            <marker date="1485480037000" expanded="true" signature="6447:6645" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoader.GraphQL.xproj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="37" lean-forward="false" selection-start-line="9" selection-start-column="37" selection-end-line="9" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader/DataLoader.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="114" column="13" lean-forward="false" selection-start-line="114" selection-start-column="13" selection-end-line="114" selection-end-column="13" />
+          <folding>
+            <marker date="1485485699000" expanded="true" signature="6:204" ph="..." />
+            <marker date="1485485699000" expanded="true" signature="226:5765" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="233:1080" ph="/// Collects keys into a batch to fetch in one request. ... " />
+            <marker date="1485485699000" expanded="true" signature="1152:5763" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1365:1467" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt;. ... " />
+            <marker date="1485485699000" expanded="true" signature="1529:1577" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1587:1720" ph="/// Creates a new &lt;see cref=&quot;DataLoader{TKey,TReturn}&quot;/&gt; bound to the specified context. ... " />
+            <marker date="1485485699000" expanded="true" signature="1823:1876" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="1886:2004" ph="/// Gets the bound context if set, otherwise the current ambient context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2102:2195" ph="/// Gets the keys to retrieve in the next batch. ... " />
+            <marker date="1485485699000" expanded="true" signature="2263:2350" ph="/// Indicates the loader's current status. ... " />
+            <marker date="1485485699000" expanded="true" signature="2421:2520" ph="/// Binds an instance to a particular loading context. ... " />
+            <marker date="1485485699000" expanded="true" signature="2578:2804" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="2814:2877" ph="/// Loads an item. ... " />
+            <marker date="1485485699000" expanded="true" signature="2939:3469" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3087:3338" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="3479:3545" ph="/// Loads many items. ... " />
+            <marker date="1485485699000" expanded="true" signature="3642:3995" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4005:4107" ph="/// Triggers the fetch callback and fulfils any promises. ... " />
+            <marker date="1485485699000" expanded="true" signature="4148:4911" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4550:4740" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="4949:5064" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5154:5239" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5249:5377" ph="/// Provides a new &lt;see cref=&quot;TaskCompletionSource{T}&quot;/&gt; paired with the given key. ... " />
+            <marker date="1485485699000" expanded="true" signature="5420:5757" ph="{...}" />
+            <marker date="1485485699000" expanded="true" signature="5607:5747" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderResolver.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="46" lean-forward="false" selection-start-line="17" selection-start-column="46" selection-end-line="17" selection-end-column="46" />
+          <folding>
+            <marker date="1485485983000" expanded="true" signature="6:147" ph="..." />
+            <marker date="1485485983000" expanded="true" signature="177:1965" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="284:1963" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="659:791" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="903:1073" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="1201:1405" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="1485:1728" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="1796:1853" ph="{...}" />
+            <marker date="1485485983000" expanded="true" signature="1895:1957" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/DataLoader.GraphQL/DataLoaderListener.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="258">
+          <caret line="18" column="9" lean-forward="true" selection-start-line="18" selection-start-column="9" selection-end-line="18" selection-end-column="9" />
+          <folding>
+            <marker date="1485486156000" expanded="true" signature="6:131" ph="..." />
+            <marker date="1485486156000" expanded="true" signature="161:1126" ph="{...}" />
+            <marker date="1485486156000" expanded="true" signature="239:1124" ph="{...}" />
+            <marker date="1485486156000" expanded="true" signature="493:650" ph="{...}" />
+            <marker date="1485486156000" expanded="true" signature="759:1118" ph="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>

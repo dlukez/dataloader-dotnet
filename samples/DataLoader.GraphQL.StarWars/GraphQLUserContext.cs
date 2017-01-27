@@ -1,7 +1,7 @@
 using DataLoader;
 using GraphQL.Types;
 
-namespace GraphQL.DataLoader.StarWars
+namespace DataLoader.GraphQL.StarWars
 {
     public class GraphQLUserContext
     {

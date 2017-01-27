@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using GraphQL.DataLoader.StarWars.Schema;
+using DataLoader.GraphQL.StarWars.Schema;
 using Microsoft.AspNetCore.Hosting;
 
-namespace GraphQL.DataLoader.StarWars
+namespace DataLoader.GraphQL.StarWars
 {
     public class Program
     {

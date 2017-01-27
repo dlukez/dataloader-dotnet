@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace GraphQL.DataLoader.StarWars
+namespace DataLoader.GraphQL.StarWars
 {
     public class StarWarsContext : DbContext
     {

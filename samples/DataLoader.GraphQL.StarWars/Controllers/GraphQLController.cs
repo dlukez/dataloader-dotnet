@@ -2,10 +2,11 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.DataLoader.StarWars.Schema;
+using GraphQL.Execution;
+using DataLoader.GraphQL.StarWars.Schema;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GraphQL.DataLoader.StarWars.Controllers
+namespace DataLoader.GraphQL.StarWars.Controllers
 {
     [Route("api/graphql")]
     public class GraphQLController : Controller

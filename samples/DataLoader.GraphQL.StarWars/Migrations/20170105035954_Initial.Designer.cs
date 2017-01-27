@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace GraphQL.DataLoader.StarWars.Migrations
+namespace DataLoader.GraphQL.StarWars.Migrations
 {
     [DbContext(typeof(StarWarsContext))]
     [Migration("20170105035954_Initial")]

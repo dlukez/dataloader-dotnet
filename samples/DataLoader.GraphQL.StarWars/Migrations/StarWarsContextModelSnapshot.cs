@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace GraphQL.DataLoader.StarWars.Migrations
+namespace DataLoader.GraphQL.StarWars.Migrations
 {
     [DbContext(typeof(StarWarsContext))]
     partial class StarWarsContextModelSnapshot : ModelSnapshot
