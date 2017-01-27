@@ -16,7 +16,7 @@ namespace DataLoader.GraphQL.StarWars.Schema
 
             Field<ListGraphType<CharacterInterface>>()
                 .Name("characters")
-                .Resolve(ctx => ctx.GetDataLoader(async (ids) =>
+                .Resolve(ctx => ctx.GetDataLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
 

@@ -14,16 +14,9 @@ namespace DataLoader.GraphQL.StarWars.Controllers
         private readonly IDocumentExecuter _executer = new DocumentExecuter();
         private readonly StarWarsSchema _schema = new StarWarsSchema();
 
-        public GraphQLController()
-        {
-            Console.WriteLine($"GraphQLController created");
-        }
-
         [HttpPost]
         public async Task<ExecutionResult> Post([FromBody] GraphQLRequest request)
         {
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Executing GraphQL query");
-
             var sw = Stopwatch.StartNew();
 
             var result = await _executer.ExecuteAsync(_ =>

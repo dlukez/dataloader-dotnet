@@ -72,14 +72,10 @@ namespace DataLoader
         /// </summary>
         public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
         {
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Adding key {key}");
-            try
-            {
-                if (_queue.Count == 0) ScheduleToRun();
-                var fetchResult = new FetchCompletionPair(key);
-                _queue.Enqueue(fetchResult);
-                return fetchResult.CompletionSource.Task;
-            } finally { Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Key {key} added"); }
+            if (_queue.Count == 0) ScheduleToRun();
+            var fetchResult = new FetchCompletionPair(key);
+            _queue.Enqueue(fetchResult);
+            return fetchResult.CompletionSource.Task;
         }
 
         /// <summary>
@@ -101,7 +97,6 @@ namespace DataLoader
         public async Task ExecuteAsync()
         {
             Status = DataLoaderStatus.Executing;
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Begin execute");
             var queue = Interlocked.Exchange(ref _queue, new Queue<FetchCompletionPair>());
             var lookup = await _fetch(queue.Select(p => p.Key).ToList()).ConfigureAwait(false);
             while (queue.Count > 0)
@@ -110,7 +105,6 @@ namespace DataLoader
                 item.CompletionSource.SetResult(lookup[item.Key]);
                 item.CompletionSource.Task.Wait();
             }
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - End execute");
             Status = DataLoaderStatus.Idle;
         }
 

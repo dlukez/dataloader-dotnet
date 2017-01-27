@@ -23,7 +23,7 @@ namespace DataLoader.GraphQL.StarWars.Schema
 
             Field<ListGraphType<CharacterInterface>>()
                 .Name("friends")
-                .Resolve(ctx => ctx.GetDataLoader(async (ids) =>
+                .Resolve(ctx => ctx.GetDataLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
                         return (await db.Friendships
@@ -35,7 +35,7 @@ namespace DataLoader.GraphQL.StarWars.Schema
 
             Field<ListGraphType<EpisodeType>>()
                 .Name("appearsIn")
-                .Resolve(ctx => ctx.GetDataLoader(async (ids) =>
+                .Resolve(ctx => ctx.GetDataLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
                         return (await db.HumanAppearances

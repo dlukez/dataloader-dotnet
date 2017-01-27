@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 namespace DataLoader
 {
     /// <summary>
-    /// Defines a context for <see cref="DataLoader"/> instances.
+    /// Defines a context for <see cref="DataLoader"/> instances. Once executed, they cannot be reused.
+    /// The context will pump continuations so that subsequent loads called in code awaiting a pending
+    /// result should also be fired as a batch.
     /// </summary>
     public sealed class DataLoaderContext
     {
@@ -36,19 +38,19 @@ namespace DataLoader
         public Task Completion => _completionSource.Task;
 
         /// <summary>
-        /// Starts firing pending loaders.
+        /// Asynchronously processes pending loaders. Loaders are fired in FIFO order,
+        /// each loader is queued the first time a load method is called on it.
         /// </summary>
+        /// <remarks>
+        /// A context can only be executed once and cannot be recycled.
+        /// </remarks>
         public async Task ExecuteAsync()
         {
             if (IsLoading) throw new InvalidOperationException();
-            var sw = Stopwatch.StartNew();
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Context executing");
             IsLoading = true;
             while (_queue.Count > 0) await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
             IsLoading = false;
             _completionSource.SetResult(null);
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Context finished ({sw.ElapsedMilliseconds}ms)");
-            sw.Stop();
         }
 
         /// <summary>
@@ -59,36 +61,6 @@ namespace DataLoader
             Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Queueing loader");
             _queue.Enqueue(loader);
         }
-
-//        internal void AddToQueue(IDataLoader loader)
-//        {
-//            OnNext(loader.ExecuteAsync);
-//            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Adding loader to queue");
-//            _signal.WaitAsync().ContinueWith(delegate
-//            {
-//                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Signal fired");
-//                loader.ExecuteAsync().ContinueWith(delegate
-//                {
-//                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Firing signal");
-//                    _signal.Set();
-//                }, TaskContinuationOptions.ExecuteSynchronously);
-//            }, TaskContinuationOptions.ExecuteSynchronously);
-//        }
-
-        /// <summary>
-        /// Perform some action when the signal fires next.
-        /// </summary>
-//        internal async void OnNext(Func<Task> func)
-//        {
-//            await _signal.WaitAsync().ConfigureAwait(false);
-//            await func().ConfigureAwait(false);
-//            _signal.Set();
-//        }
-//
-//        internal void OnNext(Action<Action> next)
-//        {
-//            _signal.WaitAsync().ContinueWith(_ => next(() => _signal.Set()));
-//        }
 
         #region Ambient context
 

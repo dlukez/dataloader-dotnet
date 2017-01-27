@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 
 namespace DataLoader
 {
@@ -8,13 +6,11 @@ namespace DataLoader
     {
         public override void Post(SendOrPostCallback d, object state)
         {
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Post callback executing");
             d(state);
         }
 
         public override void Send(SendOrPostCallback d, object state)
         {
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Send callback executing");
             d(state);
         }
     }
