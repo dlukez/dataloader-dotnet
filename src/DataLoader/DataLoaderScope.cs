@@ -15,8 +15,6 @@ namespace DataLoader
     {
         private readonly DataLoaderContext _loadCtx;
         private readonly DataLoaderContext _prevLoadCtx;
-//        private readonly SynchronizationContext _prevSyncCtx;
-//        private readonly DataLoaderSynchronizationContext _syncCtx;
 
         /// <summary>
         /// Creates a new scope for a new <see cref="DataLoaderContext"/>
@@ -35,9 +33,6 @@ namespace DataLoader
             _loadCtx = context;
             _prevLoadCtx = DataLoaderContext.Current;
             DataLoaderContext.SetCurrentContext(_loadCtx);
-//            _syncCtx = new DataLoaderSynchronizationContext();
-//            _prevSyncCtx = SynchronizationContext.Current;
-//            SynchronizationContext.SetSynchronizationContext(_syncCtx);
         }
 
         /// <summary>
@@ -55,7 +50,6 @@ namespace DataLoader
                 throw new InvalidOperationException("This context for this scope does not match the current context");
 #endif
             DataLoaderContext.SetCurrentContext(_prevLoadCtx);
-//            SynchronizationContext.SetSynchronizationContext(_syncCtx);
         }
     }
 }

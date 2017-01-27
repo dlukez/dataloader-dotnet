@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using DataLoader.GraphQL.StarWars.Schema;
@@ -21,13 +20,14 @@ namespace DataLoader.GraphQL.StarWars.Controllers
 
             var result = await _executer.ExecuteAsync(_ =>
             {
+                var userContext = new GraphQLUserContext();
                 _.Schema = _schema;
                 _.Query = request.Query;
-                _.UserContext = new GraphQLUserContext();
-                _.Listeners.Add(new DataLoaderListener());
+                _.UserContext = userContext;
+                _.Listeners.Add(new DataLoaderListener(userContext.LoadContext));
             });
 
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Finished query ({sw.ElapsedMilliseconds}ms)");
+            Debug.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Finished query ({sw.ElapsedMilliseconds}ms)");
             sw.Stop();
 
             return result;
