@@ -1,0 +1,58 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   '--dry-run',
+1 verbose cli   'samples/DataLoader.GraphQL.StarWars/wwwroot/' ]
+2 info using npm@3.10.3
+3 info using node@v6.3.1
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData samples/DataLoader.GraphQL.StarWars/wwwroot/
+8 silly fetchDirectoryPackageData samples/DataLoader.GraphQL.StarWars/wwwroot/
+9 silly install normalizeTree
+10 silly loadCurrentTree Finishing
+11 silly loadIdealTree Starting
+12 silly install loadIdealTree
+13 silly cloneCurrentTree Starting
+14 silly install cloneCurrentTreeToIdealTree
+15 silly cloneCurrentTree Finishing
+16 silly loadShrinkwrap Starting
+17 silly install loadShrinkwrap
+18 silly loadShrinkwrap Finishing
+19 silly loadAllDepsIntoIdealTree Starting
+20 silly install loadAllDepsIntoIdealTree
+21 silly resolveWithNewModule !invalid#1 checking installable status
+22 silly cache add args [ 'samples/DataLoader.GraphQL.StarWars/wwwroot/', null ]
+23 verbose cache add spec samples/DataLoader.GraphQL.StarWars/wwwroot/
+24 silly cache add parsed spec Result {
+24 silly cache add   raw: 'samples/DataLoader.GraphQL.StarWars/wwwroot/',
+24 silly cache add   scope: null,
+24 silly cache add   escapedName: null,
+24 silly cache add   name: null,
+24 silly cache add   rawSpec: 'samples/DataLoader.GraphQL.StarWars/wwwroot/',
+24 silly cache add   spec: 'D:\\Dan\\Git\\dataloader-dotnet\\samples\\DataLoader.GraphQL.StarWars\\wwwroot',
+24 silly cache add   type: 'directory' }
+25 error addLocal Could not install D:\Dan\Git\dataloader-dotnet\samples\DataLoader.GraphQL.StarWars\wwwroot
+26 silly install printInstalled
+27 verbose stack Error: No name provided in package.json
+27 verbose stack     at C:\Program Files\nodejs\node_modules\npm\lib\cache\add-local.js:65:17
+27 verbose stack     at C:\Program Files\nodejs\node_modules\npm\node_modules\read-package-json\read-json.js:356:5
+27 verbose stack     at checkBinReferences_ (C:\Program Files\nodejs\node_modules\npm\node_modules\read-package-json\read-json.js:320:45)
+27 verbose stack     at final (C:\Program Files\nodejs\node_modules\npm\node_modules\read-package-json\read-json.js:354:3)
+27 verbose stack     at then (C:\Program Files\nodejs\node_modules\npm\node_modules\read-package-json\read-json.js:124:5)
+27 verbose stack     at C:\Program Files\nodejs\node_modules\npm\node_modules\read-package-json\read-json.js:214:31
+27 verbose stack     at f (C:\Program Files\nodejs\node_modules\npm\node_modules\once\once.js:17:25)
+27 verbose stack     at Glob.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\read-package-json\node_modules\glob\glob.js:146:7)
+27 verbose stack     at emitOne (events.js:96:13)
+27 verbose stack     at Glob.emit (events.js:188:7)
+28 verbose cwd D:\Dan\Git\dataloader-dotnet
+29 error Windows_NT 10.0.10586
+30 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "--dry-run" "samples/DataLoader.GraphQL.StarWars/wwwroot/"
+31 error node v6.3.1
+32 error npm  v3.10.3
+33 error No name provided in package.json
+34 error If you need help, you may report this error at:
+34 error     <https://github.com/npm/npm/issues>
+35 verbose exit [ 1, true ]

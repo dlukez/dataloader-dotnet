@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using GraphQL.Execution;
 using DataLoader.GraphQL.StarWars.Schema;
+using GraphQL;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataLoader.GraphQL.StarWars.Controllers
@@ -11,8 +11,13 @@ namespace DataLoader.GraphQL.StarWars.Controllers
     [Route("api/graphql")]
     public class GraphQLController : Controller
     {
-        private IDocumentExecuter _executer = new DocumentExecuter();
-        private StarWarsSchema _schema = new StarWarsSchema();
+        private readonly IDocumentExecuter _executer = new DocumentExecuter();
+        private readonly StarWarsSchema _schema = new StarWarsSchema();
+
+        public GraphQLController()
+        {
+            Console.WriteLine($"GraphQLController created");
+        }
 
         [HttpPost]
         public async Task<ExecutionResult> Post([FromBody] GraphQLRequest request)

@@ -82,3 +82,8 @@ To do
 - [ ] Cancellation
 - [ ] Benchmarks
 - [ ] Multithreaded performance
+
+Ideas
+-----
+- [ ] Single worker thread to service loaders
+- [ ] 

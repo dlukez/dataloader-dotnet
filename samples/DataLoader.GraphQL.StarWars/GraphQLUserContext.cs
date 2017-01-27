@@ -23,7 +23,7 @@ namespace DataLoader.GraphQL.StarWars
 
         public static IDataLoader<int, TReturn> GetDataLoader<TSource, TReturn>(this ResolveFieldContext<TSource> context, FetchDelegate<int, TReturn> fetchDelegate)
         {
-            return context.GetUserContext().LoadContext.GetLoader<int, TReturn>(context.FieldDefinition, fetchDelegate);
+            return context.GetUserContext().LoadContext.GetLoader(context.FieldDefinition, fetchDelegate);
         }
     }
 }

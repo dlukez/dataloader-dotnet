@@ -55,7 +55,7 @@ namespace DataLoader
             if (_loadCtx != DataLoaderContext.Current)
                 throw new InvalidOperationException("This context for this scope does not match the current context");
 #endif
-            if (!_loadCtx.IsLoading) _loadCtx.ExecuteAsync().Wait();
+            if (!_loadCtx.IsLoading && !_loadCtx.Completion.IsCompleted) _loadCtx.ExecuteAsync().Wait();
             DataLoaderContext.SetCurrentContext(_prevLoadCtx);
 //            SynchronizationContext.SetSynchronizationContext(_syncCtx);
         }

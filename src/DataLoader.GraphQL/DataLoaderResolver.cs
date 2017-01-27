@@ -12,8 +12,9 @@ namespace DataLoader.GraphQL
         private readonly Func<TSource, TKey> _keySelector;
         private readonly IDataLoader<TKey, TReturn> _loader;
 
-        private bool _captureFieldContext;
-        private AsyncLocal<ResolveFieldContext> _lastContext = new AsyncLocal<ResolveFieldContext>();
+        private readonly bool _captureFieldContext;
+        //private readonly AsyncLocal<ResolveFieldContext> _lastContext = new AsyncLocal<ResolveFieldContext>();
+        private ResolveFieldContext _lastContext;
 
         public DataLoaderResolver(Func<TSource, TKey> keySelector, IDataLoader<TKey, TReturn> loader)
         {
@@ -33,7 +34,7 @@ namespace DataLoader.GraphQL
         {
             _keySelector = keySelector;
             _captureFieldContext = true;
-            _loader = new DataLoader<TKey, TReturn>(ids => resolverDelegate(ids, _lastContext.Value));
+            _loader = new DataLoader<TKey, TReturn>(ids => resolverDelegate(ids, _lastContext));
         }
 
         public Task<IEnumerable<TReturn>> Resolve(ResolveFieldContext context)
@@ -42,7 +43,7 @@ namespace DataLoader.GraphQL
             var key = _keySelector(source);
 
             if (_captureFieldContext)
-                _lastContext.Value = context;
+                _lastContext = context;
 
             return _loader.LoadAsync(key);
         }
