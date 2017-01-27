@@ -8,7 +8,7 @@
     "tasks": [
         {
             "taskName": "build",
-            "args": [ "src/DataLoader", "src/DataLoader.GraphQL", "test/DataLoader.Tests" ],
+            "args": [ "src/DataLoader", "src/DataLoader.GraphQL", "test/DataLoader.Tests", "samples/DataLoader.GraphQL.StarWars" ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
         },
@@ -21,7 +21,7 @@
         {
             "taskName": "rebuild",
             "suppressTaskName": true,
-            "args": [ "build", "--no-incremental", "src/DataLoader", "src/DataLoader.GraphQL", "test/DataLoader.Tests" ],
+            "args": [ "build", "--no-incremental", "src/DataLoader", "src/DataLoader.GraphQL", "test/DataLoader.Tests", "samples/DataLoader.GraphQL.StarWars" ],
             "problemMatcher": "$msCompile"
         }
     ]

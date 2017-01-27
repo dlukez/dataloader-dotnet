@@ -35,7 +35,6 @@ namespace DataLoader
             _loadCtx = context;
             _prevLoadCtx = DataLoaderContext.Current;
             DataLoaderContext.SetCurrentContext(_loadCtx);
-
 //            _syncCtx = new DataLoaderSynchronizationContext();
 //            _prevSyncCtx = SynchronizationContext.Current;
 //            SynchronizationContext.SetSynchronizationContext(_syncCtx);
@@ -51,11 +50,10 @@ namespace DataLoader
         /// </summary>
         public void Dispose()
         {
-#if DEBUG
+#if !NET45
             if (_loadCtx != DataLoaderContext.Current)
                 throw new InvalidOperationException("This context for this scope does not match the current context");
 #endif
-            if (!_loadCtx.IsLoading && !_loadCtx.Completion.IsCompleted) _loadCtx.ExecuteAsync().Wait();
             DataLoaderContext.SetCurrentContext(_prevLoadCtx);
 //            SynchronizationContext.SetSynchronizationContext(_syncCtx);
         }

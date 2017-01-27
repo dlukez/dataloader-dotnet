@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Nito.AsyncEx.Synchronous;
 
 namespace DataLoader
 {
@@ -41,12 +41,14 @@ namespace DataLoader
         public async Task ExecuteAsync()
         {
             if (IsLoading) throw new InvalidOperationException();
+            var sw = Stopwatch.StartNew();
             Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Context executing");
             IsLoading = true;
             while (_queue.Count > 0) await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
             IsLoading = false;
             _completionSource.SetResult(null);
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Context finished");
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Context finished ({sw.ElapsedMilliseconds}ms)");
+            sw.Stop();
         }
 
         /// <summary>

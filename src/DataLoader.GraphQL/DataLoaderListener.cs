@@ -8,23 +8,19 @@ namespace DataLoader.GraphQL
 {
     public class DataLoaderListener : DocumentExecutionListenerBase<object>
     {
-        private readonly ConditionalWeakTable<object, DataLoaderScope> _contextTable =
-            new ConditionalWeakTable<object, DataLoaderScope>();
+        private DataLoaderScope _scope;
+
+        public DataLoaderContext Context => _scope.Context;
 
         public override Task BeforeExecutionAsync(object userContext, CancellationToken token)
         {
-            var scope = new DataLoaderScope();
-            _contextTable.Add(userContext, scope);
+            _scope = new DataLoaderScope();
             return Task.CompletedTask;
         }
 
-        public override async Task BeforeExecutionAwaitedAsync(object userContext, CancellationToken token)
+        public override Task BeforeExecutionAwaitedAsync(object userContext, CancellationToken token)
         {
-            DataLoaderScope scope;
-            if (!_contextTable.TryGetValue(userContext, out scope))
-                throw new InvalidOperationException("User context has already been garbage collected. Has execution already finished?");
-            await scope.Context.ExecuteAsync().ConfigureAwait(false);
-            scope.Dispose();
+            using (_scope) return _scope.Context.ExecuteAsync();
         }
     }
 }

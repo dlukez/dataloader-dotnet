@@ -23,7 +23,7 @@ namespace DataLoader.GraphQL.StarWars.Schema
 
             Field<ListGraphType<CharacterInterface>>()
                 .Name("friends")
-                .BatchResolve(h => h.HumanId, async (ids, ctx) =>
+                .Resolve(ctx => ctx.GetDataLoader(async (ids) =>
                     {
                         var db = ctx.GetDataContext();
                         return (await db.Friendships
@@ -31,11 +31,11 @@ namespace DataLoader.GraphQL.StarWars.Schema
                             .Select(f => new {Key = f.HumanId, f.Droid})
                             .ToListAsync())
                             .ToLookup(x => x.Key, x => x.Droid);
-                    });
+                    }).LoadAsync(ctx.Source.HumanId));
 
             Field<ListGraphType<EpisodeType>>()
                 .Name("appearsIn")
-                .BatchResolve(h => h.HumanId, async (ids, ctx) =>
+                .Resolve(ctx => ctx.GetDataLoader(async (ids) =>
                     {
                         var db = ctx.GetDataContext();
                         return (await db.HumanAppearances
@@ -43,7 +43,7 @@ namespace DataLoader.GraphQL.StarWars.Schema
                             .Select(ha => new { Key = ha.HumanId, ha.Episode })
                             .ToListAsync())
                             .ToLookup(x => x.Key, x => x.Episode);
-                    });
+                    }).LoadAsync(ctx.Source.HumanId));
         }
     }
 }

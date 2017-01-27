@@ -16,7 +16,7 @@ namespace DataLoader.GraphQL.StarWars.Schema
 
             Field<ListGraphType<CharacterInterface>>()
                 .Name("characters")
-                .BatchResolve(e => e.EpisodeId, async (ids, ctx) =>
+                .Resolve(ctx => ctx.GetDataLoader(async (ids) =>
                     {
                         var db = ctx.GetDataContext();
 
@@ -33,7 +33,7 @@ namespace DataLoader.GraphQL.StarWars.Schema
                         await Task.WhenAll(humans, droids);
 
                         return humans.Result.Concat(droids.Result).ToLookup(a => a.EpisodeId, a => a.Character);
-                    });
+                    }).LoadAsync(ctx.Source.EpisodeId));
         }
     }
 
