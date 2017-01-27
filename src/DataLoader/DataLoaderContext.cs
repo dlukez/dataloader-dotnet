@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -109,6 +108,14 @@ namespace DataLoader
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
+            // TODO - Revise this?
+            // For some reason, using `Task.Run` results in <see cref="TaskCompletionSource{T}"/>
+            // running completions synchronously. This prevents the main loop from continuing
+            // before additional load calls are reached to requeue loaders.
+            // I am presuming this is because, once inside the ThreadPool, continuations will be scheduled
+            // using the local queues (in LIFO order) instead of the global queue (which executes in FIFO order).
+            // This is really a hack I think - the same thing should be accomplished using a custom
+            // TaskScheduler or custom awaiter.
             return Task.Run(async () =>
             {
                 using (var scope = new DataLoaderScope())

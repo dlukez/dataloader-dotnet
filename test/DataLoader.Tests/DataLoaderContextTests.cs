@@ -52,23 +52,19 @@ namespace DataLoader.Tests
                 var ctx = DataLoaderContext.Current;
                 var threadId = Thread.CurrentThread.ManagedThreadId;
 
-                // Test with `await`.
+                // Test with `Task.Yield`.
                 await Task.Yield();
                 DataLoaderContext.Current.ShouldBe(ctx);
 
+                // Test with `Task.Delay`.
+                await Task.Delay(100);
+                DataLoaderContext.Current.ShouldBe(ctx);
+
                 // Test with `Task.Run`.
-                await Task.Run(() =>
-                {
-                    threadId.ShouldNotBe(Thread.CurrentThread.ManagedThreadId);
-                    DataLoaderContext.Current.ShouldBe(ctx);
-                });
+                await Task.Run(() => DataLoaderContext.Current.ShouldBe(ctx));
 
                 // Test with `Thread`.
-                var thread = new Thread(() =>
-                {
-                    threadId.ShouldNotBe(Thread.CurrentThread.ManagedThreadId);
-                    DataLoaderContext.Current.ShouldBe(ctx);
-                });
+                var thread = new Thread(() => DataLoaderContext.Current.ShouldBe(ctx));
                 thread.Start();
                 thread.Join();
 
@@ -116,42 +112,21 @@ namespace DataLoader.Tests
             {
                 await DataLoaderContext.Run(async () =>
                 {
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Before 1");
                     await loader.LoadAsync(1);
-
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Before 2");
                     await loader.LoadAsync(2);
-
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Before 3");
                     await loader.LoadAsync(3);
-
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Before 4,5,6");
                     await Task.WhenAll(loader.LoadAsync(4), loader.LoadAsync(5), loader.LoadAsync(6));
-
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Before 7,8,9");
                     var t7 = loader.LoadAsync(7);
                     var t8 = loader.LoadAsync(8);
                     var t9 = loader.LoadAsync(9);
-
-//                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Delay...");
-//                    await Task.Delay(700);
-
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Sleeping...");
                     Thread.Sleep(800);
-
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Before 10");
                     await loader.LoadAsync(10);
-
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Testing 7,8,9 are completed");
                     t7.IsCompleted.ShouldBeTrue();
                     t8.IsCompleted.ShouldBeTrue();
                     t9.IsCompleted.ShouldBeTrue();
-
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Returning");
                     return 0;
                 });
 
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - ✓ Done");
             }, TimeSpan.FromSeconds(10));
 
             loadCount.ShouldBe(5);
@@ -165,7 +140,7 @@ namespace DataLoader.Tests
 
             FetchDelegate<int, int> fetch = async (ids) =>
             {
-                await Task.Delay(new Random().Next(10, 700));
+                await Task.Delay(500);
                 loadCount++;
                 return ids.ToLookup(id => id);
             };
