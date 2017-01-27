@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace DataLoader
 {
-    public interface IDataLoader<TKey, TReturn> : IDataLoader
+    public interface IDataLoader<in TKey, TReturn> : IDataLoader
     {
         Task<IEnumerable<TReturn>> LoadAsync(TKey key);
     }

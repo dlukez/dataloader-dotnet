@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Nito.AsyncEx;
+using Nito.AsyncEx.Synchronous;
 
 namespace DataLoader
 {
@@ -11,16 +12,9 @@ namespace DataLoader
     /// </summary>
     public sealed class DataLoaderContext
     {
-        private readonly AsyncAutoResetEvent _signal = new AsyncAutoResetEvent();
-        private readonly ConcurrentDictionary<object, IDataLoader> _cache =
-            new ConcurrentDictionary<object, IDataLoader>();
-
-        /// <summary>
-        /// Creates a new <see cref="DataLoaderContext"/>. 
-        /// </summary>
-        public DataLoaderContext()
-        {
-        }
+        private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
+        private readonly TaskCompletionSource<object> _completionSource = new TaskCompletionSource<object>();
+        private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
 
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
@@ -34,19 +28,25 @@ namespace DataLoader
         /// <summary>
         /// Indicates whether loaders have been started.
         /// </summary>
-        public bool IsLoading => true;
+        public bool IsLoading { get; private set; }
 
         /// <summary>
         /// Represents whether this context has finished executing loaders.
         /// </summary>
-        public Task Completion => Task.CompletedTask;
+        public Task Completion => _completionSource.Task;
 
         /// <summary>
         /// Starts firing pending loaders.
         /// </summary>
-        public void Execute()
+        public async Task ExecuteAsync()
         {
-            _signal.Set();
+            if (IsLoading) throw new InvalidOperationException();
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Context executing");
+            IsLoading = true;
+            while (_queue.Count > 0) await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
+            IsLoading = false;
+            _completionSource.SetResult(null);
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Context finished");
         }
 
         /// <summary>
@@ -54,10 +54,39 @@ namespace DataLoader
         /// </summary>
         internal void AddToQueue(IDataLoader loader)
         {
-            _signal.WaitAsync().ContinueWith(_
-                => loader.ExecuteAsync().ContinueWith(__
-                    => _signal.Set()));
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Queueing loader");
+            _queue.Enqueue(loader);
         }
+
+//        internal void AddToQueue(IDataLoader loader)
+//        {
+//            OnNext(loader.ExecuteAsync);
+//            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Adding loader to queue");
+//            _signal.WaitAsync().ContinueWith(delegate
+//            {
+//                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Signal fired");
+//                loader.ExecuteAsync().ContinueWith(delegate
+//                {
+//                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Firing signal");
+//                    _signal.Set();
+//                }, TaskContinuationOptions.ExecuteSynchronously);
+//            }, TaskContinuationOptions.ExecuteSynchronously);
+//        }
+
+        /// <summary>
+        /// Perform some action when the signal fires next.
+        /// </summary>
+//        internal async void OnNext(Func<Task> func)
+//        {
+//            await _signal.WaitAsync().ConfigureAwait(false);
+//            await func().ConfigureAwait(false);
+//            _signal.Set();
+//        }
+//
+//        internal void OnNext(Action<Action> next)
+//        {
+//            _signal.WaitAsync().ContinueWith(_ => next(() => _signal.Set()));
+//        }
 
         #region Ambient context
 
@@ -96,14 +125,7 @@ namespace DataLoader
         /// </summary>
         public static Task<T> Run<T>(Func<Task<T>> func)
         {
-            if (func == null) throw new ArgumentNullException(nameof(func));
-
-            using (new DataLoaderScope())
-            {
-                var task = func();
-                if (task == null) throw new InvalidOperationException("No task provided");
-                return task;
-            }
+            return Run(_ => func());
         }
 
         /// <summary>
@@ -114,12 +136,16 @@ namespace DataLoader
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
-            using (var scope = new DataLoaderScope())
+            return Task.Run(async () =>
             {
-                var task = func(scope.Context);
-                if (task == null) throw new InvalidOperationException("No task provided.");
-                return task;
-            }
+                using (var scope = new DataLoaderScope())
+                {
+                    var task = func(scope.Context);
+                    if (task == null) throw new InvalidOperationException("No task provided.");
+                    await scope.Context.ExecuteAsync().ConfigureAwait(false);
+                    return await task;
+                }
+            });
         }
     }
 }

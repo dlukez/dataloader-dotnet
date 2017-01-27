@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using DataLoader;
 using GraphQL.Builders;
 using GraphQL.Types;
 
-namespace GraphQL.DataLoader
+namespace DataLoader.GraphQL
 {
     public static class GraphQLExtensions
     {

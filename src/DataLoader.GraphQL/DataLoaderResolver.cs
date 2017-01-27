@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using DataLoader;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
-namespace GraphQL.DataLoader
+namespace DataLoader.GraphQL
 {
     public class DataLoaderResolver<TSource, TKey, TReturn> : IFieldResolver<Task<IEnumerable<TReturn>>>
     {

@@ -18,33 +18,28 @@ namespace DataLoader
     /// is deferred (and keys are collected) until the loader is invoked, which can occur in the following circumstances:
     /// <list type="bullet">
     /// <item>The delegate supplied to <see cref="DataLoaderContext.Run{T}"/> returned.</item>
-    /// <item><see cref="DataLoaderContext.Execute">StartLoading</see> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
+    /// <item><see cref="DataLoaderContext.ExecuteAsync">StartLoading</see> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
     /// <item>The loader was invoked explicitly by calling <see cref="ExecuteAsync"/>.</item>
     /// </list>
     /// </remarks>
     public class DataLoader<TKey, TReturn> : IDataLoader<TKey, TReturn>
     {
-        private readonly SemaphoreSlim _lock = new SemaphoreSlim(1);
-        private readonly FetchDelegate<TKey, TReturn> _fetchDelegate;
-
-        private HashSet<TKey> _keys = new HashSet<TKey>();
-        private TaskCompletionSource<ILookup<TKey, TReturn>> _completionSource =
-            new TaskCompletionSource<ILookup<TKey, TReturn>>();
-
+        private readonly FetchDelegate<TKey, TReturn> _fetch;
+        private Queue<FetchCompletionPair> _queue = new Queue<FetchCompletionPair>();
         private DataLoaderContext _boundContext;
 
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/>.
         /// </summary>
-        public DataLoader(FetchDelegate<TKey, TReturn> fetchDelegate)
+        public DataLoader(FetchDelegate<TKey, TReturn> fetch)
         {
-            _fetchDelegate = fetchDelegate;
+            _fetch = fetch;
         }
 
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/> bound to the specified context.
         /// </summary>
-        public DataLoader(FetchDelegate<TKey, TReturn> fetchDelegate, DataLoaderContext context) : this(fetchDelegate)
+        public DataLoader(FetchDelegate<TKey, TReturn> fetch, DataLoaderContext context) : this(fetch)
         {
             SetContext(context);
         }
@@ -57,16 +52,12 @@ namespace DataLoader
         /// <summary>
         /// Gets the keys to retrieve in the next batch.
         /// </summary>
-        public IEnumerable<TKey> Keys => new ReadOnlyCollection<TKey>(_keys.ToList());
+        public IEnumerable<TKey> Keys => GetKeys(_queue);
 
         /// <summary>
         /// Indicates the loader's current status.
         /// </summary>
-        public DataLoaderStatus Status => _keys.Count == 0
-            ? DataLoaderStatus.Idle
-            : (_lock.CurrentCount > 0
-                ? DataLoaderStatus.WaitingToExecute
-                : DataLoaderStatus.Executing);
+        public DataLoaderStatus Status { get; private set; }
 
         /// <summary>
         /// Binds an instance to a particular loading context.
@@ -82,18 +73,16 @@ namespace DataLoader
         /// <summary>
         /// Loads an item.
         /// </summary>
-        public async Task<IEnumerable<TReturn>> LoadAsync(TKey key)
+        public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
         {
-            Task<ILookup<TKey, TReturn>> task;
-            await _lock.WaitAsync().ConfigureAwait(false);
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Adding key {key}");
             try
             {
-                if (_keys.Count == 0) Context?.AddToQueue(this);
-                _keys.Add(key);
-                task = _completionSource.Task;
-            }
-            finally { _lock.Release(); }
-            return (await task.ConfigureAwait(false))[key];
+                if (_queue.Count == 0) ScheduleToRun();
+                var fetchResult = new FetchCompletionPair(key);
+                _queue.Enqueue(fetchResult);
+                return fetchResult.CompletionSource.Task;
+            } finally { Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Key {key} added"); }
         }
 
         /// <summary>
@@ -114,20 +103,44 @@ namespace DataLoader
         /// </summary>
         public async Task ExecuteAsync()
         {
-            await _lock.WaitAsync().ConfigureAwait(false);
-            try
+            Status = DataLoaderStatus.Executing;
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - Begin execute");
+            var queue = Interlocked.Exchange(ref _queue, new Queue<FetchCompletionPair>());
+            var lookup = await _fetch(queue.Select(p => p.Key).ToList()).ConfigureAwait(false);
+            while (queue.Count > 0)
             {
-                var lookup = await _fetchDelegate(_keys.ToList()).ConfigureAwait(false);
-                _completionSource.SetResult(lookup);
-                _completionSource = new TaskCompletionSource<ILookup<TKey, TReturn>>();
-                _keys.Clear();
+                var item = queue.Dequeue();
+                item.CompletionSource.SetResult(lookup[item.Key]);
+                item.CompletionSource.Task.Wait();
             }
-            finally { _lock.Release(); }
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} task {Task.CurrentId} - End execute");
+            Status = DataLoaderStatus.Idle;
+        }
 
-            await _lock.WaitAsync().ConfigureAwait(false);
-            var task = _keys.Count > 0 ? Task.Run(ExecuteAsync) : null;
-            _lock.Release();
-            if (task != null) await task.ConfigureAwait(false);
+        private void ScheduleToRun()
+        {
+            Status = DataLoaderStatus.WaitingToExecute;
+            Context?.AddToQueue(this);
+        }
+
+        private static IEnumerable<TKey> GetKeys(IEnumerable<FetchCompletionPair> pairs)
+        {
+            return pairs.Select(p => p.Key).Distinct().ToList();
+        }
+
+        /// <summary>
+        /// Provides a new <see cref="TaskCompletionSource{T}"/> paired with the given key.
+        /// </summary>
+        private struct FetchCompletionPair
+        {
+            public readonly TKey Key;
+            public readonly TaskCompletionSource<IEnumerable<TReturn>> CompletionSource;
+
+            public FetchCompletionPair(TKey key)
+            {
+                Key = key;
+                CompletionSource = new TaskCompletionSource<IEnumerable<TReturn>>();
+            }
         }
     }
 }

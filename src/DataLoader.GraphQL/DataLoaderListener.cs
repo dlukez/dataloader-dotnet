@@ -1,24 +1,30 @@
+using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using DataLoader;
 using GraphQL.Execution;
 
-namespace GraphQL.DataLoader
+namespace DataLoader.GraphQL
 {
     public class DataLoaderListener : DocumentExecutionListenerBase<object>
     {
-        private DataLoaderScope _scope;
+        private readonly ConditionalWeakTable<object, DataLoaderScope> _contextTable =
+            new ConditionalWeakTable<object, DataLoaderScope>();
 
         public override Task BeforeExecutionAsync(object userContext, CancellationToken token)
         {
-            _scope = new DataLoaderScope();
+            var scope = new DataLoaderScope();
+            _contextTable.Add(userContext, scope);
             return Task.CompletedTask;
         }
 
-        public override Task BeforeExecutionAwaitedAsync(object userContext, CancellationToken token)
+        public override async Task BeforeExecutionAwaitedAsync(object userContext, CancellationToken token)
         {
-            _scope.Dispose();
-            return Task.CompletedTask;
+            DataLoaderScope scope;
+            if (!_contextTable.TryGetValue(userContext, out scope))
+                throw new InvalidOperationException("User context has already been garbage collected. Has execution already finished?");
+            await scope.Context.ExecuteAsync().ConfigureAwait(false);
+            scope.Dispose();
         }
     }
 }
