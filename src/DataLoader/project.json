@@ -26,6 +26,7 @@
         "System.Threading.Thread": "4.3.0"
       }
     },
-    "net46": {}
+    "net46": {},
+    "net45": {}
   }
 }
