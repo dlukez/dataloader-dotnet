@@ -72,10 +72,13 @@ namespace DataLoader
         /// </summary>
         public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
         {
-            if (_queue.Count == 0) ScheduleToRun();
-            var fetchResult = new FetchCompletionPair(key);
-            _queue.Enqueue(fetchResult);
-            return fetchResult.CompletionSource.Task;
+            lock (_queue)
+            {
+                if (_queue.Count == 0) ScheduleToRun();
+                var fetchResult = new FetchCompletionPair(key);
+                _queue.Enqueue(fetchResult);
+                return fetchResult.CompletionSource.Task;
+            }
         }
 
         /// <summary>
@@ -97,13 +100,13 @@ namespace DataLoader
         public async Task ExecuteAsync()
         {
             Status = DataLoaderStatus.Executing;
-            var queue = Interlocked.Exchange(ref _queue, new Queue<FetchCompletionPair>());
-            var lookup = await _fetch(queue.Select(p => p.Key).ToList()).ConfigureAwait(false);
+            Queue<FetchCompletionPair> queue;
+            lock (_queue) queue = Interlocked.Exchange(ref _queue, new Queue<FetchCompletionPair>());
+            var lookup = await _fetch(GetKeys(queue)).ConfigureAwait(false);
             while (queue.Count > 0)
             {
                 var item = queue.Dequeue();
                 item.CompletionSource.SetResult(lookup[item.Key]);
-                item.CompletionSource.Task.Wait();
             }
             Status = DataLoaderStatus.Idle;
         }
@@ -126,7 +129,6 @@ namespace DataLoader
         {
             public readonly TKey Key;
             public readonly TaskCompletionSource<IEnumerable<TReturn>> CompletionSource;
-
             public FetchCompletionPair(TKey key)
             {
                 Key = key;
