@@ -108,34 +108,30 @@ namespace DataLoader.Tests
                 return ids.ToLookup(id => id);
             });
 
-            Should.CompleteIn(async () =>
+            var task = DataLoaderContext.Run(async () =>
             {
-                await DataLoaderContext.Run(async () =>
-                {
-                    await loader.LoadAsync(1);
-                    await loader.LoadAsync(2);
-                    await loader.LoadAsync(3);
-                    await Task.WhenAll(loader.LoadAsync(4), loader.LoadAsync(5), loader.LoadAsync(6));
-                    var t7 = loader.LoadAsync(7);
-                    var t8 = loader.LoadAsync(8);
-                    var t9 = loader.LoadAsync(9);
-                    Thread.Sleep(800);
-                    await loader.LoadAsync(10);
-                    t7.IsCompleted.ShouldBeTrue();
-                    t8.IsCompleted.ShouldBeTrue();
-                    t9.IsCompleted.ShouldBeTrue();
-                    return 0;
-                });
-
-            }, TimeSpan.FromSeconds(10));
-
+                await loader.LoadAsync(1);
+                await loader.LoadAsync(2);
+                await loader.LoadAsync(3);
+                await Task.WhenAll(loader.LoadAsync(4), loader.LoadAsync(5), loader.LoadAsync(6));
+                var t7 = loader.LoadAsync(7);
+                var t8 = loader.LoadAsync(8);
+                var t9 = loader.LoadAsync(9);
+                Thread.Sleep(800);
+                await loader.LoadAsync(10);
+                t7.IsCompleted.ShouldBeTrue();
+                t8.IsCompleted.ShouldBeTrue();
+                t9.IsCompleted.ShouldBeTrue();
+                return 0;
+            });
+            
+            Should.CompleteIn(task, TimeSpan.FromSeconds(10));
             loadCount.ShouldBe(5);
         }
 
         [Fact]
-        public async Task DataLoaderContext_Completes()
+        public void DataLoaderContext_Completes()
         {
-            var ctx = new DataLoaderContext();
             var loadCount = 0;
 
             FetchDelegate<int, int> fetch = async (ids) =>
@@ -145,20 +141,25 @@ namespace DataLoader.Tests
                 return ids.ToLookup(id => id);
             };
 
-            var loader1 = new DataLoader<int, int>(fetch, ctx);
-            var loader2 = new DataLoader<int, int>(fetch, ctx);
-            var tasks = new[]
-            {
-                loader1.LoadAsync(1),
-                loader1.LoadAsync(2),
-                loader2.LoadAsync(1),
-                loader2.LoadAsync(2),
-                ctx.Completion
-            };
+            var loader1 = new DataLoader<int, int>(fetch);
+            var loader2 = new DataLoader<int, int>(fetch);
 
-            await ctx.ExecuteAsync();
+            var task = DataLoaderContext.Run(async () =>
+            {
+                var tasks = new[]
+                {
+                    loader1.LoadAsync(1),
+                    loader1.LoadAsync(2),
+                    loader2.LoadAsync(1),
+                    loader2.LoadAsync(2)
+                };
+
+                await Task.WhenAll(tasks);
+                return 5;
+            });
+
+            Should.CompleteIn(task, TimeSpan.FromSeconds(5));
             loadCount.ShouldBe(2);
-            Should.CompleteIn(Task.WhenAll(tasks), TimeSpan.FromSeconds(5));
         }
     }
 }

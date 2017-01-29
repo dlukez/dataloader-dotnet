@@ -107,6 +107,7 @@ namespace DataLoader
             {
                 var item = queue.Dequeue();
                 item.CompletionSource.SetResult(lookup[item.Key]);
+                item.CompletionSource.Task.Wait();
             }
             Status = DataLoaderStatus.Idle;
         }
@@ -123,7 +124,7 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Provides a new <see cref="TaskCompletionSource{T}"/> paired with the given key.
+        /// Creates a new <see cref="TaskCompletionSource{T}"/> paired with the given key.
         /// </summary>
         private struct FetchCompletionPair
         {

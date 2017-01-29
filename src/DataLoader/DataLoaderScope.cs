@@ -10,7 +10,7 @@ namespace DataLoader
     /// When a new scope is created, the <see cref="DataLoaderContext.Current"/> property
     /// is updated to point to the attached context.
     /// </remarks>
-    public class DataLoaderScope : IDisposable
+    internal class DataLoaderScope : IDisposable
     {
         private readonly DataLoaderContext _loadCtx;
         private readonly DataLoaderContext _prevLoadCtx;

@@ -4,8 +4,18 @@ namespace DataLoader.GraphQL.StarWars
 {
     public class GraphQLUserContext
     {
-        public StarWarsContext DataContext { get; set; } = new StarWarsContext();
-        public DataLoaderContext LoadContext { get; set; } = new DataLoaderContext();
+        public StarWarsContext DataContext { get; set; }
+        public DataLoaderContext LoadContext { get; set; }
+
+        public GraphQLUserContext(DataLoaderContext loadContext) : this(loadContext, new StarWarsContext())
+        {
+        }
+
+        public GraphQLUserContext(DataLoaderContext loadContext, StarWarsContext dataContext)
+        {
+            DataContext = dataContext;
+            LoadContext = loadContext;
+        }
     }
 
     public static class GraphQLUserContextExtensions

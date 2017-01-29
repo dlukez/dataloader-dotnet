@@ -18,14 +18,12 @@ namespace DataLoader.GraphQL.StarWars.Controllers
         {
             var sw = Stopwatch.StartNew();
 
-            var result = await _executer.ExecuteAsync(_ =>
+            var result = await DataLoaderContext.Run(ctx => _executer.ExecuteAsync(_ =>
             {
-                var userContext = new GraphQLUserContext();
                 _.Schema = _schema;
                 _.Query = request.Query;
-                _.UserContext = userContext;
-                _.Listeners.Add(new DataLoaderListener(userContext.LoadContext));
-            });
+                _.UserContext = new GraphQLUserContext(ctx);
+            }));
 
             Debug.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - Finished query ({sw.ElapsedMilliseconds}ms)");
             sw.Stop();

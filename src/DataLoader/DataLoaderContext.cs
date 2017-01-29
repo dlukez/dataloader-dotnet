@@ -17,6 +17,10 @@ namespace DataLoader
         private readonly TaskCompletionSource<object> _completionSource = new TaskCompletionSource<object>();
         private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
 
+        internal DataLoaderContext()
+        {
+        }
+
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
         /// </summary>
@@ -43,7 +47,7 @@ namespace DataLoader
         /// <remarks>
         /// A context can only be executed once and cannot be recycled.
         /// </remarks>
-        public async Task ExecuteAsync()
+        private async Task ExecuteAsync()
         {
             if (IsLoading) throw new InvalidOperationException();
             IsLoading = true;
