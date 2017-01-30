@@ -115,20 +115,25 @@ namespace DataLoader
         /// </summary>
         public async Task ExecuteAsync()
         {
-            Queue<FetchCompletionPair> queue;
-            lock (_queue)
+            _isExecuting = true;
+            try
             {
-                queue = _queue;
-                _queue = new Queue<FetchCompletionPair>();
-            }
+                Queue<FetchCompletionPair> queue;
+                lock (_queue)
+                {
+                    queue = _queue;
+                    _queue = new Queue<FetchCompletionPair>();
+                }
 
-            var lookup = await _fetch(GetKeys(queue)).ConfigureAwait(false);
-            while (queue.Count > 0)
-            {
-                var item = queue.Dequeue();
-                item.CompletionSource.SetResult(lookup[item.Key]);
-                await item.CompletionSource.Task.ConfigureAwait(false);
+                var lookup = await _fetch(GetKeys(queue)).ConfigureAwait(false);
+                while (queue.Count > 0)
+                {
+                    var item = queue.Dequeue();
+                    item.CompletionSource.SetResult(lookup[item.Key]);
+                    await item.CompletionSource.Task.ConfigureAwait(false);
+                }
             }
+            finally { _isExecuting = false; }
         }
 
         private static IEnumerable<TKey> GetKeys(IEnumerable<FetchCompletionPair> pairs)
