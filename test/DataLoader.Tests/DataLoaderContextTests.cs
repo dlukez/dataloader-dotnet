@@ -146,15 +146,14 @@ namespace DataLoader.Tests
 
             var task = DataLoaderContext.Run(async () =>
             {
-                var tasks = new[]
+                await Task.WhenAll(new[]
                 {
                     loader1.LoadAsync(1),
                     loader1.LoadAsync(2),
                     loader2.LoadAsync(1),
                     loader2.LoadAsync(2)
-                };
-
-                await Task.WhenAll(tasks);
+                });
+                
                 return 5;
             });
 

@@ -21,6 +21,7 @@ namespace DataLoader
     /// </remarks>
     public class DataLoader<TKey, TReturn> : IDataLoader<TKey, TReturn>
     {
+        private readonly object _lock = new object();
         private readonly FetchDelegate<TKey, TReturn> _fetch;
         private Queue<FetchCompletionPair> _queue = new Queue<FetchCompletionPair>();
         private DataLoaderContext _boundContext;
@@ -61,8 +62,9 @@ namespace DataLoader
         /// </summary>
         public void SetContext(DataLoaderContext context)
         {
-            if (Status != DataLoaderStatus.Idle)
-                throw new InvalidOperationException("Cannot set context - loader must be not be queued or executing");
+            lock (_lock)
+                if (Status != DataLoaderStatus.Idle)
+                    throw new InvalidOperationException("Cannot set context - loader is waiting to execute or executing");
 
             _boundContext = context;
         }
@@ -72,13 +74,17 @@ namespace DataLoader
         /// </summary>
         public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
         {
-            lock (_queue)
+            var fetchResult = new FetchCompletionPair(key);
+            bool shouldSchedule;
+
+            lock (_lock)
             {
-                if (_queue.Count == 0) ScheduleToRun();
-                var fetchResult = new FetchCompletionPair(key);
+                shouldSchedule = _queue.Count == 0;
                 _queue.Enqueue(fetchResult);
-                return fetchResult.CompletionSource.Task;
             }
+
+            if (shouldSchedule) ScheduleToRun();
+            return fetchResult.CompletionSource.Task;
         }
 
         /// <summary>
@@ -99,17 +105,29 @@ namespace DataLoader
         /// </summary>
         public async Task ExecuteAsync()
         {
-            Status = DataLoaderStatus.Executing;
             Queue<FetchCompletionPair> queue;
-            lock (_queue) queue = Interlocked.Exchange(ref _queue, new Queue<FetchCompletionPair>());
+
+            lock (_lock)
+            {
+                if (Status == DataLoaderStatus.Idle) return;
+                if (Status == DataLoaderStatus.Executing) throw new InvalidOperationException("Load already executing");
+                Status = DataLoaderStatus.Executing;
+                queue = _queue;
+                _queue = new Queue<FetchCompletionPair>();
+            }
+
             var lookup = await _fetch(GetKeys(queue)).ConfigureAwait(false);
             while (queue.Count > 0)
             {
                 var item = queue.Dequeue();
                 item.CompletionSource.SetResult(lookup[item.Key]);
-                item.CompletionSource.Task.Wait();
+                await item.CompletionSource.Task.ConfigureAwait(false);
             }
-            Status = DataLoaderStatus.Idle;
+
+            lock (_lock)
+            {
+                Status = DataLoaderStatus.Idle;
+            }
         }
 
         private void ScheduleToRun()
@@ -126,10 +144,10 @@ namespace DataLoader
         /// <summary>
         /// Creates a new <see cref="TaskCompletionSource{T}"/> paired with the given key.
         /// </summary>
-        private struct FetchCompletionPair
+        private class FetchCompletionPair
         {
-            public readonly TKey Key;
-            public readonly TaskCompletionSource<IEnumerable<TReturn>> CompletionSource;
+            public TKey Key { get; }
+            public TaskCompletionSource<IEnumerable<TReturn>> CompletionSource { get; }
             public FetchCompletionPair(TKey key)
             {
                 Key = key;

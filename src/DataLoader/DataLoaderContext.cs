@@ -14,8 +14,8 @@ namespace DataLoader
     public sealed class DataLoaderContext
     {
         private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
-        private readonly TaskCompletionSource<object> _completionSource = new TaskCompletionSource<object>();
         private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
+        private TaskCompletionSource<object> _completionSource = new TaskCompletionSource<object>();
 
         internal DataLoaderContext()
         {
@@ -47,13 +47,14 @@ namespace DataLoader
         /// <remarks>
         /// A context can only be executed once and cannot be recycled.
         /// </remarks>
-        private async Task ExecuteAsync()
+        private async void Complete()
         {
             if (IsLoading) throw new InvalidOperationException();
             IsLoading = true;
             while (_queue.Count > 0) await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
             IsLoading = false;
-            _completionSource.SetResult(null);
+            var tcs = Interlocked.Exchange(ref _completionSource, new TaskCompletionSource<object>(null));
+            tcs.SetResult(null);
         }
 
         /// <summary>
@@ -120,14 +121,14 @@ namespace DataLoader
             // using the local queues (in LIFO order) instead of the global queue (which executes in FIFO order).
             // This is really a hack I think - the same thing should be accomplished using a custom
             // TaskScheduler or custom awaiter.
-            return Task.Run(async () =>
+            return Task.Run(() =>
             {
                 using (var scope = new DataLoaderScope())
                 {
                     var task = func(scope.Context);
                     if (task == null) throw new InvalidOperationException("No task provided.");
-                    await scope.Context.ExecuteAsync().ConfigureAwait(false);
-                    return await task;
+                    scope.Context.Complete();
+                    return task;
                 }
             });
         }

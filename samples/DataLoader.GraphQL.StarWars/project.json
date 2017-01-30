@@ -1,12 +1,13 @@
 {
   "dependencies": {
     "GraphQL": "0.14.4.649",
-    "DataLoader.GraphQL": { "target": "project" },
+    "DataLoader": { "target": "project" },
     
     "Microsoft.NETCore.App": {
       "version": "1.0.0",
       "type": "platform"
     },
+    
     "Microsoft.AspNetCore.Mvc": "1.0.1",
     "Microsoft.AspNetCore.Routing": "1.0.1",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
@@ -23,7 +24,7 @@
       "version": "1.0.0-preview2-final",
       "type": "build"
     },
-    "Microsoft.EntityFrameworkCore.Sqlite": "1.0.1",
+    "Microsoft.EntityFrameworkCore.Sqlite": "1.0.1"
   },
 
   "tools": {
