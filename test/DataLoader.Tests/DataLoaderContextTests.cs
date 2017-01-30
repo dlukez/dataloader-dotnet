@@ -144,17 +144,15 @@ namespace DataLoader.Tests
             var loader1 = new DataLoader<int, int>(fetch);
             var loader2 = new DataLoader<int, int>(fetch);
 
-            var task = DataLoaderContext.Run(async () =>
+            var task = DataLoaderContext.Run(() =>
             {
-                await Task.WhenAll(new[]
+                return Task.WhenAll(new[]
                 {
                     loader1.LoadAsync(1),
                     loader1.LoadAsync(2),
                     loader2.LoadAsync(1),
                     loader2.LoadAsync(2)
                 });
-                
-                return 5;
             });
 
             Should.CompleteIn(task, TimeSpan.FromSeconds(5));
