@@ -1,7 +1,5 @@
 param (
-  [Parameter(Mandatory=$true)]
-  [string]$PrereleaseTag,
-  [Parameter()]
+  [string]$PrereleaseTag = $env:PrereleaseTag,
   [string]$Configuration = "Release"
 )
 
