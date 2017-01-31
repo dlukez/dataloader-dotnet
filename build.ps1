@@ -4,10 +4,10 @@ param (
   [string]$Configuration = "Release"
 )
 
-dotnet restore
+dotnet restore DataLoader.sln
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-dotnet build --configuration $Configuration
+dotnet build DataLoader.sln --configuration $Configuration
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 dotnet test test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
