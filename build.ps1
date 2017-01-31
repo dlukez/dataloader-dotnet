@@ -4,16 +4,24 @@ param (
   [string]$Configuration = "Release"
 )
 
-dotnet restore DataLoader.sln
+if (-not $PrereleaseTag) {
+  $PrereleaseTag = "dev"
+}
+
+dotnet restore
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-dotnet build DataLoader.sln --configuration $Configuration
+dotnet build .\src\DataLoader\ --configuration $Configuration
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-dotnet test test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
+cd .\test\DataLoader.Tests\
+dotnet test --configuration $Configuration
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+cd ..\..\
 
-dotnet pack src/DataLoader/DataLoader.csproj --configuration $Configuration --include-symbols --version-suffix $PrereleaseTag
+cd .\src\DataLoader\
+dotnet pack --configuration $Configuration --include-symbols --version-suffix $PrereleaseTag
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+cd ..\..\
 
 exit 0
