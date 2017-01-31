@@ -8,6 +8,8 @@ if (-not $PrereleaseTag) {
   $PrereleaseTag = "dev"
 }
 
+& .\dotnet-install.ps1
+
 dotnet restore
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
