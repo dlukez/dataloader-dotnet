@@ -1,4 +1,5 @@
 param (
+  [Parameter(Position = 1)]
   [string]$PrereleaseTag = $env:PrereleaseTag,
   [string]$Configuration = "Release"
 )

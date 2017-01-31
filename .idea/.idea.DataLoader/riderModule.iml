@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$/../..">
       <sourceFolder url="file://$MODULE_DIR$/../../samples/DataLoader.GraphQL.StarWars" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/DataLoader" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../test/DataLoader.Tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../test/DataLoader.Tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/../../packages" />
       <excludeFolder url="file://$MODULE_DIR$/../../samples/DataLoader.GraphQL.StarWars/bin" />
       <excludeFolder url="file://$MODULE_DIR$/../../samples/DataLoader.GraphQL.StarWars/obj" />
