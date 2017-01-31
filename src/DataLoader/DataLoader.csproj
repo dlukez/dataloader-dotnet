@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>A port of Facebook's DataLoader for .NET</Description>
+    <VersionPrefix>0.1.2</VersionPrefix>
+    <Authors>Daniel Zimmermann</Authors>
+    <TargetFrameworks>netstandard1.3;net46;net45</TargetFrameworks>
+    <AssemblyName>DataLoader</AssemblyName>
+    <PackageId>DataLoader</PackageId>
+    <PackageTags>dataloader;batch;future</PackageTags>
+    <PackageProjectUrl>https://github.com/dlukez/dataloader-dotnet</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/dlukez/dataloader-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+    <PackageReference Include="NETStandard.Library" Version="1.6.0" />
+    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>
