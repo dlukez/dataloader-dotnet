@@ -4,9 +4,8 @@
 
     <PackageId>DataLoader</PackageId>
     <Description>A port of Facebook's DataLoader for .NET</Description>
-    <PackageVersion>0.1.2</PackageVersion>
     <Authors>Daniel Zimmermann</Authors>
-    <PackageTags>dataloader;batch;future</PackageTags>
+    <PackageTags>dataloader batch future</PackageTags>
     <PackageProjectUrl>https://github.com/dlukez/dataloader-dotnet</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/dlukez/dataloader-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
 
