@@ -14,10 +14,7 @@ if (-not $SkipInstall) {
 dotnet restore
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-dotnet build --configuration $Configuration
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-dotnet test test\DataLoader.Tests\DataLoader.Tests.csproj --configuration $Configuration
+dotnet msbuild /p:Configuration=$Configuration
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 dotnet pack src\DataLoader\DataLoader.csproj --configuration $Configuration --include-symbols
