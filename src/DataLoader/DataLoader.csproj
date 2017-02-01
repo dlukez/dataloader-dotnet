@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
   <PropertyGroup>
-    <Description>A port of Facebook's DataLoader for .NET</Description>
-    <VersionPrefix>0.1.2</VersionPrefix>
-    <Authors>Daniel Zimmermann</Authors>
     <TargetFrameworks>netstandard1.3;net46;net45</TargetFrameworks>
-    <AssemblyName>DataLoader</AssemblyName>
+
     <PackageId>DataLoader</PackageId>
+    <Description>A port of Facebook's DataLoader for .NET</Description>
+    <PackageVersion>0.1.2-*</PackageVersion>
+    <Authors>Daniel Zimmermann</Authors>
     <PackageTags>dataloader;batch;future</PackageTags>
     <PackageProjectUrl>https://github.com/dlukez/dataloader-dotnet</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/dlukez/dataloader-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
+
+    <AssemblyName>DataLoader</AssemblyName>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -18,7 +19,7 @@
     <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3'">
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
   </ItemGroup>
 
@@ -26,10 +27,9 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
+  
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
 </Project>
