@@ -2,7 +2,7 @@ param (
   [Parameter(Position = 1)]
   [string]$PrereleaseTag = $env:PrereleaseTag,
   [string]$Configuration = "Release",
-  [switch]$SkipInstall
+  [switch]$SkipInstall = $false
 )
 
 if (-not $PrereleaseTag) {
@@ -10,13 +10,13 @@ if (-not $PrereleaseTag) {
 }
 
 if (-not $SkipInstall) {
-  & .\dotnet-install.ps1 -Architecture x64
+  & .\tools\dotnet-install.ps1 -Architecture x64
 }
 
 dotnet restore DataLoader.sln
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-dotnet build DataLoader.sln -configuration $Configuration
+dotnet build DataLoader.sln --configuration $Configuration
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 dotnet test test\DataLoader.Tests\DataLoader.Tests.csproj --configuration $Configuration
