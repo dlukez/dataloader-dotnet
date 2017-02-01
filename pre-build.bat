@@ -1,2 +1,2 @@
 call %GitVersion% /output buildserver
-dir %MsBuildExe%\..\
+dir "C:\Program Files (x86)\MSBuild\""
