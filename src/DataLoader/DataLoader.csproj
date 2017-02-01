@@ -4,7 +4,7 @@
 
     <PackageId>DataLoader</PackageId>
     <Description>A port of Facebook's DataLoader for .NET</Description>
-    <PackageVersion>0.1.2-*</PackageVersion>
+    <PackageVersion>0.1.2</PackageVersion>
     <Authors>Daniel Zimmermann</Authors>
     <PackageTags>dataloader;batch;future</PackageTags>
     <PackageProjectUrl>https://github.com/dlukez/dataloader-dotnet</PackageProjectUrl>
@@ -27,7 +27,7 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
