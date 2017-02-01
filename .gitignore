@@ -6,6 +6,7 @@ packages/
 # User-specific files
 *.suo
 *.user
+*.userprefs
 
 # Build files
 [Bb]in/

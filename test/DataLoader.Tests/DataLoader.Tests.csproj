@@ -1,17 +1,22 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0'">Exe</OutputType>
+    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0'">Library</OutputType>
     <TargetFramework>netcoreapp1.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DataLoader\DataLoader.csproj" />
+    <ProjectReference Include="..\..\src\DataLoader\DataLoader.csproj">
+      <Project>{49247793-58CE-4FFC-8DED-2DF2D3193424}</Project>
+      <Name>DataLoader</Name>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="1.0.0-alpha-20170106-08" />
     <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
     <PackageReference Include="Shouldly" Version="2.8.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk">
+      <Version>15.0.0-preview-20170125-04</Version>
+    </PackageReference>
   </ItemGroup>
 </Project>
