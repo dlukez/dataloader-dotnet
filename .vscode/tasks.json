@@ -4,27 +4,25 @@
     "version": "0.1.0",
     "command": "dotnet",
     "isShellCommand": true,
+    "showOutput": "silent",
     "args": [],
     "tasks": [
         {
             "taskName": "build",
-            "args": [ "src/DataLoader", "test/DataLoader.Tests", "samples/DataLoader.GraphQL.StarWars" ],
+            "args": [ "DataLoader.sln" ],
             "isBuildCommand": true,
-            "showOutput": "silent",
             "problemMatcher": "$msCompile"
         },
         {
             "taskName": "test",
             "args": [ "test/DataLoader.Tests" ],
             "isTestCommand": true,
-            "showOutput": "silent",
             "problemMatcher": "$msCompile"
         },
         {
             "taskName": "rebuild",
             "suppressTaskName": true,
             "args": [ "build", "--no-incremental", "src/DataLoader", "test/DataLoader.Tests", "samples/DataLoader.GraphQL.StarWars" ],
-            "showOutput": "silent",
             "problemMatcher": "$msCompile"
         }
     ]
