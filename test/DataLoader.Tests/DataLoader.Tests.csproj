@@ -6,10 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)src\DataLoader\DataLoader.csproj">
-      <Project>{49247793-58CE-4FFC-8DED-2DF2D3193424}</Project>
-      <Name>DataLoader</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\src\DataLoader\DataLoader.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,10 +15,4 @@
     <PackageReference Include="Shouldly" Version="2.8.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20161024-02" />
   </ItemGroup>
-
-  <Target Name="Test">
-    <Exec ContinueOnError="true" IgnoreExitCode="true" Command="dotnet test">
-      <Output TaskParameter="ExitCode" PropertyName="ErrorCode"/>
-    </Exec>
-  </Target>
 </Project>

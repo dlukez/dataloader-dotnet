@@ -38,7 +38,7 @@ namespace DataLoader
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/> bound to the specified context.
         /// </summary>
-        public DataLoader(FetchDelegate<TKey, TReturn> fetch, DataLoaderContext context) : this(fetch)
+        internal DataLoader(FetchDelegate<TKey, TReturn> fetch, DataLoaderContext context) : this(fetch)
         {
             SetContext(context);
         }
@@ -70,7 +70,7 @@ namespace DataLoader
         /// <summary>
         /// Binds an instance to a particular loading context.
         /// </summary>
-        public void SetContext(DataLoaderContext context)
+        internal void SetContext(DataLoaderContext context)
         {
             lock (_lock)
                 if (_queue.Count > 0)

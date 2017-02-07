@@ -19,7 +19,6 @@ namespace DataLoader.Tests
             {
                 DataLoaderContext.Current.ShouldBe(ctx);
                 DataLoaderContext.Current.ShouldNotBeNull();
-                return Task.FromResult(1);
             });
 
             DataLoaderContext.Current.ShouldBeNull();
@@ -31,16 +30,16 @@ namespace DataLoader.Tests
             await DataLoaderContext.Run(async outerCtx =>
             {
                 DataLoaderContext.Current.ShouldBe(outerCtx);
+
                 await DataLoaderContext.Run(innerCtx =>
                 {
                     innerCtx.ShouldNotBe(outerCtx);
                     innerCtx.ShouldBe(DataLoaderContext.Current);
-                    return Task.FromResult(1);
                 });
+
                 DataLoaderContext.Current.ShouldBe(outerCtx);
-                return 2;
             });
-            
+
             DataLoaderContext.Current.ShouldBeNull();
         }
 
@@ -67,8 +66,6 @@ namespace DataLoader.Tests
                 var thread = new Thread(() => DataLoaderContext.Current.ShouldBe(ctx));
                 thread.Start();
                 thread.Join();
-
-                return true;
             });
         }
 
@@ -110,53 +107,34 @@ namespace DataLoader.Tests
 
             var task = DataLoaderContext.Run(async () =>
             {
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
                 await loader.LoadAsync(1);
+
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
                 await loader.LoadAsync(2);
+
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
                 await loader.LoadAsync(3);
+
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
                 await Task.WhenAll(loader.LoadAsync(4), loader.LoadAsync(5), loader.LoadAsync(6));
+
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
                 var t7 = loader.LoadAsync(7);
                 var t8 = loader.LoadAsync(8);
                 var t9 = loader.LoadAsync(9);
                 Thread.Sleep(800);
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount} (again)");
                 await loader.LoadAsync(10);
+
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
                 t7.IsCompleted.ShouldBeTrue();
                 t8.IsCompleted.ShouldBeTrue();
                 t9.IsCompleted.ShouldBeTrue();
-                return 0;
             });
-            
+
             Should.CompleteIn(task, TimeSpan.FromSeconds(10));
             loadCount.ShouldBe(5);
-        }
-
-        [Fact]
-        public void DataLoaderContext_Completes()
-        {
-            var loadCount = 0;
-
-            FetchDelegate<int, int> fetch = async (ids) =>
-            {
-                await Task.Delay(500);
-                loadCount++;
-                return ids.ToLookup(id => id);
-            };
-
-            var loader1 = new DataLoader<int, int>(fetch);
-            var loader2 = new DataLoader<int, int>(fetch);
-
-            var task = DataLoaderContext.Run(() =>
-            {
-                return Task.WhenAll(new[]
-                {
-                    loader1.LoadAsync(1),
-                    loader1.LoadAsync(2),
-                    loader2.LoadAsync(1),
-                    loader2.LoadAsync(2)
-                });
-            });
-
-            Should.CompleteIn(task, TimeSpan.FromSeconds(5));
-            loadCount.ShouldBe(2);
         }
     }
 }

@@ -35,8 +35,8 @@ namespace DataLoader
         /// </summary>
         public IDataLoader<TKey, TReturn> GetLoader<TKey, TReturn>(object key, FetchDelegate<TKey, TReturn> fetch)
         {
-            return (IDataLoader<TKey, TReturn>) _cache.GetOrAdd(key, _ =>
-                new DataLoader<TKey, TReturn>(fetch, this));
+            return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ =>
+               new DataLoader<TKey, TReturn>(fetch, this));
         }
 
         /// <summary>
@@ -45,25 +45,40 @@ namespace DataLoader
         public bool IsLoading { get; private set; }
 
         /// <summary>
-        /// Represents whether this context has finished executing loaders.
+        /// Represents whether this context has been completed.
         /// </summary>
         public Task Completion => _completionSource.Task;
 
         /// <summary>
-        /// Asynchronously processes pending loaders. Loaders are fired in FIFO order,
-        /// each loader is queued the first time a load method is called on it.
+        /// Begins processing the waiting loaders, firing them sequentially until there are none remaining.
         /// </summary>
         /// <remarks>
-        /// A context can only be executed once and cannot be recycled.
+        /// Loaders are fired in the order that they are first called. Once completed the context cannot be reused.
         /// </remarks>
         public async void Complete()
         {
             if (IsLoading) throw new InvalidOperationException();
             IsLoading = true;
-            while (_queue.Count > 0) await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
+
+            try
+            {
+                while (_queue.Count > 0)
+                {
+                    await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
+                }
+
+                _completionSource.SetResult(null);
+            }
+            catch (OperationCanceledException)
+            {
+                _completionSource.SetCanceled();
+            }
+            catch (Exception e)
+            {
+                _completionSource.SetException(e);
+            }
+
             IsLoading = false;
-            var tcs = Interlocked.Exchange(ref _completionSource, new TaskCompletionSource<object>(null));
-            tcs.SetResult(null);
         }
 
         /// <summary>
@@ -111,24 +126,43 @@ namespace DataLoader
             return Run(_ => func());
         }
 
+        /// <summary>
+        /// Runs code within a new loader context before firing any pending
+        /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
+        /// </summary>
+        public static Task Run(Action action)
+        {
+            return Run(_ => { action(); return Task.FromResult(true); });
+        }
+
 #endif
 
         /// <summary>
         /// Runs code within a new loader context before firing any pending
-        /// <see cref="DataLoader{TKey,TReturn}"/> requests.
+        /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
+        /// </summary>
+        public static Task Run(Action<DataLoaderContext> action)
+        {
+            return Run(ctx => { action(ctx); return Task.FromResult(true); });
+        }
+
+        /// <summary>
+        /// Runs code within a new loader context before firing any pending
+        /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
         /// </summary>
         public static Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
-            // TODO - Revise this?
-            // For some reason, using `Task.Run` results in <see cref="TaskCompletionSource{T}"/>
-            // running completions synchronously. This prevents the main loop from continuing
-            // before additional load calls are reached to requeue loaders.
-            // I am presuming this is because, once inside the ThreadPool, continuations will be scheduled
-            // using the local queues (in LIFO order) instead of the global queue (which executes in FIFO order).
-            // This is really a hack I think - the same thing should be accomplished using a custom
-            // TaskScheduler or custom awaiter.
+            // TODO
+            //
+            // For some reason, using `Task.Run` causes <see cref="TaskCompletionSource{T}"/> to run continuations
+            // synchronously, which prevents the main loop from continuing on to the next loader before they're done.
+            //
+            // I presume this is because once we're inside the ThreadPool, continuations will be scheduled using the
+            // local queues (in LIFO order) instead of the global queue (which executes in FIFO order). This is really
+            // a hack I think - the same thing should be accomplished using a custom TaskScheduler or custom awaiter.
+            //
             return Task.Run(() =>
             {
                 using (var scope = new DataLoaderScope())

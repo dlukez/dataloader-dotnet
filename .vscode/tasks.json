@@ -9,20 +9,28 @@
     "tasks": [
         {
             "taskName": "build",
-            "args": [ "DataLoader.sln" ],
+            "args": [
+                "DataLoader.sln"
+            ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
         },
         {
             "taskName": "test",
-            "args": [ "test/DataLoader.Tests" ],
+            "args": [
+                "test/DataLoader.Tests"
+            ],
             "isTestCommand": true,
             "problemMatcher": "$msCompile"
         },
         {
             "taskName": "rebuild",
             "suppressTaskName": true,
-            "args": [ "build", "--no-incremental", "src/DataLoader", "test/DataLoader.Tests", "samples/DataLoader.GraphQL.StarWars" ],
+            "args": [
+                "build",
+                "--no-incremental",
+                "DataLoader.sln"
+            ],
             "problemMatcher": "$msCompile"
         }
     ]

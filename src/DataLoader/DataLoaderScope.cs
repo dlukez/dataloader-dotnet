@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace DataLoader
 {
@@ -18,7 +19,8 @@ namespace DataLoader
         /// <summary>
         /// Creates a scope for a new <see cref="DataLoaderContext"/>.
         /// </summary>
-        public DataLoaderScope() : this(new DataLoaderContext())
+        /// <remarks>The context will be completed when the scope disposed of.</remarks>
+        public DataLoaderScope() : this(new DataLoaderContext(), true)
         {
         }
 
@@ -26,18 +28,20 @@ namespace DataLoader
         /// Creates a scope for a new <see cref="DataLoaderContext"/>.
         /// </summary>
         /// <param name="completeOnDisposal">Configures whether to complete the context when the scope is disposed of. </param>
-        public DataLoaderScope(bool completeOnDisposal) : this(new DataLoaderContext())
+        public DataLoaderScope(bool completeOnDisposal) : this(new DataLoaderContext(), completeOnDisposal)
         {
-            _completeOnDisposal = completeOnDisposal;
         }
 
         /// <summary>
         /// Creates a scope for the given <see cref="DataLoaderContext"/>.
         /// </summary>
-        public DataLoaderScope(DataLoaderContext context)
+        /// <param name="context"></param>
+        /// <param name="completeOnDisposal">Configures whether to complete the context when the scope is disposed of. </param>
+        internal DataLoaderScope(DataLoaderContext context, bool completeOnDisposal)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+            _completeOnDisposal = completeOnDisposal;
             _loadCtx = context;
             _prevLoadCtx = DataLoaderContext.Current;
             DataLoaderContext.SetCurrentContext(_loadCtx);
@@ -47,6 +51,11 @@ namespace DataLoader
         /// The context contained in this scope. Contains data relevant to the current load operation.
         /// </summary>
         public DataLoaderContext Context => _loadCtx;
+
+        /// <summary>
+        /// Represents the scope's completion.
+        /// </summary>
+        public Task Completion => _loadCtx.Completion;
 
         /// <summary>
         /// Marks the end of this scope and the point at which pending loaders will be fired.

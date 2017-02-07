@@ -12,6 +12,5 @@ namespace DataLoader
     {
         DataLoaderStatus Status { get; }
         Task ExecuteAsync();
-        void SetContext(DataLoaderContext context);
     }
 }
