@@ -4,26 +4,35 @@ namespace DataLoader
 {
     /// <summary>
     /// Represents the beginning and end of a data loader block or operation.
-    /// When disposed, pending loaders will be triggered.
     /// </summary>
     /// <remarks>
-    /// When a new scope is created, the <see cref="DataLoaderContext.Current"/> property
-    /// is updated to point to the attached context.
+    /// When a new scope is created, <see cref="DataLoaderContext.Current"/> is updated to point to the <see cref="DataLoaderContext">context</see>
+    /// created or given in the constructor. When the scope is disposed of, the <code>Current</code> property is reset to its previous value. 
     /// </remarks>
-    internal class DataLoaderScope : IDisposable
+    public class DataLoaderScope : IDisposable
     {
+        private readonly bool _completeOnDisposal;
         private readonly DataLoaderContext _loadCtx;
         private readonly DataLoaderContext _prevLoadCtx;
 
         /// <summary>
-        /// Creates a new scope for a new <see cref="DataLoaderContext"/>
+        /// Creates a scope for a new <see cref="DataLoaderContext"/>.
         /// </summary>
         public DataLoaderScope() : this(new DataLoaderContext())
         {
         }
 
         /// <summary>
-        /// Creates a new scope for the given <see cref="DataLoaderContext"/>.
+        /// Creates a scope for a new <see cref="DataLoaderContext"/>.
+        /// </summary>
+        /// <param name="completeOnDisposal">Configures whether to complete the context when the scope is disposed of. </param>
+        public DataLoaderScope(bool completeOnDisposal) : this(new DataLoaderContext())
+        {
+            _completeOnDisposal = completeOnDisposal;
+        }
+
+        /// <summary>
+        /// Creates a scope for the given <see cref="DataLoaderContext"/>.
         /// </summary>
         public DataLoaderScope(DataLoaderContext context)
         {
@@ -48,6 +57,7 @@ namespace DataLoader
             if (_loadCtx != DataLoaderContext.Current)
                 throw new InvalidOperationException("This context for this scope does not match the current context");
 #endif
+            if (_completeOnDisposal) _loadCtx.Complete();
             DataLoaderContext.SetCurrentContext(_prevLoadCtx);
         }
     }

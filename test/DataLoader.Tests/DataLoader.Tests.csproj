@@ -1,11 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build;Test">
+﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0'">Library</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.0</TargetFramework>
+    <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8;dnxcore50;</PackageTargetFallback>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DataLoader\DataLoader.csproj">
+    <ProjectReference Include="$(SolutionDir)src\DataLoader\DataLoader.csproj">
       <Project>{49247793-58CE-4FFC-8DED-2DF2D3193424}</Project>
       <Name>DataLoader</Name>
     </ProjectReference>
@@ -13,9 +14,14 @@
 
   <ItemGroup>
     <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
-    <PackageReference Include="xunit.MSBuild" Version="2.0.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
     <PackageReference Include="Shouldly" Version="2.8.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170125-04" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20161024-02" />
   </ItemGroup>
+
+  <Target Name="Test">
+    <Exec ContinueOnError="true" IgnoreExitCode="true" Command="dotnet test">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode"/>
+    </Exec>
+  </Target>
 </Project>

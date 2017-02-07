@@ -11,12 +11,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("DataLoader")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCopyright("Copyright © Daniel Zimmermann 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
+// to COM components. If you need to access a type in this assembly from
 // COM, set the ComVisible attribute to true on that type.
 
 [assembly: ComVisible(false)]
@@ -25,6 +25,5 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("8E469F11-59AE-40C6-8EC0-27D387C8C0E8")]
 
-// Make internals available to unit tests.
-
+// Expose internals to test assemblies
 [assembly: InternalsVisibleTo("DataLoader.Tests")]

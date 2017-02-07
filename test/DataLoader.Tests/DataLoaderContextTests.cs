@@ -97,7 +97,7 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public void DataLoaderContext_TriggersConsecutiveLoads()
+        public void DataLoaderContext_Run_TriggersConsecutiveLoads()
         {
             var loadCount = 0;
 

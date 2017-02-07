@@ -7,10 +7,19 @@ using System.Threading.Tasks;
 namespace DataLoader
 {
     /// <summary>
-    /// Defines a context for <see cref="DataLoader"/> instances. Once executed, they cannot be reused.
-    /// The context will pump continuations so that subsequent loads called in code awaiting a pending
-    /// result should also be fired as a batch.
+    /// Defines a context for <see cref="DataLoader"/> instances.
     /// </summary>
+    /// <remarks>
+    /// This class contains any data required by <see cref="DataLoader"/> instances and is responsible for managing their execution.
+    ///e
+    /// Loaders enlist themselves with the context active at the time when a <code>Load</code> method is called on a loader instance.
+    /// When the <see cref="DataLoaderContext.Complete">Complete</see> method is called on the context, it begins executing these waiting loaders.
+    /// Loaders are executed serially, since  parallel requests to a database are generally not conducive to good performance or throughput.
+    ///
+    /// The context will try to wait until each loader - as well as continuations attached to each promise it hands out - finish executing
+    /// before moving on to the next. The purpose of this is to allow loaders to enlist or reenlist themselves so that they too are processed
+    /// as part the context's completion.
+    /// </remarks>
     public sealed class DataLoaderContext
     {
         private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
@@ -47,7 +56,7 @@ namespace DataLoader
         /// <remarks>
         /// A context can only be executed once and cannot be recycled.
         /// </remarks>
-        private async void Complete()
+        public async void Complete()
         {
             if (IsLoading) throw new InvalidOperationException();
             IsLoading = true;
@@ -65,12 +74,9 @@ namespace DataLoader
             _queue.Enqueue(loader);
         }
 
-        #region Ambient context
-
 #if NET45
 
         internal static DataLoaderContext Current => null;
-
         internal static void SetCurrentContext(DataLoaderContext context) {}
 
 #else
@@ -94,7 +100,7 @@ namespace DataLoader
 
 #endif
 
-#endregion
+#if !NET45
 
         /// <summary>
         /// Runs code within a new loader context before firing any pending
@@ -104,6 +110,8 @@ namespace DataLoader
         {
             return Run(_ => func());
         }
+
+#endif
 
         /// <summary>
         /// Runs code within a new loader context before firing any pending
@@ -127,7 +135,6 @@ namespace DataLoader
                 {
                     var task = func(scope.Context);
                     if (task == null) throw new InvalidOperationException("No task provided.");
-                    scope.Context.Complete();
                     return task;
                 }
             });

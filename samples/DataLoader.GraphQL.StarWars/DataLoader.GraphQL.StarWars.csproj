@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <DebugType>portable</DebugType>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>DataLoader.GraphQL.StarWars</AssemblyName>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <PackageId>DataLoader.GraphQL.StarWars</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);netstandard1.3;portable-net45+win8</PackageTargetFallback>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -16,13 +16,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\**\*;**\*.cshtml;appsettings.json;web.config">
+    <Content Exclude="wwwroot\**\*" />
+    <Content Update="wwwroot\index.html;appsettings.json;web.config">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DataLoader\DataLoader.csproj" />
+    <ProjectReference Include="$(ProjectDir)..\..\src\DataLoader\DataLoader.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,9 +36,5 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0-msbuild3-final" />
   </ItemGroup>
 </Project>
