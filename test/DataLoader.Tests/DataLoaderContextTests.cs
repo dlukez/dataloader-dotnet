@@ -123,7 +123,7 @@ namespace DataLoader.Tests
                 var t7 = loader.LoadAsync(7);
                 var t8 = loader.LoadAsync(8);
                 var t9 = loader.LoadAsync(9);
-                Thread.Sleep(800);
+                Thread.Sleep(200);
                 Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount} (again)");
                 await loader.LoadAsync(10);
 

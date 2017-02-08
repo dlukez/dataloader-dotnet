@@ -1,1 +1,0 @@
-call %GitVersion% /output buildserver

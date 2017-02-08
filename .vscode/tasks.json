@@ -18,7 +18,7 @@
         {
             "taskName": "test",
             "args": [
-                "test/DataLoader.Tests"
+                "test/DataLoader.Tests/DataLoader.Tests.csproj"
             ],
             "isTestCommand": true,
             "problemMatcher": "$msCompile"

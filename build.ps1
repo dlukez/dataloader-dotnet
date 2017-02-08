@@ -1,25 +1,34 @@
 # Params
 param (
-    [string]$Configuration = "Release",
-    [switch]$SkipInstall = $false,
-    [string]$PrereleaseTag
+    [string]$Configuration = $env:Configuration,
+    [string]$PrereleaseTag = $env:PrereleaseTag
 )
 
-if (-not $PrereleaseTag) {
-    $PrereleaseTag = "dev"; 
+if (-not $Configuration) {
+    $Configuration = "Release"
 }
 
-# Script behavior
-$ErrorActionPreference = "Stop";
+if (-not $PrereleaseTag) {
+    $PrereleaseTag = "dev"
+}
 
-# Install the SDK
-if (-not $SkipInstall) {
-    & .\tools\dotnet-install.ps1 -Architecture x64;
+# Setup
+$ErrorActionPreference = "Stop"
+
+# Helpers
+function Test-ExitCode {
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE 
+    }
 }
 
 # Build script
-dotnet msbuild test/DataLoader.Tests/DataLoader.Tests.csproj /t:Restore,VSTest /p:Configuration=$Configuration 
-dotnet msbuild src/DataLoader/DataLoader.csproj /t:Clean,Restore,Build,Pack /p:Configuration=$Configuration
-# dotnet clean
-# dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
-# dotnet pack ./src/DataLoader/DataLoader.csproj --configuration $Configuration
+dotnet msbuild test/DataLoader.Tests/DataLoader.Tests.csproj /t:Restore,VSTest /v:normal /p:Configuration=$Configuration
+Test-ExitCode
+
+dotnet msbuild src/DataLoader/DataLoader.csproj /t:Clean,Restore,Build,Pack /v:normal /p:Configuration=$Configuration
+Test-ExitCode
+
+# Invoke-BuildStep { dotnet clean }
+# Invoke-BuildStep { dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration }
+# Invoke-BuildStep { dotnet pack ./src/DataLoader/DataLoader.csproj --configuration $Configuration }

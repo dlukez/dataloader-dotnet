@@ -15,8 +15,4 @@
     <PackageReference Include="Shouldly" Version="2.8.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20161024-02" />
   </ItemGroup>
-
-  <Target Name="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
-    <CallTarget Target="VSTest" />
-  </Target>
 </Project>

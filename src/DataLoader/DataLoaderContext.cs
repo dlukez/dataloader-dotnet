@@ -40,9 +40,9 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Indicates whether loaders have been started.
+        /// Indicates whether loaders have been fired and are in progress.
         /// </summary>
-        public bool IsLoading { get; private set; }
+        public bool IsCompleting { get; private set; }
 
         /// <summary>
         /// Represents whether this context has been completed.
@@ -57,8 +57,8 @@ namespace DataLoader
         /// </remarks>
         public async void Complete()
         {
-            if (IsLoading) throw new InvalidOperationException();
-            IsLoading = true;
+            if (IsCompleting) throw new InvalidOperationException();
+            IsCompleting = true;
 
             try
             {
@@ -78,7 +78,7 @@ namespace DataLoader
                 _completionSource.SetException(e);
             }
 
-            IsLoading = false;
+            IsCompleting = false;
         }
 
         /// <summary>
@@ -165,10 +165,11 @@ namespace DataLoader
             //
             return Task.Run(() =>
             {
-                using (var scope = new DataLoaderScope())
+                using (var scope = new DataLoaderScope(false))
                 {
                     var task = func(scope.Context);
                     if (task == null) throw new InvalidOperationException("No task provided.");
+                    scope.Context.Complete();
                     return task;
                 }
             });
