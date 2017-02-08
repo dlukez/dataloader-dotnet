@@ -1,3 +1,4 @@
+# Params
 param (
     [string]$Configuration = "Release",
     [switch]$SkipInstall = $false,
@@ -5,32 +6,20 @@ param (
 )
 
 if (-not $PrereleaseTag) {
-    $PrereleaseTag = "dev"
+    $PrereleaseTag = "dev"; 
 }
 
+# Script behavior
+$ErrorActionPreference = "Stop";
+
+# Install the SDK
 if (-not $SkipInstall) {
-    & .\tools\dotnet-install.ps1 -Architecture x64
+    & .\tools\dotnet-install.ps1 -Architecture x64;
 }
 
-function Confirm-ExitCode {
-    if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE
-    }
-}
-
-dotnet clean
-Confirm-ExitCode
-
-dotnet restore
-Confirm-ExitCode
-
-dotnet build ./src/DataLoader/DataLoader.csproj --configuration $Configuration --no-incremental
-Confirm-ExitCode
-
-dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
-Confirm-ExitCode
-
-dotnet pack ./src/DataLoader/DataLoader.csproj --configuration $Configuration --no-build --include-symbols --version-suffix $PrereleaseTag
-Confirm-ExitCode
-
-exit 0
+# Build script
+dotnet msbuild test/DataLoader.Tests/DataLoader.Tests.csproj /t:Restore,VSTest /p:Configuration=$Configuration 
+dotnet msbuild src/DataLoader/DataLoader.csproj /t:Clean,Restore,Build,Pack /p:Configuration=$Configuration
+# dotnet clean
+# dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
+# dotnet pack ./src/DataLoader/DataLoader.csproj --configuration $Configuration
