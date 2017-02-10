@@ -26,12 +26,17 @@ function Test-ExitCode {
 }
 
 # Build script
-dotnet msbuild test/DataLoader.Tests/DataLoader.Tests.csproj /t:Restore,VSTest /v:normal /p:Configuration=$Configuration
+dotnet clean
 Test-ExitCode
 
-dotnet msbuild src/DataLoader/DataLoader.csproj /t:Clean,Restore,Build,Pack /v:normal /p:Configuration=$Configuration
+dotnet restore
 Test-ExitCode
 
-# Invoke-BuildStep { dotnet clean }
-# Invoke-BuildStep { dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration }
-# Invoke-BuildStep { dotnet pack ./src/DataLoader/DataLoader.csproj --configuration $Configuration }
+dotnet build --configuration $Configuration
+Test-ExitCode
+
+dotnet test ./test/DataLoader.Tests/ --configuration $Configuration
+Test-ExitCode
+
+dotnet pack ./src/DataLoader/DataLoader.csproj --configuration $Configuration --no-build
+Test-ExitCode
