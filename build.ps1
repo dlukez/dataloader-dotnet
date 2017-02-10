@@ -38,5 +38,5 @@ Test-ExitCode
 dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
 Test-ExitCode
 
-dotnet pack ./src/DataLoader/DataLoader.csproj --configuration $Configuration --no-build
+dotnet pack ./src/DataLoader/DataLoader.csproj --configuration $Configuration --no-build --include-symbols
 Test-ExitCode
