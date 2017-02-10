@@ -130,9 +130,9 @@ namespace DataLoader
         /// Runs code within a new loader context before firing any pending
         /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
         /// </summary>
-        public static Task Run(Action action)
+        public static Task Run(Func<Task> func)
         {
-            return Run(_ => { action(); return Task.FromResult(true); });
+            return Run(_ => func());
         }
 
 #endif
@@ -141,16 +141,24 @@ namespace DataLoader
         /// Runs code within a new loader context before firing any pending
         /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
         /// </summary>
-        public static Task Run(Action<DataLoaderContext> action)
+        public static Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
         {
-            return Run(ctx => { action(ctx); return Task.FromResult(true); });
+            return Task.Run<T>(() =>
+            {
+                using (var scope = new DataLoaderScope())
+                {
+                    var task = func(scope.Context);
+                    if (task == null) throw new InvalidOperationException("No task provided.");
+                    return task;
+                }
+            });
         }
 
         /// <summary>
         /// Runs code within a new loader context before firing any pending
         /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
         /// </summary>
-        public static Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
+        public static Task Run(Func<DataLoaderContext, Task> func)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
@@ -165,11 +173,10 @@ namespace DataLoader
             //
             return Task.Run(() =>
             {
-                using (var scope = new DataLoaderScope(false))
+                using (var scope = new DataLoaderScope())
                 {
                     var task = func(scope.Context);
                     if (task == null) throw new InvalidOperationException("No task provided.");
-                    scope.Context.Complete();
                     return task;
                 }
             });

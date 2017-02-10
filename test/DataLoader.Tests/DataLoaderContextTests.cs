@@ -19,6 +19,7 @@ namespace DataLoader.Tests
             {
                 DataLoaderContext.Current.ShouldBe(ctx);
                 DataLoaderContext.Current.ShouldNotBeNull();
+                return Task.CompletedTask;
             });
 
             DataLoaderContext.Current.ShouldBeNull();
@@ -35,6 +36,7 @@ namespace DataLoader.Tests
                 {
                     innerCtx.ShouldNotBe(outerCtx);
                     innerCtx.ShouldBe(DataLoaderContext.Current);
+                    return Task.CompletedTask;
                 });
 
                 DataLoaderContext.Current.ShouldBe(outerCtx);
@@ -107,30 +109,28 @@ namespace DataLoader.Tests
 
             var task = DataLoaderContext.Run(async () =>
             {
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
-                await loader.LoadAsync(1);
+                var one = await loader.LoadAsync(1);
+                var two = await loader.LoadAsync(2);
+                var three = await loader.LoadAsync(3);
 
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
-                await loader.LoadAsync(2);
+                var fourfivesix = await Task.WhenAll(
+                    loader.LoadAsync(4),
+                    loader.LoadAsync(5),
+                    loader.LoadAsync(6)
+                );
 
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
-                await loader.LoadAsync(3);
-
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
-                await Task.WhenAll(loader.LoadAsync(4), loader.LoadAsync(5), loader.LoadAsync(6));
-
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
                 var t7 = loader.LoadAsync(7);
                 var t8 = loader.LoadAsync(8);
                 var t9 = loader.LoadAsync(9);
                 Thread.Sleep(200);
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount} (again)");
-                await loader.LoadAsync(10);
 
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} - {loadCount}");
+                var ten = await loader.LoadAsync(10);
+
                 t7.IsCompleted.ShouldBeTrue();
                 t8.IsCompleted.ShouldBeTrue();
                 t9.IsCompleted.ShouldBeTrue();
+
+                return true;
             });
 
             Should.CompleteIn(task, TimeSpan.FromSeconds(10));
