@@ -1,2 +1,1 @@
-call %GitVersion% /output buildserver
-exit
+%GitVersion% /output buildserver

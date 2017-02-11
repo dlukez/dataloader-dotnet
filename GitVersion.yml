@@ -1,3 +1,1 @@
 mode: ContinuousDeployment
-ignore:
-  sha: []

@@ -1,15 +1,15 @@
 # Params
 param (
     [string]$Configuration = $env:Configuration,
-    [string]$PrereleaseTag = $env:PrereleaseTag
+    [string]$Version = $env:SemVer
 )
+
+if (-not $Version) {
+    $Version = '0.0.0'
+}
 
 if (-not $Configuration) {
     $Configuration = "Release"
-}
-
-if (-not $PrereleaseTag) {
-    $PrereleaseTag = "dev"
 }
 
 # Download the SDK
@@ -32,11 +32,10 @@ Test-ExitCode
 dotnet restore
 Test-ExitCode
 
-dotnet build --configuration $Configuration
+dotnet msbuild ./src/DataLoader/DataLoader.csproj /t:Build,Pack /p:Configuration=$Configuration /p:IncludeSymbols:$true /p:Version=$Version
 Test-ExitCode
 
-dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
+dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration --no-build
 Test-ExitCode
 
-dotnet pack ./src/DataLoader/DataLoader.csproj --configuration $Configuration --no-build --include-symbols --version-suffix $PrereleaseTag
-Test-ExitCode
+exit
