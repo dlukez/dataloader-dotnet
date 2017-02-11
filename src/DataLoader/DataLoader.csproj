@@ -3,6 +3,7 @@
     <Title>DataLoader for .NET</Title>
     <PackageId>DataLoader</PackageId>
     <PackageVersion>0.1.2</PackageVersion>
+    <Version>0.1.2</Version>
     <Description>A port of Facebook's DataLoader for .NET</Description>
     <Authors>Daniel Zimmermann</Authors>
     <IsPackable>true</IsPackable>
