@@ -13,6 +13,7 @@ packages/
 [Oo]bj/
 
 # Project files
+.idea/
 .vs/
 project.lock.json
 _ReSharper*/
