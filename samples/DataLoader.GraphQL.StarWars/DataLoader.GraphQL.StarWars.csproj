@@ -22,7 +22,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.0.2" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.NET.Sdk.Web" Version="1.0.0-alpha-20161117-1-119" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

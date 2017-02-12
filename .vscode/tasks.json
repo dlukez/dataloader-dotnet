@@ -16,6 +16,25 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "taskName": "sample",
+            "suppressTaskName": true,
+            "args": [
+                "build",
+                "samples/DataLoader.GraphQL.StarWars/DataLoader.GraphQL.StarWars.csproj"
+            ],
+            "isBuildCommand": false,
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "db",
+            "suppressTaskName": true,
+            "args": [
+                "ef",
+                "database",
+                "update"
+            ]
+        },
+        {
             "taskName": "test",
             "args": [
                 "test/DataLoader.Tests/DataLoader.Tests.csproj"
@@ -28,8 +47,7 @@
             "suppressTaskName": true,
             "args": [
                 "build",
-                "--no-incremental",
-                "DataLoader.sln"
+                "--no-incremental"
             ],
             "problemMatcher": "$msCompile"
         }

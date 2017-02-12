@@ -2,7 +2,6 @@
   <PropertyGroup>
     <Title>DataLoader for .NET</Title>
     <PackageId>DataLoader</PackageId>
-    <!--<PackageVersion>0.1.2-$(PrereleaseTag)</PackageVersion>-->
     <Description>A port of Facebook's DataLoader for .NET</Description>
     <Authors>Daniel Zimmermann</Authors>
     <IsPackable>true</IsPackable>
