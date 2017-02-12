@@ -32,7 +32,7 @@ Test-ExitCode
 dotnet restore
 Test-ExitCode
 
-dotnet msbuild ./src/DataLoader/DataLoader.csproj /t:Rebuild,Pack /p:Configuration=$Configuration /p:Version=$Version /p:IncludeSymbols=true
+dotnet msbuild src/DataLoader/DataLoader.csproj /t:Rebuild,Pack /p:Configuration=$Configuration /p:Version=$Version /p:IncludeSymbols=true
 Test-ExitCode
 
 dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
