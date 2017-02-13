@@ -130,7 +130,8 @@ namespace DataLoader
                 {
                     var item = queue.Dequeue();
                     item.CompletionSource.SetResult(lookup[item.Key]);
-                    ((IAsyncResult)item.CompletionSource.Task).AsyncWaitHandle.WaitOne();
+                    var completion = (IAsyncResult)item.CompletionSource.Task;
+                    if (!completion.CompletedSynchronously) completion.AsyncWaitHandle.WaitOne();
                 }
             }
             finally { _isExecuting = false; }
