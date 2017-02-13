@@ -26,7 +26,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "taskName": "build-db",
+            "taskName": "setup",
             "suppressTaskName": true,
             "args": [
                 "ef",
