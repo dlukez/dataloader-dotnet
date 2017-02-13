@@ -1,12 +1,7 @@
 # Params
 param (
-    [string]$Configuration = $env:Configuration,
-    [string]$Version = $env:SemVer
+    [string]$Configuration = $env:Configuration
 )
-
-if (-not $Version) {
-    $Version = '0.0.0'
-}
 
 if (-not $Configuration) {
     $Configuration = "Release"
@@ -32,7 +27,7 @@ Test-ExitCode
 dotnet restore
 Test-ExitCode
 
-dotnet msbuild src/DataLoader/DataLoader.csproj /t:Rebuild,Pack /p:Configuration=$Configuration /p:Version=$Version /p:IncludeSymbols=true
+dotnet msbuild src/DataLoader/DataLoader.csproj /t:Rebuild,Pack /p:Configuration=$Configuration /p:IncludeSymbols=true
 Test-ExitCode
 
 dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
