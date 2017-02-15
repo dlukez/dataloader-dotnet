@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <DebugType>portable</DebugType>
-    <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8;dnxcore50;</PackageTargetFallback>
+    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50;</PackageTargetFallback>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
