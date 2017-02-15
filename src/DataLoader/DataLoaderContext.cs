@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,10 +12,10 @@ namespace DataLoader
     /// </summary>
     /// <remarks>
     /// This class contains any data required by <see cref="DataLoader"/> instances and is responsible for managing their execution.
-    ///e
+    ///
     /// Loaders enlist themselves with the context active at the time when a <code>Load</code> method is called on a loader instance.
-    /// When the <see cref="DataLoaderContext.Complete">Complete</see> method is called on the context, it begins executing these waiting loaders.
-    /// Loaders are executed serially, since  parallel requests to a database are generally not conducive to good performance or throughput.
+    /// When the <see cref="DataLoaderContext.Complete"/> method is called on the context, it begins executing the enlisted loaders.
+    /// Loaders are executed serially, since parallel requests to a database are generally not conducive to good performance or throughput.
     ///
     /// The context will try to wait until each loader - as well as continuations attached to each promise it hands out - finish executing
     /// before moving on to the next. The purpose of this is to allow loaders to enlist or reenlist themselves so that they too are processed
@@ -25,6 +26,7 @@ namespace DataLoader
         private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
         private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
         private TaskCompletionSource<object> _completionSource = new TaskCompletionSource<object>();
+        private bool _isCompleting;
 
         internal DataLoaderContext()
         {
@@ -33,16 +35,11 @@ namespace DataLoader
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
         /// </summary>
-        public IDataLoader<TKey, TReturn> GetLoader<TKey, TReturn>(object key, FetchDelegate<TKey, TReturn> fetch)
+        public IDataLoader<TKey, TReturn> GetLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetcher)
         {
             return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ =>
-               new DataLoader<TKey, TReturn>(fetch, this));
+               new DataLoader<TKey, TReturn>(fetcher, this));
         }
-
-        /// <summary>
-        /// Indicates whether loaders have been fired and are in progress.
-        /// </summary>
-        public bool IsCompleting { get; private set; }
 
         /// <summary>
         /// Represents whether this context has been completed.
@@ -57,15 +54,13 @@ namespace DataLoader
         /// </remarks>
         public async void Complete()
         {
-            if (IsCompleting) throw new InvalidOperationException();
-            IsCompleting = true;
+            if (_isCompleting) throw new InvalidOperationException();
+            _isCompleting = true;
 
             try
             {
                 while (_queue.Count > 0)
-                {
                     await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
-                }
 
                 _completionSource.SetResult(null);
             }
@@ -78,7 +73,7 @@ namespace DataLoader
                 _completionSource.SetException(e);
             }
 
-            IsCompleting = false;
+            _isCompleting = false;
         }
 
         /// <summary>
@@ -89,8 +84,11 @@ namespace DataLoader
             _queue.Enqueue(loader);
         }
 
-#if NET45
+#region Ambient Context
 
+#if NETSTANDARD1_1
+
+        // No-ops for .NET 4.5 (so we don't have to change the remaining codebase)
         internal static DataLoaderContext Current => null;
         internal static void SetCurrentContext(DataLoaderContext context) {}
 
@@ -112,10 +110,6 @@ namespace DataLoader
         {
             LocalContext.Value = context;
         }
-
-#endif
-
-#if !NET45
 
         /// <summary>
         /// Runs code within a new loader context before firing any pending
@@ -143,6 +137,14 @@ namespace DataLoader
         /// </summary>
         public static Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
         {
+            // TODO: Investigate the usage of Task.Run
+            //
+            // For some reason, using `Task.Run` causes <see cref="TaskCompletionSource{T}"/> to run continuations
+            // synchronously, which prevents the main loop from continuing on to the next loader before they're done.
+            //
+            // I presume this is because once we're inside the ThreadPool, continuations will be scheduled using the
+            // local queues (in LIFO order) instead of the global queue (which executes in FIFO order). This is really
+            // a hack I think - the same thing should be accomplished using a custom TaskScheduler or custom awaiter.
             return Task.Run<T>(() =>
             {
                 using (var scope = new DataLoaderScope())
@@ -162,15 +164,7 @@ namespace DataLoader
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
-            // TODO
-            //
-            // For some reason, using `Task.Run` causes <see cref="TaskCompletionSource{T}"/> to run continuations
-            // synchronously, which prevents the main loop from continuing on to the next loader before they're done.
-            //
-            // I presume this is because once we're inside the ThreadPool, continuations will be scheduled using the
-            // local queues (in LIFO order) instead of the global queue (which executes in FIFO order). This is really
-            // a hack I think - the same thing should be accomplished using a custom TaskScheduler or custom awaiter.
-            //
+            // TODO: see above
             return Task.Run(() =>
             {
                 using (var scope = new DataLoaderScope())
@@ -181,5 +175,7 @@ namespace DataLoader
                 }
             });
         }
+
+#endregion
     }
 }

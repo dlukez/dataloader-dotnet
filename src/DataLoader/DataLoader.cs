@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataLoader
 {
     /// <summary>
-    /// Collects keys into a batch to fetch in one request.
+    /// Collects keys into a batch to load in one request.
     /// </summary>
     /// <remarks>
     /// When a call is made to one of the <see cref="LoadAsync"/> methods, each key is stored and a
@@ -22,7 +21,7 @@ namespace DataLoader
     public class DataLoader<TKey, TReturn> : IDataLoader<TKey, TReturn>
     {
         private readonly object _lock = new object();
-        private readonly FetchDelegate<TKey, TReturn> _fetch;
+        private readonly Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> _fetch;
         private Queue<FetchCompletionPair> _queue = new Queue<FetchCompletionPair>();
         private DataLoaderContext _boundContext;
         private bool _isExecuting;
@@ -30,7 +29,7 @@ namespace DataLoader
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/>.
         /// </summary>
-        public DataLoader(FetchDelegate<TKey, TReturn> fetch)
+        public DataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetch)
         {
             _fetch = fetch;
         }
@@ -38,15 +37,27 @@ namespace DataLoader
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/> bound to the specified context.
         /// </summary>
-        internal DataLoader(FetchDelegate<TKey, TReturn> fetch, DataLoaderContext context) : this(fetch)
+        internal DataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetch, DataLoaderContext context) : this(fetch)
         {
             SetContext(context);
         }
 
+#if NETSTANDARD1_1
+
         /// <summary>
-        /// Gets the bound context if set, otherwise the current ambient context.
+        /// Gets the context the loader is bound to.
         /// </summary>
+        public DataLoaderContext Context => _boundContext;
+
+#else
+
+        /// <summary>
+        /// Gets the context the loader is bound to, otherwise the current ambient context.
+        /// </summary>
+        /// <seealso cref="DataLoaderContext.Current"/>
         public DataLoaderContext Context => _boundContext ?? DataLoaderContext.Current;
+
+#endif
 
         /// <summary>
         /// Gets the keys to retrieve in the next batch.

@@ -50,7 +50,7 @@ namespace DataLoader
         /// <summary>
         /// The context contained in this scope. Contains data relevant to the current load operation.
         /// </summary>
-        public DataLoaderContext Context => _loadCtx;
+        internal DataLoaderContext Context => _loadCtx;
 
         /// <summary>
         /// Represents the scope's completion.
@@ -62,11 +62,15 @@ namespace DataLoader
         /// </summary>
         public void Dispose()
         {
-#if !NET45
+
+#if NETSTANDARD1_3
+
             if (_loadCtx != DataLoaderContext.Current)
                 throw new InvalidOperationException("This context for this scope does not match the current context");
+                
 #endif
-            if (_completeOnDisposal && !_loadCtx.IsCompleting && !Completion.IsCompleted) _loadCtx.Complete();
+
+            if (_completeOnDisposal) _loadCtx.Complete();
             DataLoaderContext.SetCurrentContext(_prevLoadCtx);
         }
     }
