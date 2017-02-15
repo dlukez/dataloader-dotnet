@@ -12,10 +12,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DataLoader\DataLoader.csproj" />
+    
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL" Version="0.14.4.649" />
+    <PackageReference Include="GraphQL" Version="0.14.6.657" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.0.1" />
