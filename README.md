@@ -4,7 +4,7 @@ DataLoader for .NET
 A port of Facebook's [DataLoader](https://github.com/facebook/dataloader) for .NET.
 
 [![NuGet](https://img.shields.io/nuget/v/DataLoader.svg)](https://nuget.org/packages/DataLoader)
-[![MyGet Pre Release](https://img.shields.io/myget/dlukez/vpre/DataLoader.svg)](https://www.myget.org/feed/dlukez/package/nuget/DataLoader)
+[![MyGet Pre Release](https://img.shields.io/myget/dlukez/vpre/DataLoader.svg?label=myget)](https://www.myget.org/feed/dlukez/package/nuget/DataLoader)
 [![MyGet Build Status](https://www.myget.org/BuildSource/Badge/dlukez?identifier=265cd302-0184-43af-abc8-6041143cfc91)](https://www.myget.org/feed/dlukez/package/nuget/DataLoader)
 
 Originally began as [a solution](https://github.com/dlukez/graphql-dotnet-dataloader) to the [select N+1 problem](https://github.com/graphql-dotnet/graphql-dotnet/issues/21) for [GraphQL in .NET](https://github.com/graphql-dotnet/graphql-dotnet) but found that most of the (small amount of) code was independent and could be generalized for use in other scenarios.

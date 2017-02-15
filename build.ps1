@@ -1,36 +1,25 @@
-# Params
-param (
-    [string]$Configuration = $env:Configuration
-)
-
-if (-not $Configuration) {
-    $Configuration = "Release"
-}
-
-# Download the SDK
-& ./tools/dotnet-install.ps1 -Version 1.0.0-rc4-004771 -Architecture x64
-
 # Setup
 $ErrorActionPreference = "Stop"
 
-# Helpers
-function Test-ExitCode {
-    if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE 
-    }
+if (-not $env:Configuration) {
+    $env:Configuration = "Release"
 }
 
-# Build script
-dotnet clean
-Test-ExitCode
+if (-not $env:PackageVersion) {
+    $env:PackageVersion = (gitversion | ConvertFrom-Json).NuGetVersionV2
+}
 
-dotnet restore
-Test-ExitCode
+if ($env:BuildRunner) {
+    & ./tools/dotnet-install.ps1 -Version 1.0.0-rc4-004771 -Architecture x86
+}
 
-dotnet msbuild src/DataLoader/DataLoader.csproj /t:Rebuild,Pack /p:Configuration=$Configuration /p:IncludeSymbols=true
-Test-ExitCode
+# Build
+dotnet msbuild src/DataLoader/DataLoader.csproj /t:Restore,Rebuild,Pack /p:IncludeSymbols=true
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-dotnet test ./test/DataLoader.Tests/DataLoader.Tests.csproj --configuration $Configuration
-Test-ExitCode
+# Test
+dotnet msbuild test/DataLoader.Tests/DataLoader.Tests.csproj /t:Restore,VSTest
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+# End
 exit

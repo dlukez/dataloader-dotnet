@@ -16,16 +16,6 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "taskName": "build-sample",
-            "suppressTaskName": true,
-            "args": [
-                "build",
-                "samples/DataLoader.GraphQL.StarWars/DataLoader.GraphQL.StarWars.csproj"
-            ],
-            "isBuildCommand": false,
-            "problemMatcher": "$msCompile"
-        },
-        {
             "taskName": "setup",
             "suppressTaskName": true,
             "args": [

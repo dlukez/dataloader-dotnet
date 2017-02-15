@@ -19,3 +19,7 @@ project.lock.json
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
+
+# Miscellaneous files
+.DS_STORE
+Thumbs.db
