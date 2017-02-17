@@ -86,7 +86,7 @@ namespace DataLoader
 
 #region Ambient Context
 
-#if NETSTANDARD1_1
+#if NET45
 
         // No-ops for .NET 4.5 (so we don't have to change the remaining codebase)
         internal static DataLoaderContext Current => null;

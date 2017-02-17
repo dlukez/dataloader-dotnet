@@ -8,7 +8,7 @@
     <PackageTags>dataloader batch future</PackageTags>
     <PackageProjectUrl>https://github.com/dlukez/dataloader-dotnet</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/dlukez/dataloader-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
-    <TargetFrameworks>netstandard1.1;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;net46;net45</TargetFrameworks>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
