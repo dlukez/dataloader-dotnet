@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using GraphQL.Types;
 
 namespace DataLoader.GraphQL.StarWars
@@ -30,7 +34,7 @@ namespace DataLoader.GraphQL.StarWars
             return context.GetUserContext().DataContext;
         }
 
-        public static IDataLoader<int, TReturn> GetDataLoader<TSource, TReturn>(this ResolveFieldContext<TSource> context, FetchDelegate<int, TReturn> fetchDelegate)
+        public static IDataLoader<int, TReturn> GetDataLoader<TSource, TReturn>(this ResolveFieldContext<TSource> context, Func<IEnumerable<int>, Task<ILookup<int, TReturn>>> fetchDelegate)
         {
             return context.GetUserContext().LoadContext.GetLoader(context.FieldDefinition, fetchDelegate);
         }
