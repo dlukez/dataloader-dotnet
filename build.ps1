@@ -1,15 +1,12 @@
-# Setup
+# Set parameters
 $ErrorActionPreference = "Stop"
-
 if (-not $env:Configuration) { $env:Configuration = "Release" }
+if (-not $env:PackageVersion) { $env:PackageVersion = (gitversion | ConvertFrom-Json).FullSemVer }
 
-if (-not $env:PackageVersion) { $env:PackageVersion = (gitversion | ConvertFrom-Json).NuGetVersionV2 }
-
-if ($env:BuildRunner) { & ./tools/dotnet-install.ps1 -Version 1.0.0-rc4-004771 -Architecture x86 }
-
+# Helper functions
 function Invoke-BuildStep { param([scriptblock]$cmd) & $cmd; if ($LASTEXITCODE -ne 0) { exit 1 } }
 
-# Restore
+# Run build
 Invoke-BuildStep { dotnet restore src/DataLoader/DataLoader.csproj }
 Invoke-BuildStep { dotnet restore test/DataLoader.Tests/DataLoader.Tests.csproj }
 Invoke-BuildStep { dotnet build src/DataLoader/DataLoader.csproj }
