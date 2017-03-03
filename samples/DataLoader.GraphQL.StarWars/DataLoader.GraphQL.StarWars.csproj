@@ -1,22 +1,18 @@
-<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <AssemblyName>DataLoader.GraphQL.StarWars</AssemblyName>
     <TargetFramework>netcoreapp1.0</TargetFramework>
+    <DefaultExcludeItems>$(DefaultExcludeItems);**\node_modules\**</DefaultExcludeItems>
+    <DefaultExcludesInProjectFolder>$(DefaultExcludesInProjectFolder);**/node_modules/**</DefaultExcludesInProjectFolder>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\index.html;appsettings.json;web.config">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\DataLoader\DataLoader.csproj" />
-    
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="GraphQL" Version="0.14.6.657" />
+    <PackageReference Include="Faker.NETCore" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.0.1" />

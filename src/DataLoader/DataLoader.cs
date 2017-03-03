@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataLoader
@@ -129,20 +130,18 @@ namespace DataLoader
             _isExecuting = true;
             try
             {
-                Queue<FetchCompletionPair> queue;
-                lock (_queue)
-                {
-                    queue = _queue;
-                    _queue = new Queue<FetchCompletionPair>();
-                }
-
+                var queue = Interlocked.Exchange(ref _queue, new Queue<FetchCompletionPair>());
                 var lookup = await _fetch(GetKeys(queue)).ConfigureAwait(false);
                 while (queue.Count > 0)
                 {
                     var item = queue.Dequeue();
                     item.CompletionSource.SetResult(lookup[item.Key]);
-                    var completion = (IAsyncResult)item.CompletionSource.Task;
-                    if (!completion.CompletedSynchronously) completion.AsyncWaitHandle.WaitOne();
+                    var task = item.CompletionSource.Task;
+                    if (!task.IsCompleted)
+                    {
+                        Console.WriteLine($"Not completed: task {task.Id} (thread {Thread.CurrentThread.ManagedThreadId})");
+                        task.Wait();
+                    }
                 }
             }
             finally { _isExecuting = false; }

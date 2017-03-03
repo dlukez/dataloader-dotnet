@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.3;net46;net45</TargetFrameworks>
+    <TargetFramework  Condition=" '$(OS)' == 'Unix'       ">netstandard1.3</TargetFramework>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">netstandard1.3;net46;net45</TargetFrameworks>
     <PackageId>DataLoader</PackageId>
     <Description>A port of Facebook's DataLoader for .NET</Description>
     <Authors>Daniel Zimmermann</Authors>

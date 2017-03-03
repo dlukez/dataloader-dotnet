@@ -52,27 +52,11 @@ namespace DataLoader
         /// <remarks>
         /// Loaders are fired in the order that they are first called. Once completed the context cannot be reused.
         /// </remarks>
-        public async void Complete()
+        public async Task Complete()
         {
             if (_isCompleting) throw new InvalidOperationException();
             _isCompleting = true;
-
-            try
-            {
-                while (_queue.Count > 0)
-                    await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
-
-                _completionSource.SetResult(null);
-            }
-            catch (OperationCanceledException)
-            {
-                _completionSource.SetCanceled();
-            }
-            catch (Exception e)
-            {
-                _completionSource.SetException(e);
-            }
-
+            while (_queue.Count > 0) await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
             _isCompleting = false;
         }
 
@@ -83,8 +67,6 @@ namespace DataLoader
         {
             _queue.Enqueue(loader);
         }
-
-#region Ambient Context
 
 #if NET45
 
@@ -137,7 +119,9 @@ namespace DataLoader
         /// </summary>
         public static Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
         {
-            // TODO: Investigate the usage of Task.Run
+            if (func == null) throw new ArgumentNullException(nameof(func));
+
+            // TODO: Investigate this.
             //
             // For some reason, using `Task.Run` causes <see cref="TaskCompletionSource{T}"/> to run continuations
             // synchronously, which prevents the main loop from continuing on to the next loader before they're done.
@@ -175,7 +159,5 @@ namespace DataLoader
                 }
             });
         }
-
-#endregion
     }
 }

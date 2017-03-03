@@ -1,3 +1,6 @@
+using DataLoader.GraphQL.StarWars.Schema;
+using GraphQL;
+using GraphQL.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -24,9 +27,12 @@ namespace DataLoader.GraphQL.StarWars
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSingleton(new StarWarsSchema());
+            services.AddSingleton<IDocumentExecuter>(new DocumentExecuter());
+            services.AddSingleton<IDocumentWriter>(new DocumentWriter(true));
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseDefaultFiles();
             app.UseStaticFiles();

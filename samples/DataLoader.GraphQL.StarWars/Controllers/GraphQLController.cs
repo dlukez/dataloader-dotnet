@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DataLoader.GraphQL.StarWars.Schema;
 using GraphQL;
+using GraphQL.Language.AST;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataLoader.GraphQL.StarWars.Controllers
@@ -12,8 +13,14 @@ namespace DataLoader.GraphQL.StarWars.Controllers
     public class GraphQLController : Controller
     {
         private static int _queryNumber;
-        private readonly IDocumentExecuter _executer = new DocumentExecuter();
-        private readonly StarWarsSchema _schema = new StarWarsSchema();
+        private readonly StarWarsSchema _schema;
+        private readonly IDocumentExecuter _executer;
+
+        public GraphQLController(StarWarsSchema schema, IDocumentExecuter executer)
+        {
+            _schema = schema;
+            _executer = executer;
+        }
 
         [HttpPost]
         public async Task<ExecutionResult> Post([FromBody] GraphQLRequest request)

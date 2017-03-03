@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using DataLoader.GraphQL.StarWars.Schema;
 using Microsoft.AspNetCore.Hosting;
 
 namespace DataLoader.GraphQL.StarWars
@@ -15,8 +14,8 @@ namespace DataLoader.GraphQL.StarWars
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
                 .UseStartup<Startup>()
+                .UseIISIntegration()
                 .Build();
 
             host.Run();
@@ -26,153 +25,70 @@ namespace DataLoader.GraphQL.StarWars
         {
             using (var db = new StarWarsContext())
             {
-                if (db.Humans.Any())
-                    return;
+                if (db.Humans.Any()) return;
+
+                const int numberOfHumans = 1000;
+                const int numberOfDroids = 1000;
+                const int numberOfFriendships = 1500;
+                const int numberOfAppearancesPerType = 1250;
+
+                var random = new Random();
 
                 db.Humans.RemoveRange(db.Humans);
                 db.Droids.RemoveRange(db.Droids);
+                db.Episodes.RemoveRange(db.Episodes);
                 db.Friendships.RemoveRange(db.Friendships);
+                db.DroidAppearances.RemoveRange(db.DroidAppearances);
+                db.HumanAppearances.RemoveRange(db.HumanAppearances);
 
-                var luke = new Human
+                // Humans
+                db.Humans.AddRange(Enumerable.Range(1, numberOfHumans).Select(id => new Human
                 {
-                    HumanId = 1,
-                    Name = "Luke",
-                    HomePlanet = "Tatooine"
-                };
-                db.Humans.Add(luke);
+                    HumanId = id,
+                    Name = Faker.Name.First(),
+                    HomePlanet = Faker.Company.BS()
+                }));
 
-                var vader = new Human
+                // Droids
+                db.Droids.AddRange(Enumerable.Range(1, numberOfDroids).Select(id => new Droid
                 {
-                    HumanId = 2,
-                    Name = "Vader",
-                    HomePlanet = "Tatooine"
-                };
-                db.Humans.Add(vader);
+                    DroidId = id,
+                    Name = $"{(char)Faker.RandomNumber.Next('A', 'Z')}"
+                         + $"{Faker.RandomNumber.Next(1, 9)}"
+                         + $"{(char)Faker.RandomNumber.Next('A', 'Z')}"
+                         + $"{Faker.RandomNumber.Next(1, 9)}"
+                }));
 
-                var ash = new Human
+                // Episodes
+                db.Episodes.AddRange(new[]
                 {
-                    HumanId = 3,
-                    Name = "Ash",
-                    HomePlanet = "Cromwell"
-                };
-                db.Humans.Add(ash);
-
-                var leia = new Human
-                {
-                    HumanId = 4,
-                    Name = "Leia",
-                    HomePlanet = "Tatooine"
-                };
-                db.Humans.Add(leia);
-
-                var george = new Human
-                {
-                    HumanId = 5,
-                    Name = "George",
-                    HomePlanet = null
-                };
-                db.Humans.Add(george);
-
-                var r2d2 = new Droid
-                {
-                    DroidId = 1,
-                    Name = "R2-D2",
-                    PrimaryFunction = "Astromech"
-                };
-                db.Droids.Add(r2d2);
-
-                var c3p0 = new Droid
-                {
-                    DroidId = 2,
-                    Name = "C-3PO",
-                    PrimaryFunction = "Protocol"
-                };
-                db.Droids.Add(c3p0);
-
-                db.Friendships.Add(new Friendship
-                {
-                    HumanId = luke.HumanId,
-                    DroidId = r2d2.DroidId
+                    new Episode { EpisodeId = 4, Name = "A New Hope", Year = "1978" },
+                    new Episode { EpisodeId = 5, Name = "Rise of the Empire", Year = "1980" },
+                    new Episode { EpisodeId = 6, Name = "Return of the Jedi", Year = "1983" }
                 });
 
-                db.Friendships.Add(new Friendship
+                // Friendships
+                db.Friendships.AddRange(Enumerable.Range(1, numberOfFriendships).Select(_ => new Friendship
                 {
-                    HumanId = luke.HumanId,
-                    DroidId = c3p0.DroidId
-                });
+                    DroidId = random.Next(1, numberOfDroids),
+                    HumanId = random.Next(1, numberOfHumans)
+                }));
 
-                db.Friendships.Add(new Friendship
+                // Appearances (Droid)
+                db.DroidAppearances.AddRange(Enumerable.Range(1, numberOfAppearancesPerType).Select(_ => new DroidAppearance
                 {
-                    HumanId = vader.HumanId,
-                    DroidId = r2d2.DroidId
-                });
+                    EpisodeId = random.Next(4, 6),
+                    DroidId = random.Next(1, numberOfDroids)
+                }));
 
-                db.Friendships.Add(new Friendship
+                // Appearances (Human)
+                db.HumanAppearances.AddRange(Enumerable.Range(1, numberOfAppearancesPerType).Select(_ => new HumanAppearance
                 {
-                    HumanId = ash.HumanId,
-                    DroidId = c3p0.DroidId
-                });
+                    EpisodeId = random.Next(4, 6),
+                    HumanId = random.Next(1, numberOfHumans)
+                }));
 
-                var newHope = new Episode
-                {
-                    EpisodeId = (int)Episodes.NEWHOPE,
-                    Name = "A New Hope",
-                    Year = null
-                };
-                db.Episodes.Add(newHope);
-
-                var empire = new Episode
-                {
-                    EpisodeId = (int)Episodes.EMPIRE,
-                    Name = "Rise of the Empire",
-                    Year = "1980"
-                };
-                db.Episodes.Add(empire);
-
-                var jedi = new Episode
-                {
-                    EpisodeId = (int)Episodes.JEDI,
-                    Name = "Rise of the Jedi",
-                    Year = "1983"
-                };
-                db.Episodes.Add(jedi);
-
-                db.HumanAppearances.Add(new HumanAppearance
-                {
-                    HumanId = ash.HumanId,
-                    EpisodeId = (int)Episodes.EMPIRE
-                });
-
-                db.HumanAppearances.Add(new HumanAppearance
-                {
-                    HumanId = vader.HumanId,
-                    EpisodeId = (int) Episodes.EMPIRE
-                });
-
-                db.DroidAppearances.Add(new DroidAppearance
-                {
-                    DroidId = r2d2.DroidId,
-                    EpisodeId = (int)Episodes.EMPIRE
-                });
-
-                db.DroidAppearances.Add(new DroidAppearance
-                {
-                    DroidId = r2d2.DroidId,
-                    EpisodeId = (int)Episodes.NEWHOPE
-                });
-
-                db.DroidAppearances.Add(new DroidAppearance
-                {
-                    DroidId = r2d2.DroidId,
-                    EpisodeId = (int)Episodes.JEDI
-                });
-
-                db.DroidAppearances.Add(new DroidAppearance
-                {
-                    DroidId = c3p0.DroidId,
-                    EpisodeId = (int)Episodes.NEWHOPE
-                });
-
+                // Save
                 var count = db.SaveChanges();
                 Console.WriteLine("{0} records saved to database", count);
             }
