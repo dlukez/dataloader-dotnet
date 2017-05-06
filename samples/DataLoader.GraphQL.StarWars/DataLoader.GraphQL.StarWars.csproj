@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <AssemblyName>DataLoader.GraphQL.StarWars</AssemblyName>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <DefaultExcludeItems>$(DefaultExcludeItems);**\node_modules\**</DefaultExcludeItems>
-    <DefaultExcludesInProjectFolder>$(DefaultExcludesInProjectFolder);**/node_modules/**</DefaultExcludesInProjectFolder>
+    <DefaultExcludesInProjectFolder>$(DefaultExcludesInProjectFolder);**\node_modules\**</DefaultExcludesInProjectFolder>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0-msbuild3-final" />
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0" />
   </ItemGroup>
 </Project>

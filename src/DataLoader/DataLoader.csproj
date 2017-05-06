@@ -1,16 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework  Condition=" '$(OS)' == 'Unix'       ">netstandard1.3</TargetFramework>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">netstandard1.3;net46;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;net46;net45</TargetFrameworks>
     <PackageId>DataLoader</PackageId>
     <Description>A port of Facebook's DataLoader for .NET</Description>
     <Authors>Daniel Zimmermann</Authors>
     <PackageTags>dataloader batch future</PackageTags>
     <PackageProjectUrl>https://github.com/dlukez/dataloader-dotnet</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/dlukez/dataloader-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
-    <PackageTargetFallback>$(PackageTargetFallback);dotnet;portable-net45</PackageTargetFallback>
   </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
   </ItemGroup>
 </Project>

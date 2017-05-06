@@ -110,19 +110,6 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Loads many items.
-        /// </summary>
-        public async Task<IDictionary<TKey, IEnumerable<TReturn>>> LoadAsync(params TKey[] keys)
-        {
-            var tasks = keys.Select(async key =>
-                new KeyValuePair<TKey, IEnumerable<TReturn>>(
-                    key, await LoadAsync(key).ConfigureAwait(false)));
-
-            var results = await Task.WhenAll(tasks).ConfigureAwait(false);
-            return results.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-        }
-
-        /// <summary>
         /// Triggers the fetch callback and fulfils any promises.
         /// </summary>
         public async Task ExecuteAsync()
