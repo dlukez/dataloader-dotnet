@@ -1,11 +1,3 @@
-/*
- *  Example 1: One loader instance for each HumanType instance.
- *
- *    If the schema is created once on application startup and reused
- *    for every request, then the same loader will be used by
- *    multiple requests/threads. This is probably unsafe.
- */
-
 using System.Linq;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;

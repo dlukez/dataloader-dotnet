@@ -17,7 +17,7 @@ namespace DataLoader
         private readonly DataLoaderContext _prevLoadCtx;
 
         /// <summary>
-        /// Creates a scope for a new <see cref="DataLoaderContext"/>.
+        /// Creates a scope with a new <see cref="DataLoaderContext"/>.
         /// </summary>
         /// <remarks>The context will be completed when the scope disposed of.</remarks>
         public DataLoaderScope() : this(new DataLoaderContext(), true)
@@ -25,7 +25,7 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Creates a scope for a new <see cref="DataLoaderContext"/>.
+        /// Creates a scope with a new <see cref="DataLoaderContext"/>.
         /// </summary>
         /// <param name="completeOnDisposal">Configures whether to complete the context when the scope is disposed of. </param>
         public DataLoaderScope(bool completeOnDisposal) : this(new DataLoaderContext(), completeOnDisposal)
@@ -33,7 +33,7 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Creates a scope for the given <see cref="DataLoaderContext"/>.
+        /// Creates a scope with the given <see cref="DataLoaderContext"/>.
         /// </summary>
         /// <param name="context"></param>
         /// <param name="completeOnDisposal">Configures whether to complete the context when the scope is disposed of. </param>
@@ -48,29 +48,30 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// The context contained in this scope. Contains data relevant to the current load operation.
+        /// The context for in this scope. Contains data relevant to the current load operation.
         /// </summary>
-        internal DataLoaderContext Context => _loadCtx;
-
-        /// <summary>
-        /// Represents the scope's completion.
-        /// </summary>
-        public Task Completion => _loadCtx.Completion;
+        public DataLoaderContext Context => _loadCtx;
 
         /// <summary>
         /// Marks the end of this scope and the point at which pending loaders will be fired.
         /// </summary>
-        public void Dispose()
+        public Task CompleteAsync()
         {
-
-#if NETSTANDARD1_3
-
+#if FEATURE_ASYNCLOCAL
             if (_loadCtx != DataLoaderContext.Current)
-                throw new InvalidOperationException("This context for this scope does not match the current context");
-                
+                throw new InvalidOperationException("This scope's context is no longer current");
 #endif
 
-            if (_completeOnDisposal) _loadCtx.Complete();
+            return _loadCtx.CompleteAsync();
+        }
+
+        public void Dispose()
+        {
+#if FEATURE_ASYNCLOCAL
+            if (_loadCtx != DataLoaderContext.Current)
+                throw new InvalidOperationException("This scope's context is no longer current");
+#endif
+
             DataLoaderContext.SetCurrentContext(_prevLoadCtx);
         }
     }

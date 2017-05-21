@@ -1,10 +1,3 @@
-/*
- *  Example 2: Each request has its own context passed through the UserContext.
- *
- *    This helps keep queries/batches separate and is more likely to prevent
- *    issues arising from other queries that are executing concurrently.
- */
-
 using System.Linq;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;

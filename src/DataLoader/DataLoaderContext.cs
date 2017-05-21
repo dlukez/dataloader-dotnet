@@ -14,7 +14,7 @@ namespace DataLoader
     /// This class contains any data required by <see cref="DataLoader"/> instances and is responsible for managing their execution.
     ///
     /// Loaders enlist themselves with the context active at the time when a <code>Load</code> method is called on a loader instance.
-    /// When the <see cref="DataLoaderContext.Complete"/> method is called on the context, it begins executing the enlisted loaders.
+    /// When the <see cref="CompleteAsync"/> method is called on the context, it begins executing the enlisted loaders.
     /// Loaders are executed serially, since parallel requests to a database are generally not conducive to good performance or throughput.
     ///
     /// The context will try to wait until each loader - as well as continuations attached to each promise it hands out - finish executing
@@ -23,7 +23,8 @@ namespace DataLoader
     /// </remarks>
     public sealed class DataLoaderContext
     {
-        private readonly Queue<IDataLoader> _queue = new Queue<IDataLoader>();
+        private readonly object _lock = new object();
+        private readonly ConcurrentQueue<IDataLoader> _loaderQueue = new ConcurrentQueue<IDataLoader>();
         private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
         private TaskCompletionSource<object> _completionSource = new TaskCompletionSource<object>();
         private bool _isCompleting;
@@ -37,14 +38,8 @@ namespace DataLoader
         /// </summary>
         public IDataLoader<TKey, TReturn> GetLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetcher)
         {
-            return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ =>
-               new DataLoader<TKey, TReturn>(fetcher, this));
+            return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ => new DataLoader<TKey, TReturn>(fetcher, this));
         }
-
-        /// <summary>
-        /// Represents whether this context has been completed.
-        /// </summary>
-        public Task Completion => _completionSource.Task;
 
         /// <summary>
         /// Begins processing the waiting loaders, firing them sequentially until there are none remaining.
@@ -52,11 +47,19 @@ namespace DataLoader
         /// <remarks>
         /// Loaders are fired in the order that they are first called. Once completed the context cannot be reused.
         /// </remarks>
-        public async Task Complete()
+        public async Task CompleteAsync()
         {
-            if (_isCompleting) throw new InvalidOperationException();
-            _isCompleting = true;
-            while (_queue.Count > 0) await _queue.Dequeue().ExecuteAsync().ConfigureAwait(false);
+            lock (_lock)
+            {
+                if (_isCompleting) throw new InvalidOperationException();
+                _isCompleting = true;
+            }
+
+            while (_loaderQueue.TryDequeue(out IDataLoader loader))
+            {
+                await loader.ExecuteAsync().ConfigureAwait(false);
+            }
+
             _isCompleting = false;
         }
 
@@ -65,10 +68,10 @@ namespace DataLoader
         /// </summary>
         internal void AddToQueue(IDataLoader loader)
         {
-            _queue.Enqueue(loader);
+            _loaderQueue.Enqueue(loader);
         }
 
-#if NET45
+#if !FEATURE_ASYNCLOCAL
 
         // No-ops for .NET 4.5 (so we don't have to change the remaining codebase)
         internal static DataLoaderContext Current => null;
@@ -80,7 +83,7 @@ namespace DataLoader
 
         /// <summary>
         /// Represents ambient data local to the current load operation.
-        /// <seealso cref="DataLoaderContext.Run{T}(Func{Task{T}})"/>
+        /// <seealso cref="DataLoaderContext.Run{T}(Func{T}})"/>
         /// </summary>
         public static DataLoaderContext Current => LocalContext.Value;
 
@@ -94,70 +97,50 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Runs code within a new loader context before firing any pending
-        /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
+        /// Runs code within a new loader context before firing any pending loaders.
         /// </summary>
-        public static Task<T> Run<T>(Func<Task<T>> func)
+        public static Task<T> Run<T>(Func<T> func)
         {
             return Run(_ => func());
         }
 
         /// <summary>
-        /// Runs code within a new loader context before firing any pending
-        /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
+        /// Runs code within a new loader context before firing any pending loaders.
         /// </summary>
-        public static Task Run(Func<Task> func)
+        public static Task Run(Action action)
         {
-            return Run(_ => func());
+            return Run(_ => action());
         }
 
 #endif
 
         /// <summary>
-        /// Runs code within a new loader context before firing any pending
-        /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
+        /// Runs code within a new loader context before firing any pending loaders.
         /// </summary>
-        public static Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
+        public static async Task<T> Run<T>(Func<DataLoaderContext, T> func)
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
-            // TODO: Investigate this.
-            //
-            // For some reason, using `Task.Run` causes <see cref="TaskCompletionSource{T}"/> to run continuations
-            // synchronously, which prevents the main loop from continuing on to the next loader before they're done.
-            //
-            // I presume this is because once we're inside the ThreadPool, continuations will be scheduled using the
-            // local queues (in LIFO order) instead of the global queue (which executes in FIFO order). This is really
-            // a hack I think - the same thing should be accomplished using a custom TaskScheduler or custom awaiter.
-            return Task.Run<T>(() =>
+            using (var scope = new DataLoaderScope())
             {
-                using (var scope = new DataLoaderScope())
-                {
-                    var task = func(scope.Context);
-                    if (task == null) throw new InvalidOperationException("No task provided.");
-                    return task;
-                }
-            });
+                var result = func(scope.Context);
+                await scope.CompleteAsync().ConfigureAwait(false);
+                return result;
+            }
         }
 
         /// <summary>
-        /// Runs code within a new loader context before firing any pending
-        /// <see cref="DataLoader{TKey,TReturn}">DataLoader</see> instances.
+        /// Runs code within a new loader context before firing any pending loaders.
         /// </summary>
-        public static Task Run(Func<DataLoaderContext, Task> func)
+        public static async Task Run(Action<DataLoaderContext> action)
         {
-            if (func == null) throw new ArgumentNullException(nameof(func));
+            if (action == null) throw new ArgumentNullException(nameof(action));
 
-            // TODO: see above
-            return Task.Run(() =>
+            using (var scope = new DataLoaderScope())
             {
-                using (var scope = new DataLoaderScope())
-                {
-                    var task = func(scope.Context);
-                    if (task == null) throw new InvalidOperationException("No task provided.");
-                    return task;
-                }
-            });
+                action(scope.Context);
+                await scope.CompleteAsync();
+            }
         }
     }
 }

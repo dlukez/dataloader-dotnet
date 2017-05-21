@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace DataLoader
 {
@@ -14,8 +14,8 @@ namespace DataLoader
     /// promise task is handed back that represents the future result of the deferred request. The request
     /// is deferred (and keys are collected) until the loader is invoked, which can occur in the following circumstances:
     /// <list type="bullet">
-    /// <item>The delegate supplied to <see cref="DataLoaderContext.Run{T}"/> returned.</item>
-    /// <item><see cref="DataLoaderContext.ExecuteAsync">StartLoading</see> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
+    /// <item>The delegate supplied to <see cref="DataLoaderContext.Run"/> returned.</item>
+    /// <item><see cref="DataLoaderContext.CompleteAsync"/> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
     /// <item>The loader was invoked explicitly by calling <see cref="ExecuteAsync"/>.</item>
     /// </list>
     /// </remarks>
@@ -43,20 +43,20 @@ namespace DataLoader
             SetContext(context);
         }
 
-#if NETSTANDARD1_1
-
-        /// <summary>
-        /// Gets the context the loader is bound to.
-        /// </summary>
-        public DataLoaderContext Context => _boundContext;
-
-#else
+#if FEATURE_ASYNCLOCAL
 
         /// <summary>
         /// Gets the context the loader is bound to, otherwise the current ambient context.
         /// </summary>
         /// <seealso cref="DataLoaderContext.Current"/>
         public DataLoaderContext Context => _boundContext ?? DataLoaderContext.Current;
+
+#else
+
+        /// <summary>
+        /// Gets the context the loader is bound to.
+        /// </summary>
+        public DataLoaderContext Context => _boundContext;
 
 #endif
 
@@ -72,8 +72,9 @@ namespace DataLoader
         {
             get
             {
-                return _isExecuting ? DataLoaderStatus.Executing :
-                    _queue.Count > 0
+                return _isExecuting
+                    ? DataLoaderStatus.Executing
+                    : _queue.Count > 0
                         ? DataLoaderStatus.WaitingToExecute
                         : DataLoaderStatus.Idle;
             }
@@ -86,7 +87,7 @@ namespace DataLoader
         {
             lock (_lock)
                 if (_queue.Count > 0)
-                    throw new InvalidOperationException("Cannot set context while a load is pending or executing");
+                    throw new InvalidOperationException("Cannot set context while a loader is awaiting execution or executing");
 
             _boundContext = context;
         }
@@ -97,15 +98,11 @@ namespace DataLoader
         public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
         {
             var fetchResult = new FetchCompletionPair(key);
-            bool shouldSchedule;
-
-            lock (_queue)
+            lock (_lock)
             {
-                shouldSchedule = _queue.Count == 0;
+                if (_queue.Count == 0) Context?.AddToQueue(this);
                 _queue.Enqueue(fetchResult);
             }
-
-            if (shouldSchedule) Context?.AddToQueue(this);
             return fetchResult.CompletionSource.Task;
         }
 
@@ -117,18 +114,19 @@ namespace DataLoader
             _isExecuting = true;
             try
             {
-                var queue = Interlocked.Exchange(ref _queue, new Queue<FetchCompletionPair>());
-                var lookup = await _fetch(GetKeys(queue)).ConfigureAwait(false);
-                while (queue.Count > 0)
+                Queue<FetchCompletionPair> toFetch;
+                lock (_lock)
                 {
-                    var item = queue.Dequeue();
+                    toFetch = _queue;
+                    _queue = new Queue<FetchCompletionPair>();
+                }
+
+                var lookup = await _fetch(GetKeys(toFetch)).ConfigureAwait(false);
+                while (toFetch.Count > 0)
+                {
+                    var item = toFetch.Dequeue();
                     item.CompletionSource.SetResult(lookup[item.Key]);
-                    var task = item.CompletionSource.Task;
-                    if (!task.IsCompleted)
-                    {
-                        Console.WriteLine($"Not completed: task {task.Id} (thread {Thread.CurrentThread.ManagedThreadId})");
-                        task.Wait();
-                    }
+                    Debug.Assert(item.CompletionSource.Task.IsCompleted);
                 }
             }
             finally { _isExecuting = false; }
@@ -140,12 +138,13 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Creates a new <see cref="TaskCompletionSource{T}"/> paired with the given key.
+        /// A <see cref="TaskCompletionSource{T}"/> paired with a given key.
         /// </summary>
         private class FetchCompletionPair
         {
             public TKey Key { get; }
             public TaskCompletionSource<IEnumerable<TReturn>> CompletionSource { get; }
+
             public FetchCompletionPair(TKey key)
             {
                 Key = key;

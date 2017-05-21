@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DataLoader.GraphQL.StarWars.Schema;
 using GraphQL;
-using GraphQL.Language.AST;
+using GraphQL.Instrumentation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DataLoader.GraphQL.StarWars.Controllers
@@ -29,16 +30,15 @@ namespace DataLoader.GraphQL.StarWars.Controllers
             Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} - Running query {queryNumber}...");
             var sw = Stopwatch.StartNew();
 
-            var result = await DataLoaderContext.Run(ctx => _executer.ExecuteAsync(_ =>
+            var result = await await DataLoaderContext.Run(ctx => _executer.ExecuteAsync(_ =>
             {
                 _.Schema = _schema;
                 _.Query = request.Query;
                 _.UserContext = new GraphQLUserContext(ctx);
             }));
 
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} - Finished query {queryNumber} ({sw.ElapsedMilliseconds}ms)");
             sw.Stop();
-
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} - Executed query {queryNumber} ({sw.ElapsedMilliseconds}ms)");
             return result;
         }
     }

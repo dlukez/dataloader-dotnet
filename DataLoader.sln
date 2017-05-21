@@ -1,10 +1,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLoader", "src\DataLoader\DataLoader.csproj", "{49247793-58CE-4FFC-8DED-2DF2D3193424}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLoader.Tests", "test\DataLoader.Tests\DataLoader.Tests.csproj", "{22F9631E-90EE-405B-BEA2-77D0D24B39E3}"
 EndProject
-Project("{13B669BE-BB05-4DDF-9536-439F39A36129}") = "DataLoader.GraphQL.StarWars", "samples\DataLoader.GraphQL.StarWars\DataLoader.GraphQL.StarWars.csproj", "{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLoader.GraphQL.StarWars", "samples\DataLoader.GraphQL.StarWars\DataLoader.GraphQL.StarWars.csproj", "{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLoader", "src\DataLoader\DataLoader.csproj", "{94870F79-F4CD-4128-A613-38214FFAEA90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,41 +16,35 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Release|Any CPU.Build.0 = Release|Any CPU
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Debug|x64.ActiveCfg = Debug|x64
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Debug|x64.Build.0 = Debug|x64
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Debug|x86.ActiveCfg = Debug|x86
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Debug|x86.Build.0 = Debug|x86
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Release|x64.ActiveCfg = Release|x64
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Release|x64.Build.0 = Release|x64
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Release|x86.ActiveCfg = Release|x86
-		{49247793-58CE-4FFC-8DED-2DF2D3193424}.Release|x86.Build.0 = Release|x86
 		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Debug|x64.ActiveCfg = Debug|x64
-		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Debug|x64.Build.0 = Debug|x64
-		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Debug|x86.ActiveCfg = Debug|x86
-		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Debug|x86.Build.0 = Debug|x86
-		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Release|x64.ActiveCfg = Release|x64
-		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Release|x64.Build.0 = Release|x64
-		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Release|x86.ActiveCfg = Release|x86
-		{22F9631E-90EE-405B-BEA2-77D0D24B39E3}.Release|x86.Build.0 = Release|x86
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Debug|x64.ActiveCfg = Debug|x64
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Debug|x64.Build.0 = Debug|x64
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Debug|x86.ActiveCfg = Debug|x86
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Debug|x86.Build.0 = Debug|x86
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Release|x64.ActiveCfg = Release|x64
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Release|x64.Build.0 = Release|x64
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Release|x86.ActiveCfg = Release|x86
-		{AB099A22-F89E-4C7B-BDBF-1373CF2190F4}.Release|x86.Build.0 = Release|x86
+        {94870F79-F4CD-4128-A613-38214FFAEA90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94870F79-F4CD-4128-A613-38214FFAEA90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94870F79-F4CD-4128-A613-38214FFAEA90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94870F79-F4CD-4128-A613-38214FFAEA90}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
+		$0.TextStylePolicy = $2
+		$2.scope = text/x-csharp
+		$2.FileWidth = 80
+		$2.TabsToSpaces = True
+		$0.CSharpFormattingPolicy = $3
+		$3.scope = text/x-csharp
+		$0.TextStylePolicy = $4
+		$4.FileWidth = 80
+		$4.TabsToSpaces = True
+		$4.NoTabsAfterNonTabs = True
+		$4.scope = text/plain
+		$0.StandardHeader = $5
+		$0.VersionControlPolicy = $6
 	EndGlobalSection
 EndGlobal

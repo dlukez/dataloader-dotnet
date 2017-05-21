@@ -7,7 +7,7 @@ namespace DataLoader.GraphQL.StarWars
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             InitTestData();
 
@@ -25,6 +25,8 @@ namespace DataLoader.GraphQL.StarWars
         {
             using (var db = new StarWarsContext())
             {
+                db.Database.EnsureCreated();
+
                 if (db.Humans.Any()) return;
 
                 const int numberOfHumans = 1000;
