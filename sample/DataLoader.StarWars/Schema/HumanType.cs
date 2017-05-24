@@ -2,7 +2,7 @@ using System.Linq;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataLoader.GraphQL.StarWars.Schema
+namespace DataLoader.StarWars.Schema
 {
     public class HumanType : ObjectGraphType<Human>
     {
@@ -20,10 +20,10 @@ namespace DataLoader.GraphQL.StarWars.Schema
                     {
                         var db = ctx.GetDataContext();
                         return (await db.Friendships
-                            .Where(f => ids.Contains(f.HumanId))
-                            .Select(f => new {Key = f.HumanId, f.Droid})
-                            .ToListAsync())
-                            .ToLookup(x => x.Key, x => x.Droid);
+                                .Where(f => ids.Contains(f.HumanId))
+                                .Select(f => new { Key = f.HumanId, f.Droid })
+                                .ToListAsync())
+                                .ToLookup(x => x.Key, x => x.Droid);
                     }).LoadAsync(ctx.Source.HumanId));
 
             Field<ListGraphType<EpisodeType>>()

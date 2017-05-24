@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataLoader.GraphQL.StarWars.Schema
+namespace DataLoader.StarWars.Schema
 {
     public class EpisodeType : ObjectGraphType<Episode>
     {

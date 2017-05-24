@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace DataLoader.GraphQL.StarWars.Migrations
+namespace DataLoader.StarWars.Migrations
 {
     public partial class Initial : Migration
     {

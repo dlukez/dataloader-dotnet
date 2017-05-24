@@ -1,4 +1,4 @@
-using DataLoader.GraphQL.StarWars.Schema;
+﻿using DataLoader.StarWars.Schema;
 using GraphQL;
 using GraphQL.Http;
 using Microsoft.AspNetCore.Builder;
@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace DataLoader.GraphQL.StarWars
+namespace DataLoader.StarWars
 {
     public class Startup
     {

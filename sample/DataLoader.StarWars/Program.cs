@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 
-namespace DataLoader.GraphQL.StarWars
+namespace DataLoader.StarWars
 {
     public class Program
     {
@@ -29,12 +29,13 @@ namespace DataLoader.GraphQL.StarWars
 
                 if (db.Humans.Any()) return;
 
+                const int seed = 42;
                 const int numberOfHumans = 1000;
                 const int numberOfDroids = 1000;
                 const int numberOfFriendships = 1500;
                 const int numberOfAppearancesPerType = 1250;
 
-                var random = new Random();
+                var random = new Random(seed);
 
                 db.Humans.RemoveRange(db.Humans);
                 db.Droids.RemoveRange(db.Droids);

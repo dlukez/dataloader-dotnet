@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using DataLoader.GraphQL.StarWars.Schema;
+using DataLoader.StarWars.Schema;
 using GraphQL;
 
-namespace DataLoader.GraphQL.StarWars
+namespace DataLoader.StarWars
 {
     public static class Profiler
     {

@@ -3,18 +3,18 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace DataLoader.GraphQL.StarWars.Migrations
+namespace DataLoader.StarWars.Migrations
 {
     [DbContext(typeof(StarWarsContext))]
-    [Migration("20170105035954_Initial")]
-    partial class Initial
+    [Migration("20161125230846_Create")]
+    partial class Create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.1");
 
-            modelBuilder.Entity("DataLoader.StarWars.Droid", b =>
+            modelBuilder.Entity("DataLoader.StarWars.Data.Droid", b =>
                 {
                     b.Property<int>("DroidId")
                         .ValueGeneratedOnAdd();
@@ -28,7 +28,7 @@ namespace DataLoader.GraphQL.StarWars.Migrations
                     b.ToTable("Droids");
                 });
 
-            modelBuilder.Entity("DataLoader.StarWars.DroidAppearance", b =>
+            modelBuilder.Entity("DataLoader.StarWars.Data.DroidAppearance", b =>
                 {
                     b.Property<int>("DroidAppearanceId")
                         .ValueGeneratedOnAdd();
@@ -46,7 +46,7 @@ namespace DataLoader.GraphQL.StarWars.Migrations
                     b.ToTable("DroidAppearances");
                 });
 
-            modelBuilder.Entity("DataLoader.StarWars.Episode", b =>
+            modelBuilder.Entity("DataLoader.StarWars.Data.Episode", b =>
                 {
                     b.Property<int>("EpisodeId")
                         .ValueGeneratedOnAdd();
@@ -60,7 +60,7 @@ namespace DataLoader.GraphQL.StarWars.Migrations
                     b.ToTable("Episodes");
                 });
 
-            modelBuilder.Entity("DataLoader.StarWars.Friendship", b =>
+            modelBuilder.Entity("DataLoader.StarWars.Data.Friendship", b =>
                 {
                     b.Property<int>("FriendshipId")
                         .ValueGeneratedOnAdd();
@@ -78,7 +78,7 @@ namespace DataLoader.GraphQL.StarWars.Migrations
                     b.ToTable("Friendships");
                 });
 
-            modelBuilder.Entity("DataLoader.StarWars.Human", b =>
+            modelBuilder.Entity("DataLoader.StarWars.Data.Human", b =>
                 {
                     b.Property<int>("HumanId")
                         .ValueGeneratedOnAdd();
@@ -92,7 +92,7 @@ namespace DataLoader.GraphQL.StarWars.Migrations
                     b.ToTable("Humans");
                 });
 
-            modelBuilder.Entity("DataLoader.StarWars.HumanAppearance", b =>
+            modelBuilder.Entity("DataLoader.StarWars.Data.HumanAppearance", b =>
                 {
                     b.Property<int>("HumanAppearanceId")
                         .ValueGeneratedOnAdd();
@@ -110,40 +110,40 @@ namespace DataLoader.GraphQL.StarWars.Migrations
                     b.ToTable("HumanAppearances");
                 });
 
-            modelBuilder.Entity("DataLoader.StarWars.DroidAppearance", b =>
+            modelBuilder.Entity("DataLoader.StarWars.Data.DroidAppearance", b =>
                 {
-                    b.HasOne("DataLoader.StarWars.Droid", "Droid")
+                    b.HasOne("DataLoader.StarWars.Data.Droid", "Droid")
                         .WithMany("Appearances")
                         .HasForeignKey("DroidId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("DataLoader.StarWars.Episode", "Episode")
+                    b.HasOne("DataLoader.StarWars.Data.Episode", "Episode")
                         .WithMany("DroidAppearances")
                         .HasForeignKey("EpisodeId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("DataLoader.StarWars.Friendship", b =>
+            modelBuilder.Entity("DataLoader.StarWars.Data.Friendship", b =>
                 {
-                    b.HasOne("DataLoader.StarWars.Droid", "Droid")
+                    b.HasOne("DataLoader.StarWars.Data.Droid", "Droid")
                         .WithMany("Friendships")
                         .HasForeignKey("DroidId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("DataLoader.StarWars.Human", "Human")
+                    b.HasOne("DataLoader.StarWars.Data.Human", "Human")
                         .WithMany("Friendships")
                         .HasForeignKey("HumanId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("DataLoader.StarWars.HumanAppearance", b =>
+            modelBuilder.Entity("DataLoader.StarWars.Data.HumanAppearance", b =>
                 {
-                    b.HasOne("DataLoader.StarWars.Episode", "Episode")
+                    b.HasOne("DataLoader.StarWars.Data.Episode", "Episode")
                         .WithMany("HumanAppearances")
                         .HasForeignKey("EpisodeId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("DataLoader.StarWars.Human", "Human")
+                    b.HasOne("DataLoader.StarWars.Data.Human", "Human")
                         .WithMany("Appearances")
                         .HasForeignKey("HumanId")
                         .OnDelete(DeleteBehavior.Cascade);

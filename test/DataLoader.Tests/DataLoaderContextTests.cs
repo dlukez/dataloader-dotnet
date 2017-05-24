@@ -131,7 +131,7 @@ namespace DataLoader.Tests
                 t9.IsCompleted.ShouldBeTrue();
 
                 return true;
-            });
+            }).Unwrap();
 
             Should.CompleteIn(task, TimeSpan.FromSeconds(10));
             loadCount.ShouldBe(5);

@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
 
-namespace DataLoader.GraphQL.StarWars
+namespace DataLoader.StarWars
 {
     public class GraphQLUserContext
     {

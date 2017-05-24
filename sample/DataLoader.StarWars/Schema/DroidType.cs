@@ -1,8 +1,8 @@
-using System.Linq;
+﻿using System.Linq;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataLoader.GraphQL.StarWars.Schema
+namespace DataLoader.StarWars.Schema
 {
     public class DroidType : ObjectGraphType<Droid>
     {
