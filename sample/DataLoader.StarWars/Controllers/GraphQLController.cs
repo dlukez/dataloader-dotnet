@@ -28,7 +28,7 @@ namespace DataLoader.StarWars.Controllers
             Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} - Running query {queryNumber}...");
             var sw = Stopwatch.StartNew();
 
-            var result = await await DataLoaderContext.Run(ctx => _executer.ExecuteAsync(_ =>
+            var result = await DataLoaderContext.Run(ctx => _executer.ExecuteAsync(_ =>
             {
                 _.Schema = _schema;
                 _.Query = request.Query;

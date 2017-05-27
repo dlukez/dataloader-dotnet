@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
 namespace DataLoader.Tests
 {
@@ -48,27 +49,36 @@ namespace DataLoader.Tests
         [Fact]
         public async Task DataLoaderContext_Run_FlowsCurrentContext()
         {
-            await DataLoaderContext.Run(async () =>
+            var checkpoints = 0;
+            await await DataLoaderContext.Run(async () =>
             {
                 var ctx = DataLoaderContext.Current;
-                var threadId = Thread.CurrentThread.ManagedThreadId;
 
                 // Test with `Task.Yield`.
                 await Task.Yield();
                 DataLoaderContext.Current.ShouldBe(ctx);
+                checkpoints++; // 1
 
                 // Test with `Task.Delay`.
                 await Task.Delay(100);
                 DataLoaderContext.Current.ShouldBe(ctx);
+                checkpoints++; // 2
 
                 // Test with `Task.Run`.
                 await Task.Run(() => DataLoaderContext.Current.ShouldBe(ctx));
+                checkpoints++; // 3
 
                 // Test with `Thread`.
-                var thread = new Thread(() => DataLoaderContext.Current.ShouldBe(ctx));
+                var thread = new Thread(() =>
+                {
+                    DataLoaderContext.Current.ShouldBe(ctx);
+                    checkpoints++; // 4
+                });
                 thread.Start();
                 thread.Join();
             });
+
+            checkpoints.ShouldBe(4);
         }
 
         [Fact]
@@ -96,7 +106,7 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public void DataLoaderContext_Run_TriggersConsecutiveLoads()
+        public async Task DataLoaderContext_Run_TriggersConsecutiveLoads()
         {
             var loadCount = 0;
 
@@ -107,7 +117,7 @@ namespace DataLoader.Tests
                 return ids.ToLookup(id => id);
             });
 
-            var task = DataLoaderContext.Run(async () =>
+            var task = await DataLoaderContext.Run(async () =>
             {
                 var one = await loader.LoadAsync(1);
                 var two = await loader.LoadAsync(2);
@@ -130,8 +140,7 @@ namespace DataLoader.Tests
                 t8.IsCompleted.ShouldBeTrue();
                 t9.IsCompleted.ShouldBeTrue();
 
-                return true;
-            }).Unwrap();
+            });
 
             Should.CompleteIn(task, TimeSpan.FromSeconds(10));
             loadCount.ShouldBe(5);

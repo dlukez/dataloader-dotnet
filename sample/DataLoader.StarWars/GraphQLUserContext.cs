@@ -36,7 +36,7 @@ namespace DataLoader.StarWars
 
         public static IDataLoader<int, TReturn> GetDataLoader<TSource, TReturn>(this ResolveFieldContext<TSource> context, Func<IEnumerable<int>, Task<ILookup<int, TReturn>>> fetchDelegate)
         {
-            return context.GetUserContext().LoadContext.GetLoader(context.FieldDefinition, fetchDelegate);
+            return context.GetUserContext().LoadContext.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
         }
     }
 }

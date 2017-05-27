@@ -6,9 +6,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/samples/DataLoader.GraphQL.StarWars/bin/Debug/netcoreapp1.0/DataLoader.GraphQL.StarWars.dll",
+            "program": "${workspaceRoot}/sample/DataLoader.StarWars/bin/Debug/netcoreapp1.1/DataLoader.StarWars.dll",
             "args": [],
-            "cwd": "${workspaceRoot}/samples/DataLoader.GraphQL.StarWars",
+            "cwd": "${workspaceRoot}/sample/DataLoader.StarWars",
             "stopAtEntry": false,
             "launchBrowser": {
                 "enabled": true,
