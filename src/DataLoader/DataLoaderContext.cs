@@ -26,9 +26,6 @@ namespace DataLoader
     {
         private readonly ConcurrentQueue<IDataLoader> _loaderQueue = new ConcurrentQueue<IDataLoader>();
         private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
-
-        private readonly object _lock = new object();
-
         private bool _isCompleting;
 
         internal DataLoaderContext()
@@ -38,17 +35,22 @@ namespace DataLoader
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
         /// </summary>
-        public IDataLoader<TKey, TReturn> GetOrCreateLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetcher)
+        public IDataLoader<TKey, TReturn> GetOrCreateLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetch)
         {
-            return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ => new DataLoader<TKey, TReturn>(fetcher, this));
+            return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ => new DataLoader<TKey, TReturn>(fetch, this));
         }
 
         /// <summary>
-        /// Begins processing the waiting loaders, firing them sequentially until there are none remaining.
+        /// Queues a loader for later execution.
         /// </summary>
-        /// <remarks>
-        /// Loaders are fired in the order that they are first called. Once a context has been completed it cannot be reused.
-        /// </remarks>
+        internal void QueueLoader(IDataLoader loader)
+        {
+            _loaderQueue.Enqueue(loader);
+        }
+
+        /// <summary>
+        /// Executes the waiting loaders in sequence until there are none remaining.
+        /// </summary>
         internal async Task CompleteAsync()
         {
             if (_isCompleting) throw new InvalidOperationException();
@@ -64,20 +66,12 @@ namespace DataLoader
             finally { _isCompleting = false; }
         }
 
-        /// <summary>
-        /// Queues a loader for later execution.
-        /// </summary>
-        internal void QueueLoader(IDataLoader loader)
-        {
-            _loaderQueue.Enqueue(loader);
-        }
-
 #if FEATURE_ASYNCLOCAL
-        private static AsyncLocal<DataLoaderContext> _localContext = new AsyncLocal<DataLoaderContext>();
+        private static readonly AsyncLocal<DataLoaderContext> _localContext = new AsyncLocal<DataLoaderContext>();
 
         /// <summary>
-        /// Represents ambient data local to the current load operation.
-        /// <seealso cref="DataLoaderContext.Run{T}(Func{T}})"/>
+        /// Represents the ambient context governing the current load operation.
+        /// <seealso cref="o:Run"/>
         /// </summary>
         public static DataLoaderContext Current => _localContext.Value;
 
@@ -177,35 +171,35 @@ namespace DataLoader
 
 #region Context switchers
         /// <summary>
-        /// Switches out the data loader context, restoring the old one when disposed.
+        /// Switches out the data loader context and restores it when disposed.
         /// </summary>
         private class DataLoaderContextSwitcher : IDisposable
         {
-            private DataLoaderContext _prevCtx;
+            private readonly DataLoaderContext _prevLoadCtx;
 
-            public DataLoaderContextSwitcher(DataLoaderContext context)
+            public DataLoaderContextSwitcher(DataLoaderContext loadCtx)
             {
-                _prevCtx = DataLoaderContext.Current;
-                DataLoaderContext.SetLoaderContext(context);
+                _prevLoadCtx = DataLoaderContext.Current;
+                DataLoaderContext.SetLoaderContext(loadCtx);
             }
 
             public void Dispose()
             {
-                DataLoaderContext.SetLoaderContext(_prevCtx);
+                DataLoaderContext.SetLoaderContext(_prevLoadCtx);
             }
         }
 
         /// <summary>
-        /// Switches out the synchronization context, restoring the old one when disposed.
+        /// Switches out the synchronization context and restores it when disposed.
         /// </summary>
         private class SynchronizationContextSwitcher : IDisposable
         {
-            private SynchronizationContext _prevSyncCtx;
+            private readonly SynchronizationContext _prevSyncCtx;
 
-            public SynchronizationContextSwitcher(SynchronizationContext context)
+            public SynchronizationContextSwitcher(SynchronizationContext syncCtx)
             {
                 _prevSyncCtx = SynchronizationContext.Current;
-                SynchronizationContext.SetSynchronizationContext(context);
+                SynchronizationContext.SetSynchronizationContext(syncCtx);
             }
 
             public void Dispose()
