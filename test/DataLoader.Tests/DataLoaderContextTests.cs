@@ -50,7 +50,7 @@ namespace DataLoader.Tests
         public async Task DataLoaderContext_Run_FlowsCurrentContext()
         {
             var checkpoints = 0;
-            await await DataLoaderContext.Run(async () =>
+            await DataLoaderContext.Run(async () =>
             {
                 var ctx = DataLoaderContext.Current;
 
@@ -106,7 +106,7 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public async Task DataLoaderContext_Run_TriggersConsecutiveLoads()
+        public void DataLoaderContext_Run_TriggersConsecutiveLoads()
         {
             var loadCount = 0;
 
@@ -117,7 +117,7 @@ namespace DataLoader.Tests
                 return ids.ToLookup(id => id);
             });
 
-            var task = await DataLoaderContext.Run(async () =>
+            var task = DataLoaderContext.Run(async () =>
             {
                 var one = await loader.LoadAsync(1);
                 var two = await loader.LoadAsync(2);
