@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GraphQL.Types;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLoader.StarWars
 {
     public class GraphQLUserContext
     {
-        public StarWarsContext DataContext { get; set; }
-        public DataLoaderContext LoadContext { get; set; }
+        public StarWarsContext DataContext { get; }
+        public DataLoaderContext LoadContext { get; }
 
-        public GraphQLUserContext(DataLoaderContext loadContext) : this(loadContext, new StarWarsContext())
+        public GraphQLUserContext(DataLoaderContext loadContext) : this(loadContext, new StarWarsContext().WithNoTracking())
         {
         }
 
@@ -22,21 +23,26 @@ namespace DataLoader.StarWars
         }
     }
 
+    public static class StarWarsContextExtensions
+    {
+        public static StarWarsContext WithNoTracking(this StarWarsContext context)
+        {
+            context.ChangeTracker.AutoDetectChangesEnabled = false;
+            context.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            return context;
+        }
+    }
+
     public static class GraphQLUserContextExtensions
     {
-        public static GraphQLUserContext GetUserContext<T>(this ResolveFieldContext<T> context)
-        {
-            return (GraphQLUserContext)context.UserContext;
-        }
-
         public static StarWarsContext GetDataContext<T>(this ResolveFieldContext<T> context)
         {
-            return context.GetUserContext().DataContext;
+            return ((GraphQLUserContext)context.UserContext).DataContext;
         }
 
         public static IDataLoader<int, TReturn> GetDataLoader<TSource, TReturn>(this ResolveFieldContext<TSource> context, Func<IEnumerable<int>, Task<ILookup<int, TReturn>>> fetchDelegate)
         {
-            return context.GetUserContext().LoadContext.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
+            return ((GraphQLUserContext)context.UserContext).LoadContext.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
         }
     }
 }

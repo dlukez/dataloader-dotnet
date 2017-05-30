@@ -20,9 +20,9 @@ namespace DataLoader.StarWars.Schema
                     {
                         var db = ctx.GetDataContext();
                         return (await db.Friendships
-                            .Where(f => ids.Contains(f.DroidId))
-                            .Select(f => new {Key = f.DroidId, f.Human})
-                            .ToListAsync())
+                                .Where(f => ids.Contains(f.DroidId))
+                                .Select(f => new {Key = f.DroidId, f.Human})
+                                .ToListAsync())
                             .ToLookup(x => x.Key, x => x.Human);
                     }).LoadAsync(ctx.Source.DroidId));
 

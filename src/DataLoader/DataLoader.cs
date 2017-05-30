@@ -6,6 +6,17 @@ using System.Threading.Tasks;
 
 namespace DataLoader
 {
+    public interface IDataLoader<in TKey, TReturn>
+    {
+        DataLoaderStatus Status { get; }
+        Task<IEnumerable<TReturn>> LoadAsync(TKey key);
+    }
+
+    public interface IDataLoader
+    {
+        Task<Task> ExecuteAsync();
+    }
+    
     /// <summary>
     /// Collects keys into a batch to load in one request.
     /// </summary>
@@ -14,21 +25,19 @@ namespace DataLoader
     /// promise task is handed back that represents the future result of the deferred request. The request
     /// is deferred (and keys are collected) until the loader is invoked, which can occur in the following circumstances:
     /// <list type="bullet">
-    /// <item>The delegate supplied to <see cref="DataLoaderContext.Run"/> returned.</item>
+    /// <item>The delegate supplied to <see cref="o:DataLoaderContext.Run"/> returned (but hasn't necessarily completed).</item>
     /// <item><see cref="DataLoaderContext.CompleteAsync"/> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
     /// <item>The loader was invoked explicitly by calling <see cref="ExecuteAsync"/>.</item>
     /// </list>
     /// </remarks>
-    public class DataLoader<TKey, TReturn> : IDataLoader<TKey, TReturn>
+    public class DataLoader<TKey, TReturn> : IDataLoader<TKey, TReturn>, IDataLoader
     {
         private readonly object _lock = new object();
-
+        private readonly Dictionary<TKey, Task<IEnumerable<TReturn>>> _cache = new Dictionary<TKey, Task<IEnumerable<TReturn>>>();
         private readonly Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> _fetch;
         private readonly DataLoaderContext _boundContext;
-
-        private bool _isExecuting;
-
         private List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)> _batch = new List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)>(); //= new List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)>();
+        private bool _isExecuting;
 
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/>.
@@ -79,27 +88,38 @@ namespace DataLoader
         /// </summary>
         public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
         {
-            if (_batch.Count == 0) Context?.QueueLoader(this);
+            if (!_cache.TryGetValue(key, out var task))
+            {
+                var tcs = new TaskCompletionSource<IEnumerable<TReturn>>();
+                _cache.Add(key, (task = tcs.Task));
 
-            var tcs = new TaskCompletionSource<IEnumerable<TReturn>>();
-            _batch.Add((key, tcs));
-            return tcs.Task;
+                lock (_lock)
+                {
+                    if (_batch.Count == 0) Context?.QueueLoader(this);
+                    _batch.Add((key, tcs));
+                }
+            }
+            return task;
         }
 
         /// <summary>
         /// Fetches the current batch and resolves previously handed out promises.
         /// </summary>
-        public async Task ExecuteAsync()
+        public async Task<Task> ExecuteAsync()
         {
             _isExecuting = true;
             try
             {
-                var thisBatch = Interlocked.Exchange(ref _batch, new List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)>());
+                List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)> thisBatch;
+                lock (_lock) thisBatch = Interlocked.Exchange(ref _batch, new List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)>());
                 var lookup = await _fetch(GetKeys(thisBatch)).ConfigureAwait(false);
-                foreach (var (key, tcs) in thisBatch)
+                return Task.Run(() =>
                 {
-                    tcs.SetResult(lookup[key]);
-                }
+                    foreach (var (key, tcs) in thisBatch)
+                    {
+                        tcs.SetResult(lookup[key]);
+                    }
+                });
             }
             finally { _isExecuting = false; }
         }

@@ -46,5 +46,22 @@ Global
 		$4.scope = text/plain
 		$0.StandardHeader = $5
 		$0.VersionControlPolicy = $6
+		$0.TextStylePolicy = $7
+		$7.inheritsSet = null
+		$7.scope = text/x-web
+		$0.TextStylePolicy = $8
+		$8.inheritsSet = null
+		$8.scope = text/x-vs
+		$0.TextStylePolicy = $9
+		$9.FileWidth = 80
+		$9.TabWidth = 2
+		$9.TabsToSpaces = True
+		$9.IndentWidth = 2
+		$9.NoTabsAfterNonTabs = True
+		$9.scope = application/xml
+		$0.XmlFormattingPolicy = $10
+		$10.DefaultFormat = $11
+		$11.OmitXmlDeclaration = True
+		$10.scope = application/xml
 	EndGlobalSection
 EndGlobal

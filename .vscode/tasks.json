@@ -10,7 +10,7 @@
         {
             "taskName": "build",
             "args": [
-                "DataLoader.sln"
+                "sample/DataLoader.StarWars/DataLoader.StarWars.csproj"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"

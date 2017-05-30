@@ -4,28 +4,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics;
 
 namespace DataLoader
 {
     /// <summary>
-    /// Defines a context for creating and executing <see cref="DataLoader"/> instances.
+    /// Defines a context for creating and executing <see cref="DataLoader{TKey,TReturn}"/> instances.
     /// </summary>
     /// <remarks>
-    /// This class contains any data required by <see cref="DataLoader"/> instances and is responsible for managing their execution.
-    ///
-    /// Loaders enlist themselves with the context active at the time when their <code>Load</code> method is called.
-    /// When the <see cref="CompleteAsync"/> method is called on the context, it begins executing the enlisted loaders.
-    /// Loaders are executed serially, since parallel requests to a database are generally not conducive to good performance or throughput.
-    ///
-    /// The context will try to wait until each loader - as well as continuations attached to each promise it hands out - finish executing
-    /// before moving on to the next. The purpose of this is to allow loaders to enlist or reenlist themselves so that they too are processed
-    /// as part the context's completion.
+    /// <para>
+    /// This class contains any data required by <see cref="DataLoader{TKey,TReturn}"/> instances and is responsible for managing their execution.
+    /// </para>
+    /// <para>
+    /// Loaders enlist themselves with the context active at the time when the <see cref="DataLoader{TKey,TReturn}.LoadAsync"/> method is called.
+    /// Later, when the context is completed (using the <see cref="CompleteAsync"/> method), the queue will be processed and each loader executed
+    /// in the order they were enlisted.
+    /// </para>
+    /// <para>
+    /// The context should wait until each loader has fetched its data and any continuations have run, before moving on to the next loader.
+    /// This allows for keys to be collected from continuation code and also fetched by subsequent loaders as batches.
+    /// </para>
     /// </remarks>
     public sealed class DataLoaderContext
     {
-        private readonly ConcurrentQueue<IDataLoader> _loaderQueue = new ConcurrentQueue<IDataLoader>();
         private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
+        private ConcurrentQueue<IDataLoader> _loaderQueue = new ConcurrentQueue<IDataLoader>();
         private bool _isCompleting;
 
         internal DataLoaderContext()
@@ -49,7 +51,7 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Executes the waiting loaders in sequence until there are none remaining.
+        /// Processes the queue of loaders until there are none remaining.
         /// </summary>
         internal async Task CompleteAsync()
         {
@@ -58,9 +60,25 @@ namespace DataLoader
             _isCompleting = true;
             try
             {
-                while (_loaderQueue.TryDequeue(out IDataLoader loader))
+                var tasks = new List<Task>();
+                while (tasks.Count > 0 || _loaderQueue.Count > 0)
                 {
-                    await loader.ExecuteAsync().ConfigureAwait(false);
+                    if (_loaderQueue.Count > 0)
+                    {
+                        // Process loaders in sets, in an attempt to fetch as early as possible while
+                        // allowing enough time for continuations to run and add keys to the batch.
+                        // We're essentially trying to find the balance between fetching too often
+                        // (more round-trips) and fetching too little (waiting with nothing to do).
+                        var queue = Interlocked.Exchange(ref _loaderQueue, new ConcurrentQueue<IDataLoader>());
+                        while (queue.TryDequeue(out IDataLoader loader))
+                        {
+                            // Allow one loader to fetch at a time (awaiters will continue concurrently).
+                            tasks.Add(await loader.ExecuteAsync().ConfigureAwait(false));
+                        }
+                    }
+
+                    // Wait until a loader has finished executing (waiters have completed) before firing more loaders.
+                    tasks.Remove(await Task.WhenAny(tasks).ConfigureAwait(false));
                 }
             }
             finally { _isCompleting = false; }
@@ -71,7 +89,7 @@ namespace DataLoader
 
         /// <summary>
         /// Represents the ambient context governing the current load operation.
-        /// <seealso cref="o:Run"/>
+        /// <seealso cref="Run{Task{T}}(Func{Task{T}})"/>
         /// </summary>
         public static DataLoaderContext Current => _localContext.Value;
 
@@ -80,9 +98,10 @@ namespace DataLoader
         /// </summary>
         /// <remarks>
         /// If available, <see cref="DataLoader"/> instances that are not explicitly bound to a context
-        /// will register themselves with the ambient context when their load method is first called.
+        /// will register themselves with the ambient context when the load method is called and the
+        /// batch is empty.
         /// </remarks>
-        public static void SetLoaderContext(DataLoaderContext context)
+        internal static void SetLoaderContext(DataLoaderContext context)
         {
             _localContext.Value = context;
         }
@@ -91,7 +110,7 @@ namespace DataLoader
         internal static void SetLoaderContext(DataLoaderContext context) {}
 #endif
 
-#region Run Methods
+        #region Run Methods
 #if FEATURE_ASYNCLOCAL
         /// <summary>
         /// Runs code within a new loader context before firing any pending loaders.
@@ -132,6 +151,9 @@ namespace DataLoader
                 var result = func(context);
                 await context.CompleteAsync().ConfigureAwait(false);
                 return await result.ConfigureAwait(false);
+                // try:
+                //context.CompleteAsync();
+                //return await result.ConfigureAwait(false);
             }
         }
 
@@ -167,9 +189,9 @@ namespace DataLoader
                 await context.CompleteAsync().ConfigureAwait(false);
             }
         }
-#endregion
+        #endregion
 
-#region Context switchers
+        #region Context switchers
         /// <summary>
         /// Switches out the data loader context and restores it when disposed.
         /// </summary>
@@ -208,5 +230,5 @@ namespace DataLoader
             }
         }
     }
-#endregion
+    #endregion
 }
