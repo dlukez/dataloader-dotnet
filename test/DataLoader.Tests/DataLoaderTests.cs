@@ -7,11 +7,18 @@ namespace DataLoader.Tests
     public class DataLoaderTests
     {
         [Fact]
-        public void DataLoader_ReflectsCurrentContext()
+        public async Task DataLoader_WithoutBoundContext_ReflectsCurrentContext()
         {
             var loader = new DataLoader<object, object>(_ => null);
             loader.Context.ShouldBeNull();
-            DataLoaderContext.Run(ctx => { loader.Context.ShouldBe(ctx); return Task.CompletedTask; });
+            var task = DataLoaderContext.Run(async ctx =>
+            {
+                loader.Context.ShouldBe(ctx);
+                await Task.Delay(200);
+                loader.Context.ShouldBe(ctx);
+            });
+            loader.Context.ShouldBeNull();
+            await task;
             loader.Context.ShouldBeNull();
         }
     }

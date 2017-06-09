@@ -12,17 +12,24 @@ namespace DataLoader.Tests
     public class DataLoaderContextTests
     {
         [Fact]
-        public async Task DataLoaderContext_Run_SetsCurrentContext()
+        public void DataLoaderContext_Current_IsNullByDefault()
         {
             DataLoaderContext.Current.ShouldBeNull();
+        }
 
-            await DataLoaderContext.Run(ctx =>
-            {
-                DataLoaderContext.Current.ShouldBe(ctx);
-                DataLoaderContext.Current.ShouldNotBeNull();
-                return Task.CompletedTask;
-            });
+        [Fact]
+        public async Task DataLoaderContext_Run_SetsCurrent()
+        {
+            await DataLoaderContext.Run(() => DataLoaderContext.Current.ShouldNotBeNull());
+            await DataLoaderContext.Run(ctx => DataLoaderContext.Current.ShouldBe(ctx));
+        }
 
+        [Fact]
+        public async Task DataLoaderContext_Run_UnsetsCurrent()
+        {
+            var task = DataLoaderContext.Run(() => {});
+            DataLoaderContext.Current.ShouldBeNull();
+            await task;
             DataLoaderContext.Current.ShouldBeNull();
         }
 
@@ -32,24 +39,22 @@ namespace DataLoader.Tests
             await DataLoaderContext.Run(async outerCtx =>
             {
                 DataLoaderContext.Current.ShouldBe(outerCtx);
-
-                await DataLoaderContext.Run(innerCtx =>
+                var task = DataLoaderContext.Run(innerCtx =>
                 {
                     innerCtx.ShouldNotBe(outerCtx);
                     innerCtx.ShouldBe(DataLoaderContext.Current);
-                    return Task.CompletedTask;
                 });
-
+                DataLoaderContext.Current.ShouldBe(outerCtx);
+                await task;
                 DataLoaderContext.Current.ShouldBe(outerCtx);
             });
-
-            DataLoaderContext.Current.ShouldBeNull();
         }
 
         [Fact]
         public async Task DataLoaderContext_Run_FlowsCurrentContext()
         {
             var checkpoints = 0;
+
             await DataLoaderContext.Run(async () =>
             {
                 var ctx = DataLoaderContext.Current;

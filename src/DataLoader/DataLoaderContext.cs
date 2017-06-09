@@ -51,12 +51,16 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Processes the queue of loaders until there are none remaining.
+        /// Pumps the loader queue and asynchronously executes each loader until there are none remaining.
         /// </summary>
+        /// <remarks>
+        /// Loaders will fetch exclusively (i.e. one at a time) but complete concurrently. This allows us
+        /// to process the results efficiently while avoiding hitting the DB with multiple parallel requests,
+        /// as this usually hurts performance.
+        /// </remarks>
         internal async Task CompleteAsync()
         {
             if (_isCompleting) throw new InvalidOperationException();
-
             _isCompleting = true;
             try
             {
@@ -65,19 +69,19 @@ namespace DataLoader
                 {
                     if (_loaderQueue.Count > 0)
                     {
-                        // Process loaders in sets, in an attempt to fetch as early as possible while
-                        // allowing enough time for continuations to run and add keys to the batch.
-                        // We're essentially trying to find the balance between fetching too often
-                        // (more round-trips) and fetching too little (waiting with nothing to do).
+                        // Process loaders in sets, in order to fetch as early as possible while
+                        // allowing time for continuations to run and add keys to batches.
+                        // We're essentially trying to balance fetching too often (more round-trips)
+                        // and fetching too little (unnecessary delays before fetching).
                         var queue = Interlocked.Exchange(ref _loaderQueue, new ConcurrentQueue<IDataLoader>());
                         while (queue.TryDequeue(out IDataLoader loader))
                         {
-                            // Allow one loader to fetch at a time (awaiters will continue concurrently).
+                            // Fetch exclusively, but complete waiters concurrently.
                             tasks.Add(await loader.ExecuteAsync().ConfigureAwait(false));
                         }
                     }
 
-                    // Wait until a loader has finished executing (waiters have completed) before firing more loaders.
+                    // Do more once a loader has finished executing (waiters have completed).
                     tasks.Remove(await Task.WhenAny(tasks).ConfigureAwait(false));
                 }
             }
@@ -110,7 +114,7 @@ namespace DataLoader
         internal static void SetLoaderContext(DataLoaderContext context) {}
 #endif
 
-        #region Run Methods
+#region Run Methods
 #if FEATURE_ASYNCLOCAL
         /// <summary>
         /// Runs code within a new loader context before firing any pending loaders.
@@ -144,16 +148,14 @@ namespace DataLoader
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
-            var context = new DataLoaderContext();
-            using (new DataLoaderContextSwitcher(context))
-            using (new SynchronizationContextSwitcher(null))
+            var loadCtx = new DataLoaderContext();
+            var syncCtx = new DataLoaderSynchronizationContext(loadCtx);
+            using (new DataLoaderContextSwitcher(loadCtx))
+            using (new SynchronizationContextSwitcher(syncCtx))
             {
-                var result = func(context);
-                await context.CompleteAsync().ConfigureAwait(false);
+                var result = func(loadCtx);
+                await loadCtx.CompleteAsync().ConfigureAwait(false);
                 return await result.ConfigureAwait(false);
-                // try:
-                //context.CompleteAsync();
-                //return await result.ConfigureAwait(false);
             }
         }
 
@@ -164,12 +166,13 @@ namespace DataLoader
         {
             if (func == null) throw new ArgumentNullException(nameof(func));
 
-            var context = new DataLoaderContext();
-            using (new DataLoaderContextSwitcher(context))
-            using (new SynchronizationContextSwitcher(null))
+            var loadCtx = new DataLoaderContext();
+            var syncCtx = new DataLoaderSynchronizationContext(loadCtx);
+            using (new DataLoaderContextSwitcher(loadCtx))
+            using (new SynchronizationContextSwitcher(syncCtx))
             {
-                var result = func(context);
-                await context.CompleteAsync().ConfigureAwait(false);
+                var result = func(loadCtx);
+                await loadCtx.CompleteAsync().ConfigureAwait(false);
                 await result.ConfigureAwait(false);
             }
         }
@@ -181,17 +184,38 @@ namespace DataLoader
         {
             if (action == null) throw new ArgumentNullException(nameof(action));
 
-            var context = new DataLoaderContext();
-            using (new DataLoaderContextSwitcher(context))
-            using (new SynchronizationContextSwitcher(null))
+            var loadCtx = new DataLoaderContext();
+            var syncCtx = new DataLoaderSynchronizationContext(loadCtx);
+            using (new DataLoaderContextSwitcher(loadCtx))
+            using (new SynchronizationContextSwitcher(syncCtx))
             {
-                action(context);
-                await context.CompleteAsync().ConfigureAwait(false);
+                action(loadCtx);
+                await loadCtx.CompleteAsync().ConfigureAwait(false);
             }
         }
-        #endregion
+#endregion
 
-        #region Context switchers
+#region Synchronization context
+        private class DataLoaderSynchronizationContext : SynchronizationContext
+        {
+            private readonly DataLoaderContext _loadCtx;
+            private int _operations;
+
+            public DataLoaderSynchronizationContext(DataLoaderContext loadCtx)
+            {
+                _loadCtx = loadCtx;
+            }
+
+            public override void Post(SendOrPostCallback d, object state)
+            {
+                SynchronizationContext.SetSynchronizationContext(this);
+                d(state);
+                if (!_loadCtx._isCompleting) _loadCtx.CompleteAsync();
+            }
+        }
+#endregion
+
+#region Context switchers
         /// <summary>
         /// Switches out the data loader context and restores it when disposed.
         /// </summary>
@@ -230,5 +254,5 @@ namespace DataLoader
             }
         }
     }
-    #endregion
+#endregion
 }

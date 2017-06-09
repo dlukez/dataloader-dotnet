@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace DataLoader
 {
+    public enum DataLoaderStatus
+    {
+        Idle,
+        WaitingToExecute,
+        Executing
+    }
+
     public interface IDataLoader<in TKey, TReturn>
     {
         DataLoaderStatus Status { get; }
@@ -91,7 +98,8 @@ namespace DataLoader
             if (!_cache.TryGetValue(key, out var task))
             {
                 var tcs = new TaskCompletionSource<IEnumerable<TReturn>>();
-                _cache.Add(key, (task = tcs.Task));
+                task = tcs.Task;
+                _cache.Add(key, task);
 
                 lock (_lock)
                 {
