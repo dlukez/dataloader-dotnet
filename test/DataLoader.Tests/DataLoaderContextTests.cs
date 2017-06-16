@@ -18,19 +18,11 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public async Task DataLoaderContext_Run_SetsCurrent()
-        {
-            await DataLoaderContext.Run(() => DataLoaderContext.Current.ShouldNotBeNull());
-            await DataLoaderContext.Run(ctx => DataLoaderContext.Current.ShouldBe(ctx));
-        }
-
-        [Fact]
         public async Task DataLoaderContext_Run_UnsetsCurrent()
         {
-            var task = DataLoaderContext.Run(() => {});
+            var task = DataLoaderContext.Run(() => Task.Delay(100));
             DataLoaderContext.Current.ShouldBeNull();
             await task;
-            DataLoaderContext.Current.ShouldBeNull();
         }
 
         [Fact]
@@ -38,15 +30,16 @@ namespace DataLoader.Tests
         {
             await DataLoaderContext.Run(async outerCtx =>
             {
-                DataLoaderContext.Current.ShouldBe(outerCtx);
-                var task = DataLoaderContext.Run(innerCtx =>
+                var task = DataLoaderContext.Run(async innerCtx =>
                 {
                     innerCtx.ShouldNotBe(outerCtx);
                     innerCtx.ShouldBe(DataLoaderContext.Current);
+                    await Task.Yield();
+                    innerCtx.ShouldBe(DataLoaderContext.Current);
                 });
+
                 DataLoaderContext.Current.ShouldBe(outerCtx);
                 await task;
-                DataLoaderContext.Current.ShouldBe(outerCtx);
             });
         }
 
@@ -140,15 +133,36 @@ namespace DataLoader.Tests
                 Thread.Sleep(200);
 
                 var ten = await loader.LoadAsync(10);
-
                 t7.IsCompleted.ShouldBeTrue();
                 t8.IsCompleted.ShouldBeTrue();
                 t9.IsCompleted.ShouldBeTrue();
-
             });
 
-            Should.CompleteIn(task, TimeSpan.FromSeconds(10));
+            Should.CompleteIn(task, TimeSpan.FromSeconds(5));
             loadCount.ShouldBe(5);
+        }
+
+        [Fact]
+        public void DataLoaderContext_Run_HandlesUnrelatedAwaits()
+        {
+            var loadCount = 0;
+
+            var loader = new DataLoader<int, int>(async ids =>
+            {
+                await Task.Delay(150);
+                loadCount++;
+                return ids.ToLookup(id => id);
+            });
+
+            var task = DataLoaderContext.Run(async () =>
+            {
+                var one = await loader.LoadAsync(1);
+                await Task.Delay(100);
+                var two = await loader.LoadAsync(2);
+            });
+
+            Should.CompleteIn(task, TimeSpan.FromSeconds(5));
+            loadCount.ShouldBe(2);
         }
     }
 }

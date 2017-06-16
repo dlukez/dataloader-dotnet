@@ -5,11 +5,12 @@
     <DefaultExcludesInProjectFolder>wwwroot\node_modules\**;$(DefaultExcludesInProjectFolder)</DefaultExcludesInProjectFolder>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DataLoader\DataLoader.csproj" />
+    <ProjectReference Include="../../src/DataLoader/DataLoader.csproj" />
+    <ProjectReference Include="../../../graphql-dotnet/src/GraphQL/GraphQL.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Faker.NETCore" Version="1.0.1" />
-    <PackageReference Include="GraphQL" Version="0.15.1" />
+    <!--<PackageReference Include="GraphQL" Version="0.15.1.678" />-->
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.3" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />

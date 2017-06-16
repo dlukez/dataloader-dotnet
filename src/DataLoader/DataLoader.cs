@@ -6,24 +6,11 @@ using System.Threading.Tasks;
 
 namespace DataLoader
 {
-    public enum DataLoaderStatus
+    public interface IDataLoader<in TKey, TReturn> : IDataLoader
     {
-        Idle,
-        WaitingToExecute,
-        Executing
-    }
-
-    public interface IDataLoader<in TKey, TReturn>
-    {
-        DataLoaderStatus Status { get; }
         Task<IEnumerable<TReturn>> LoadAsync(TKey key);
     }
 
-    public interface IDataLoader
-    {
-        Task<Task> ExecuteAsync();
-    }
-    
     /// <summary>
     /// Collects keys into a batch to load in one request.
     /// </summary>
@@ -33,47 +20,40 @@ namespace DataLoader
     /// is deferred (and keys are collected) until the loader is invoked, which can occur in the following circumstances:
     /// <list type="bullet">
     /// <item>The delegate supplied to <see cref="o:DataLoaderContext.Run"/> returned (but hasn't necessarily completed).</item>
-    /// <item><see cref="DataLoaderContext.CompleteAsync"/> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
+    /// <item><see cref="DataLoaderContext.Process"/> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
     /// <item>The loader was invoked explicitly by calling <see cref="ExecuteAsync"/>.</item>
     /// </list>
     /// </remarks>
-    public class DataLoader<TKey, TReturn> : IDataLoader<TKey, TReturn>, IDataLoader
+    public class DataLoader<TKey, TReturn> : IDataLoader<TKey, TReturn>
     {
         private readonly object _lock = new object();
         private readonly Dictionary<TKey, Task<IEnumerable<TReturn>>> _cache = new Dictionary<TKey, Task<IEnumerable<TReturn>>>();
-        private readonly Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> _fetch;
+        private readonly Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> _fetchDelegate;
         private readonly DataLoaderContext _boundContext;
-        private List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)> _batch = new List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)>(); //= new List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)>();
+        private List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)> _batch = new List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)>();
         private bool _isExecuting;
 
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/>.
         /// </summary>
-        public DataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetch)
+        public DataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate)
         {
-            _fetch = fetch;
+            _fetchDelegate = fetchDelegate;
         }
 
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/> bound to the specified context.
         /// </summary>
-        internal DataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetch, DataLoaderContext context) : this(fetch)
+        internal DataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate, DataLoaderContext context) : this(fetchDelegate)
         {
             _boundContext = context;
         }
 
-#if FEATURE_ASYNCLOCAL
         /// <summary>
         /// Gets the context the loader is bound to, otherwise the current ambient context.
         /// </summary>
         /// <seealso cref="DataLoaderContext.Current"/>
         public DataLoaderContext Context => _boundContext ?? DataLoaderContext.Current;
-#else
-        /// <summary>
-        /// Gets the context the loader is bound to.
-        /// </summary>
-        public DataLoaderContext Context => _boundContext;
-#endif
 
         /// <summary>
         /// Gets the keys to retrieve in the next batch.
@@ -113,21 +93,18 @@ namespace DataLoader
         /// <summary>
         /// Fetches the current batch and resolves previously handed out promises.
         /// </summary>
-        public async Task<Task> ExecuteAsync()
+        public async Task ExecuteAsync()
         {
             _isExecuting = true;
             try
             {
                 List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)> thisBatch;
                 lock (_lock) thisBatch = Interlocked.Exchange(ref _batch, new List<(TKey, TaskCompletionSource<IEnumerable<TReturn>>)>());
-                var lookup = await _fetch(GetKeys(thisBatch)).ConfigureAwait(false);
-                return Task.Run(() =>
+                var lookup = await _fetchDelegate(GetKeys(thisBatch)).ConfigureAwait(false);
+                foreach (var (key, tcs) in thisBatch)
                 {
-                    foreach (var (key, tcs) in thisBatch)
-                    {
-                        tcs.SetResult(lookup[key]);
-                    }
-                });
+                    tcs.SetResult(lookup[key]);
+                }
             }
             finally { _isExecuting = false; }
         }
