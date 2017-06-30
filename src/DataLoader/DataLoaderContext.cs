@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 namespace DataLoader
 {
     /// <summary>
-    /// Defines a context for creating and executing <see cref="DataLoader{TKey,TReturn}"/> instances.
+    /// Defines a context for creating and executing <see cref="DataLoader{TKey,TValue,TReturn}"/> instances.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This class contains any data required by <see cref="DataLoader{TKey,TReturn}"/> instances and is responsible for managing their execution.
+    /// This class contains any data required by <see cref="DataLoader{TKey,TValue,TReturn}"/> instances and is responsible for managing their execution.
     /// </para>
     /// <para>
-    /// Loaders enlist themselves with the context active at the time when the <see cref="DataLoader{TKey,TReturn}.LoadAsync"/> method is called.
+    /// Loaders enlist themselves with the context active at the time when the <see cref="DataLoader{TKey,TValue,TReturn}.LoadAsync"/> method is called.
     /// Later, when the context is completed (using the <see cref="CompleteAsync"/> method), the queue will be processed and each loader executed
     /// in the order they were enlisted.
     /// </para>
@@ -37,9 +37,17 @@ namespace DataLoader
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
         /// </summary>
-        public IDataLoader<TKey, TReturn> GetOrCreateLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetch)
+        public IDataLoader<TKey, TValue> GetOrCreateLoader<TKey, TValue>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TValue>>> fetch)
         {
-            return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ => new DataLoader<TKey, TReturn>(fetch, this));
+            return (IDataLoader<TKey, TValue>)_cache.GetOrAdd(key, _ => new DataLoader<TKey, TValue>(fetch, this));
+        }
+
+        /// <summary>
+        /// Retrieves a cached loader for the given key, creating one if none is found.
+        /// </summary>
+        public IDataLoader<TKey, TValue, TReturn> GetOrCreateLoader<TKey, TValue, TReturn>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TValue>>> fetch, Func<IEnumerable<TValue>, TReturn> transform)
+        {
+            return (IDataLoader<TKey, TValue, TReturn>)_cache.GetOrAdd(key, _ => new DataLoader<TKey, TValue, TReturn>(fetch, transform, this));
         }
 
         /// <summary>
