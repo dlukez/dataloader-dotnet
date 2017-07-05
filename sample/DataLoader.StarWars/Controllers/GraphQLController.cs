@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DataLoader.StarWars.Schema;
@@ -25,18 +26,21 @@ namespace DataLoader.StarWars.Controllers
         public async Task<ExecutionResult> Post([FromBody] GraphQLRequest request)
         {
             var queryNumber = Interlocked.Increment(ref _queryNumber);
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} - Running query {queryNumber}...");
+            Console.WriteLine();
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Running query {queryNumber}...");
             var sw = Stopwatch.StartNew();
 
-            var result = await DataLoaderContext.Run(ctx => _executer.ExecuteAsync(_ =>
+            var result = await DataLoaderContext.Run(loadCtx => _executer.ExecuteAsync(_ =>
             {
                 _.Schema = _schema;
                 _.Query = request.Query;
-                _.UserContext = new GraphQLUserContext(ctx);
+                _.UserContext = new GraphQLUserContext(loadCtx);
             }));
 
             sw.Stop();
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} - Executed query {queryNumber} ({sw.ElapsedMilliseconds}ms)");
+            if (result.Errors != null) Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Error executing query {queryNumber}: {result.Errors.Aggregate("", (s, e) => s + Environment.NewLine + e.ToString())}");
+            else Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Executed query {queryNumber} ({sw.ElapsedMilliseconds}ms)");
+
             return result;
         }
     }

@@ -27,8 +27,11 @@ namespace DataLoader
     /// </remarks>
     public sealed class DataLoaderContext : IDisposable
     {
-        private ConcurrentQueue<Func<Task<Task>>> _queue = new ConcurrentQueue<Func<Task<Task>>>();
-        private readonly DataLoaderFactory _factory;
+        private DataLoaderFactory _factory;
+
+        private TaskCompletionSource<bool> _trigger;
+
+        private Task _chain;
 
         /// <summary>
         /// Creates a new instance of a context.
@@ -39,6 +42,8 @@ namespace DataLoader
         internal DataLoaderContext()
         {
             _factory = new DataLoaderFactory(this);
+            _trigger = new TaskCompletionSource<bool>();
+            _chain = _trigger.Task;
         }
 
         /// <summary>
@@ -49,7 +54,17 @@ namespace DataLoader
         /// <summary>
         /// Attaches a delegate to the end of the task chain.
         /// </summary>
-        internal void SetNext(Func<Task<Task>> func) => _queue.Enqueue(func);
+        internal void SetNext(Func<Task> func)
+        {
+            _queue.Enqueue(func);
+            // _chain = defer();
+
+            // async Task defer()
+            // {
+            //     await _chain.ConfigureAwait(false);
+            //     await func().ConfigureAwait(false);
+            // }
+        }
 
         /// <summary>
         /// Asynchronously executes loaders until there are none remaining.
@@ -59,27 +74,7 @@ namespace DataLoader
         /// to execute the results efficiently and avoids hitting the DB with multiple parallel requests,
         /// which usually hurts performance.
         /// </remarks>
-        internal async void Execute()
-        {
-            if (_queue.Count == 0) return;
-
-            var tasks = new List<Task>();
-            while (_queue.Count > 0 || tasks.Count > 0)
-            {
-                if (_queue.Count > 0)
-                {
-                    var localQueue = Interlocked.Exchange(ref _queue, new ConcurrentQueue<Func<Task<Task>>>());
-                    while (localQueue.TryDequeue(out var func))
-                    {
-                        var completion = await func().ConfigureAwait(false);
-                        tasks.Add(completion);
-                    }
-                }
-
-                var completed = await Task.WhenAny(tasks).ConfigureAwait(false);
-                tasks.Remove(completed);
-            }
-        }
+        internal void Execute() => _trigger.SetResult(true);
 
         /// <summary>
         /// Indicates whether this context has been disposed.

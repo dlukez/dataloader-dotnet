@@ -5,11 +5,12 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            //"preLaunchTask": "build",
+            "preLaunchTask": "build",
             "program": "${workspaceRoot}/sample/DataLoader.StarWars/bin/Debug/netcoreapp1.1/DataLoader.StarWars.dll",
             "args": [],
             "cwd": "${workspaceRoot}/sample/DataLoader.StarWars",
             "stopAtEntry": false,
+            "justMyCode": true,
             "launchBrowser": {
                 "enabled": true,
                 "args": "${auto-detect-url}",

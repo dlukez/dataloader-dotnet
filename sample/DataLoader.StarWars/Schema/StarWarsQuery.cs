@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Types;
@@ -15,18 +16,15 @@ namespace DataLoader.StarWars.Schema
 
             Field<ListGraphType<HumanType>>(
                 name: "humans",
-                resolve: ctx => ctx.GetDataLoader((Func<Task<IEnumerable<Human>>>)(
-                    async () => await ctx.GetDataContext().Humans.ToListAsync())).LoadAsync());
+                resolve: ctx => ctx.GetDataLoader(async () => (await ctx.GetDataContext().Humans.ToArrayAsync()).AsEnumerable()).LoadAsync());
 
             Field<ListGraphType<DroidType>>(
                 name: "droids",
-                resolve: ctx => ctx.GetDataLoader((Func<Task<IEnumerable<Droid>>>)(
-                    async () => await ctx.GetDataContext().Droids.ToListAsync())).LoadAsync());
+                resolve: ctx => ctx.GetDataLoader(async () => (await ctx.GetDataContext().Droids.ToArrayAsync()).AsEnumerable()).LoadAsync());
 
             Field<ListGraphType<EpisodeType>>(
                 name: "episodes",
-                resolve: ctx => ctx.GetDataLoader((Func<Task<IEnumerable<Episode>>>)(
-                    async () => await ctx.GetDataContext().Episodes.ToListAsync())).LoadAsync());
+                resolve: ctx => ctx.GetDataLoader(async () => (await ctx.GetDataContext().Episodes.ToArrayAsync()).AsEnumerable()).LoadAsync());
         }
     }
 }

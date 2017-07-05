@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,31 +9,31 @@ namespace DataLoader
 {
     public interface IDataLoader<T> : IDataLoader
     {
-        Task<IEnumerable<T>> LoadAsync();
+        Task<T> LoadAsync();
     }
 
+    /// <summary>
+    /// Wraps an arbitrary query and integrates it into the loading chain.
+    /// </summary>
     public class DataLoaderRoot<T> : IDataLoader<T>
     {
-        private readonly object _lock = new object();
-        private readonly Func<Task<IEnumerable<T>>> _fetchDelegate;
         private readonly DataLoaderContext _boundContext;
-        private TaskCompletionSource<IEnumerable<T>> _tcs = new TaskCompletionSource<IEnumerable<T>>();
-        private bool _isQueued;
-        private bool _isExecuting;
+        private readonly Func<Task<T>> _fetchDelegate;
+        private readonly TaskCompletionSource<T> _completionSource = new TaskCompletionSource<T>(); 
 
         /// <summary>
         /// Creates a new <see cref="DataLoaderRoot{T}"/>.
         /// </summary>
-        public DataLoaderRoot(Func<Task<IEnumerable<T>>> fetchDelegate)
+        public DataLoaderRoot(Func<Task<T>> fetchDelegate) : this(fetchDelegate, null)
         {
-            _fetchDelegate = fetchDelegate;
         }
 
         /// <summary>
         /// Creates a new <see cref="DataLoaderRoot{T}"/> bound to the specified context.
         /// </summary>
-        internal DataLoaderRoot(Func<Task<IEnumerable<T>>> fetch, DataLoaderContext boundContext) : this(fetch)
+        internal DataLoaderRoot(Func<Task<T>> fetchDelegate, DataLoaderContext boundContext)
         {
+            _fetchDelegate = fetchDelegate;
             _boundContext = boundContext;
         }
 
@@ -43,45 +45,21 @@ namespace DataLoader
         public DataLoaderContext Context => _boundContext ?? DataLoaderContext.Current;
 
         /// <summary>
-        /// Indicates the loader's current status.
+        /// Loads data using the configured fetch delegate.
         /// </summary>
-        public DataLoaderStatus Status =>
-            _isExecuting
-                ? DataLoaderStatus.Executing
-                : _isQueued
-                    ? DataLoaderStatus.WaitingToExecute
-                    : DataLoaderStatus.Idle;
-
-        /// <summary>
-        /// Schedules the loader to run, returning a Task representing the result.
-        public Task<IEnumerable<T>> LoadAsync()
+        public async Task<T> LoadAsync()
         {
-            lock (_lock)
-            {
-                if (!_isQueued) Context?.QueueLoader(this);
-                _isQueued = true;
-            }
-
-            return _tcs.Task;
+            Context?.SetNext(ExecuteAsync);
+            return await _completionSource.Task.ConfigureAwait(false);
         }
 
         /// <summary>
         /// Executes the fetch delegate and resolves the promise.
         /// </summary>
-        public async Task ExecuteAsync()
+        public async Task<Task> ExecuteAsync()
         {
-            _isExecuting = true;
-            try
-            {
-                TaskCompletionSource<IEnumerable<T>> tcs;
-                lock (_lock)
-                {
-                    tcs = Interlocked.Exchange(ref _tcs, new TaskCompletionSource<IEnumerable<T>>());
-                    _isQueued = false;
-                }
-                tcs.SetResult(await _fetchDelegate().ConfigureAwait(false));
-            }
-            finally { _isExecuting = false; }
+            var result = await _fetchDelegate().ConfigureAwait(false);
+            return Task.Run(() => _completionSource.SetResult(result));
         }
     }
 }

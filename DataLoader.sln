@@ -64,4 +64,6 @@ Global
 		$11.OmitXmlDeclaration = True
 		$10.scope = application/xml
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
 EndGlobal

@@ -149,7 +149,7 @@ namespace DataLoader.Tests
 
             var loader = new DataLoader<int, int>(async ids =>
             {
-                await Task.Delay(150);
+                await Task.Delay(100);
                 loadCount++;
                 return ids.ToLookup(id => id);
             });
