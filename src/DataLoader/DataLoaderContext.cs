@@ -16,7 +16,7 @@ namespace DataLoader
     /// </para>
     /// <para>
     /// Loaders enlist themselves with the context active at the time when the <see cref="DataLoader{TKey,TReturn}.LoadAsync"/> method is called.
-    /// Later, when the context is triggered (using the <see cref="Process"/> method), the queue will be processed and each loader executed
+    /// Later, when the context is triggered (using the <see cref="Execute"/> method), the queue will be processed and each loader executed
     /// in the order they were enlisted.
     /// </para>
     /// <para>
@@ -24,63 +24,92 @@ namespace DataLoader
     /// This allows for keys to be collected from continuation code and also fetched by subsequent loaders as batches.
     /// </para>
     /// </remarks>
-    public sealed class DataLoaderContext
+    public sealed class DataLoaderContext : IDisposable
     {
-        private static int _nextId = 1;
-        private int _id = _nextId++;
-        private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
-        private ConcurrentQueue<IDataLoader> _loaderQueue = new ConcurrentQueue<IDataLoader>();
-        internal bool _isProcessing;
-
-        internal DataLoaderContext()
-        {
-        }
+        private ThreadLocal<Queue<IDataLoader>> _localQueue = new ThreadLocal<Queue<IDataLoader>>(() => new Queue<IDataLoader>());
+        private AsyncAutoResetEvent _fetchLock = new AsyncAutoResetEvent(true);
 
         /// <summary>
-        /// Retrieves a cached loader for the given key, creating one if none is found.
-        /// </summary>
-        public IDataLoader<TKey, TReturn> GetOrCreateLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate)
-        {
-            return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ => new DataLoader<TKey, TReturn>(fetchDelegate, this));
-        }
-
-        /// <summary>
-        /// Retrieves a cached loader for the given key, creating one if none is found.
-        /// </summary>
-        public IDataLoader<T> GetOrCreateLoader<T>(object key, Func<Task<IEnumerable<T>>> fetchDelegate)
-        {
-            return (IDataLoader<T>)_cache.GetOrAdd(key, _ => new DataLoaderRoot<T>(fetchDelegate, this));
-        }
-
-        /// <summary>
-        /// Queues a loader for later execution.
-        /// </summary>
-        internal void QueueLoader(IDataLoader loader) => _loaderQueue.Enqueue(loader);
-
-        /// <summary>
-        /// Asynchronously executes loaders until there are none remaining.
+        /// Creates a new instance of a context.
         /// </summary>
         /// <remarks>
-        /// Loaders will fetch exclusively (i.e. one at a time) but complete concurrently. This allows us
-        /// to process the results efficiently and avoids hitting the DB with multiple parallel requests,
-        /// which usually hurts performance.
+        /// Reserved for internal use only - consumers should use the static <see cref="Run"/> method.
         /// </remarks>
-        internal async void Process()
+        internal DataLoaderContext()
         {
-            if (_isProcessing) throw new InvalidOperationException();
-            if (_loaderQueue.Count == 0) return;
-            _isProcessing = true;
-            try
-            {
-                while (_loaderQueue.TryDequeue(out IDataLoader loader))
-                {
-                    await loader.ExecuteAsync().ConfigureAwait(false);
-                }
-            }
-            finally { _isProcessing = false; }
+            Factory = new DataLoaderFactory(this);
         }
 
-#if FEATURE_ASYNCLOCAL
+        /// <summary>
+        /// Provides methods for obtaining loader instances in this context.
+        /// </summary>
+        public DataLoaderFactory Factory { get; }
+
+        /// <summary>
+        /// Queues a task to be executed.
+        /// </summary>
+        /// <param name="task"></param>
+        internal void QueueLoader(IDataLoader loader)
+        {
+            ThrowIfDisposed();
+
+            Logger.WriteLine($"Queueing loader of {loader.GetType().GenericTypeArguments.Last().Name}");
+
+            _localQueue.Value.Enqueue(loader);
+        }
+
+        /// <summary>
+        /// Dequeues and executes the next loader.
+        /// </summary>
+        internal void SignalNext()
+        {
+            ThrowIfDisposed();
+
+            _fetchLock.Set();
+        }
+
+        /// <summary>
+        /// Dequeues and executes all the pending loaders on this thread.
+        /// </summary>
+        internal void FlushLoadersOnThread()
+        {
+            var localQueue = _localQueue.Value;
+            if (localQueue.Count > 0)
+            {
+                Logger.WriteLine($"Loaders queued on thread = {localQueue.Count}");
+                while (localQueue.Count > 0)
+                {
+                    _fetchLock.WaitAsync().ContinueWith(
+                        (task, state) => ((IDataLoader)state).ExecuteAsync(),
+                        localQueue.Dequeue());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether this context has been disposed.
+        /// </summary>
+        public bool IsDisposed { get; private set; }
+
+        /// <summary>
+        /// Disposes of the context. No further loaders/continuations will be attached.
+        /// </summary>
+        public void Dispose()
+        {
+            ThrowIfDisposed();
+            IsDisposed = true;
+        }
+
+        /// <summary>
+        /// Verifies that the context has not been disposed of.
+        /// </summary>
+        private void ThrowIfDisposed()
+        {
+            if (IsDisposed) throw new ObjectDisposedException(GetType().Name);
+        }
+
+        #region Ambient Context
+
         private static readonly AsyncLocal<DataLoaderContext> _localContext = new AsyncLocal<DataLoaderContext>();
 
         /// <summary>
@@ -97,46 +126,40 @@ namespace DataLoader
         /// will register themselves with the ambient context when the load method is called and the
         /// batch is empty.
         /// </remarks>
-        internal static void SetLoaderContext(DataLoaderContext context)
-        {
-            _localContext.Value = context;
-        }
-#endif
+        internal static void SetLoaderContext(DataLoaderContext context) => _localContext.Value = context;
 
-#region Run Methods
-#if FEATURE_ASYNCLOCAL
-        /// <summary>
-        /// Runs code within a new loader context before firing any pending loaders.
-        /// </summary>
-        public static Task<T> Run<T>(Func<Task<T>> func)
-        {
-            return Run(_ => func());
-        }
+        #endregion
+
+        #region Static `Run` Method
 
         /// <summary>
         /// Runs code within a new loader context before firing any pending loaders.
         /// </summary>
-        public static Task Run(Func<Task> func)
-        {
-            return Run(_ => func());
-        }
-#endif
+        public static Task<T> Run<T>(Func<Task<T>> func) => Run(_ => func());
+
+        /// <summary>
+        /// Runs code within a new loader context before firing any pending loaders.
+        /// </summary>
+        public static Task Run(Func<Task> func) => Run(_ => func());
 
         /// <summary>
         /// Runs code within a new loader context before firing any pending loaders.
         /// </summary>
         public static async Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
         {
-            if (func == null) throw new ArgumentNullException(nameof(func));
+            if (func == null) throw new ArgumentNullException();
 
-            var loadCtx = new DataLoaderContext();
-            var syncCtx = new DataLoaderSynchronizationContext(loadCtx);
+            using (var loadCtx = new DataLoaderContext())
             using (new DataLoaderContextSwitcher(loadCtx))
-            using (new SynchronizationContextSwitcher(syncCtx))
             {
-                var result = func(loadCtx);
-                loadCtx.Process();
-                return await result.ConfigureAwait(false);
+                var task = new Task<Task<T>>(() => func(loadCtx));
+                task.RunSynchronously();
+                loadCtx.FlushLoadersOnThread();
+                return await task.Result.ConfigureAwait(false);
+
+                // var rootTask = loadCtx._taskFactory.StartNew(() => func(loadCtx));
+                // rootTask.ContinueWith(_ => loadCtx.FlushLoadersOnThread(), TaskContinuationOptions.ExecuteSynchronously).IgnoreAwait();
+                // return await rootTask.Unwrap().ConfigureAwait(false);
             }
         }
 
@@ -145,39 +168,42 @@ namespace DataLoader
         /// </summary>
         public static async Task Run(Func<DataLoaderContext, Task> func)
         {
-            if (func == null) throw new ArgumentNullException(nameof(func));
+            if (func == null) throw new ArgumentNullException();
 
-            var loadCtx = new DataLoaderContext();
-            var syncCtx = new DataLoaderSynchronizationContext(loadCtx);
+            using (var loadCtx = new DataLoaderContext())
             using (new DataLoaderContextSwitcher(loadCtx))
-            using (new SynchronizationContextSwitcher(syncCtx))
             {
-                var result = func(loadCtx);
-                loadCtx.Process();
-                await result.ConfigureAwait(false);
+                var task = new Task<Task>(() => func(loadCtx));
+                task.RunSynchronously();
+                loadCtx.FlushLoadersOnThread();
+                await task.Result.ConfigureAwait(false);
+
+                // var rootTask = loadCtx._taskFactory.StartNew(() => func(loadCtx));
+                // rootTask.ContinueWith(_ => loadCtx.FlushLoadersOnThread(), TaskContinuationOptions.ExecuteSynchronously).IgnoreAwait();
+                // await rootTask.Unwrap().ConfigureAwait(false);
             }
         }
-#endregion
 
-#region Ambient context
-        /// <summary>
-        /// Temporarily switches out the current DataLoaderContext and SynchronizationContext until disposed.
-        /// </summary>
-        private class DataLoaderContextSwitcher : IDisposable
+        #endregion
+
+    }
+
+    /// <summary>
+    /// Temporarily switches out the current DataLoaderContext until disposed.
+    /// </summary>
+    internal class DataLoaderContextSwitcher : IDisposable
+    {
+        private readonly DataLoaderContext _prevLoadCtx;
+
+        public DataLoaderContextSwitcher(DataLoaderContext loadCtx)
         {
-            private readonly DataLoaderContext _prevLoadCtx;
-
-            public DataLoaderContextSwitcher(DataLoaderContext loadCtx)
-            {
-                _prevLoadCtx = DataLoaderContext.Current;
-                DataLoaderContext.SetLoaderContext(loadCtx);
-            }
-
-            public void Dispose()
-            {
-                DataLoaderContext.SetLoaderContext(_prevLoadCtx);
-            }
+            _prevLoadCtx = DataLoaderContext.Current;
+            DataLoaderContext.SetLoaderContext(loadCtx);
         }
-#endregion
+
+        public void Dispose()
+        {
+            DataLoaderContext.SetLoaderContext(_prevLoadCtx);
+        }
     }
 }

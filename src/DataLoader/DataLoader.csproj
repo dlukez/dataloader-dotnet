@@ -1,18 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>netstandard1.3;net46;net45</TargetFrameworks>
-    <PackageId>DataLoader</PackageId>
-    <Description>A port of Facebook's DataLoader for .NET</Description>
-    <Authors>Daniel Zimmermann</Authors>
-    <PackageTags>dataloader batch future</PackageTags>
-    <PackageProjectUrl>https://github.com/dlukez/dataloader-dotnet</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/dlukez/dataloader-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
-    <DefineConstants Condition=" '$(TargetFramework)' != 'net45' ">FEATURE_ASYNCLOCAL</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.ValueTuple" Version="4.3.0" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard1.3</TargetFramework>
+		<PackageId>DataLoader</PackageId>
+		<Description>A port of Facebook's DataLoader for .NET</Description>
+		<Authors>Daniel Zimmermann</Authors>
+		<PackageTags>dataloader batch future</PackageTags>
+		<PackageProjectUrl>https://github.com/dlukez/dataloader-dotnet</PackageProjectUrl>
+		<PackageLicenseUrl>https://github.com/dlukez/dataloader-dotnet/blob/master/LICENSE.md</PackageLicenseUrl>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
+		<PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+		<PackageReference Include="System.ValueTuple" Version="4.3.0" />
+	</ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DataLoader.StarWars.Schema;
@@ -11,7 +12,6 @@ namespace DataLoader.StarWars.Controllers
     [Route("api/graphql")]
     public class GraphQLController : Controller
     {
-        private static int _queryNumber;
         private readonly StarWarsSchema _schema;
         private readonly IDocumentExecuter _executer;
 
@@ -21,22 +21,29 @@ namespace DataLoader.StarWars.Controllers
             _executer = executer;
         }
 
+        private static int _queryNumber;
         [HttpPost]
         public async Task<ExecutionResult> Post([FromBody] GraphQLRequest request)
         {
             var queryNumber = Interlocked.Increment(ref _queryNumber);
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} - Running query {queryNumber}...");
+            Console.WriteLine();
+            Console.WriteLine($"Running query {queryNumber}...");
             var sw = Stopwatch.StartNew();
 
-            var result = await DataLoaderContext.Run(ctx => _executer.ExecuteAsync(_ =>
+            var result = await DataLoaderContext.Run(loadCtx => _executer.ExecuteAsync(_ =>
             {
                 _.Schema = _schema;
                 _.Query = request.Query;
-                _.UserContext = new GraphQLUserContext(ctx);
+                _.UserContext = new GraphQLUserContext(loadCtx);
             }));
 
             sw.Stop();
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} - Executed query {queryNumber} ({sw.ElapsedMilliseconds}ms)");
+
+            var msg = result.Errors != null
+                ? $"Error executing query {queryNumber}: {result.Errors.Aggregate("", (s, e) => s + Environment.NewLine + e.ToString())}"
+                : $"Executed query {queryNumber} ({sw.ElapsedMilliseconds}ms)";
+            Console.WriteLine(msg);
+
             return result;
         }
     }

@@ -16,9 +16,9 @@ namespace DataLoader.StarWars.Schema
             Field(d => d.PrimaryFunction);
             Interface<CharacterInterface>();
 
-            Field<ListGraphType<CharacterInterface>>()
-                .Name("friends")
-                .Resolve(ctx => ctx.GetDataLoader(async ids =>
+            FieldAsync<ListGraphType<CharacterInterface>>(
+                name: "friends",
+                resolve: async ctx => await ctx.GetDataLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
                         return (await db.Friendships
@@ -28,9 +28,9 @@ namespace DataLoader.StarWars.Schema
                             .ToLookup(x => x.Key, x => x.Human);
                     }).LoadAsync(ctx.Source.DroidId));
 
-            Field<ListGraphType<EpisodeType>>()
-                .Name("appearsIn")
-                .Resolve(ctx => ctx.GetDataLoader(async ids =>
+            FieldAsync<ListGraphType<EpisodeType>>(
+                name: "appearsIn",
+                resolve: async ctx => await ctx.GetDataLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
                         return (await db.DroidAppearances

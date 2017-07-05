@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,10 @@ namespace DataLoader.StarWars
     {
         public StarWarsContext DataContext { get; }
         public DataLoaderContext LoadContext { get; }
+
+        public GraphQLUserContext() : this(null, new StarWarsContext().WithNoTracking())
+        {
+        }
 
         public GraphQLUserContext(DataLoaderContext loadContext) : this(loadContext, new StarWarsContext().WithNoTracking())
         {
@@ -35,21 +40,30 @@ namespace DataLoader.StarWars
 
     public static class GraphQLUserContextExtensions
     {
+        public static GraphQLUserContext GetUserContext<T>(this ResolveFieldContext<T> context)
+        {
+            return (GraphQLUserContext)context.UserContext;
+        }
         public static StarWarsContext GetDataContext<T>(this ResolveFieldContext<T> context)
         {
-            return ((GraphQLUserContext)context.UserContext).DataContext;
+            return context.GetUserContext().DataContext;
+        }
+
+        public static DataLoaderContext GetLoadContext<T>(this ResolveFieldContext<T> context)
+        {
+            return context.GetUserContext().LoadContext;
+        }
+
+        public static IDataLoader<IEnumerable<TReturn>> GetDataLoader<TSource, TReturn>(
+            this ResolveFieldContext<TSource> context, Func<Task<IEnumerable<TReturn>>> fetchDelegate)
+        {
+            return context.GetLoadContext().Factory.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
         }
 
         public static IDataLoader<int, TReturn> GetDataLoader<TSource, TReturn>(
             this ResolveFieldContext<TSource> context, Func<IEnumerable<int>, Task<ILookup<int, TReturn>>> fetchDelegate)
         {
-            return ((GraphQLUserContext)context.UserContext).LoadContext.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
-        }
-
-        public static IDataLoader<TReturn> GetDataLoader<TSource, TReturn>(
-            this ResolveFieldContext<TSource> context, Func<Task<IEnumerable<TReturn>>> fetchDelegate)
-        {
-            return ((GraphQLUserContext)context.UserContext).LoadContext.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
+            return context.GetLoadContext().Factory.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
         }
     }
 }
