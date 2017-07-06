@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DataLoader
 {
@@ -23,7 +25,13 @@ namespace DataLoader
         internal void Complete(ILookup<TKey, TReturn> lookup)
         {
             _value = lookup[_key];
+            while (_continuations.Count > 0)
+                _continuations.Dequeue().Invoke();
         }
+
+        public TKey Key => _key;
+
+        public IEnumerable<TReturn> Value => _value;
 
         public DataLoaderResultAwaiter GetAwaiter() => new DataLoaderResultAwaiter(this);
 

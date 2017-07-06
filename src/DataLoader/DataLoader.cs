@@ -11,9 +11,9 @@ namespace DataLoader
     /// <summary>
     /// Provides functionality for loading data.
     /// </summary>
-    public interface IDataLoader<in TKey, TReturn> : IDataLoader
+    public interface IDataLoader<TKey, TReturn> : IDataLoader
     {
-        Task<IEnumerable<TReturn>> LoadAsync(TKey key);
+        DataLoaderResult<TKey, TReturn> LoadAsync(TKey key);
     }
 
     /// <summary>
@@ -32,10 +32,11 @@ namespace DataLoader
     {
         private static readonly Task<Task> s_completedWrappedTask = Task.FromResult(Task.CompletedTask);
         private readonly object _lock = new object();
-        private readonly ConcurrentDictionary<TKey, Task<IEnumerable<TReturn>>> _cache = new ConcurrentDictionary<TKey, Task<IEnumerable<TReturn>>>();
+
+        private List<DataLoaderResult<TKey, TReturn>> _batch;
         private readonly DataLoaderContext _boundContext;
-        private List<TKey> _batch = new List<TKey>();
-        private TaskCompletionSource<ILookup<TKey, TReturn>> _completionSource = new TaskCompletionSource<ILookup<TKey, TReturn>>();
+        private readonly ConcurrentDictionary<TKey, DataLoaderResult<TKey, TReturn>> _cache = new ConcurrentDictionary<TKey, DataLoaderResult<TKey, TReturn>>();
+        // private TaskCompletionSource<ILookup<TKey, TReturn>> _completionSource = new TaskCompletionSource<ILookup<TKey, TReturn>>();
         private Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> _fetchDelegate;
 
         /// <summary>
@@ -67,24 +68,25 @@ namespace DataLoader
         /// Each requested key is collected into a batch so that they can be fetched in a single call.
         /// When data for a key is loaded, it will be cached and used to fulfil any subsequent requests for the same key.
         /// </remarks>
-        public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
+        public DataLoaderResult<TKey, TReturn> LoadAsync(TKey key)
         {
             if (_cache.TryGetValue(key, out var task)) return task;
-            return _cache[key] = defer();
 
-            async Task<IEnumerable<TReturn>> defer()
+            var result = new DataLoaderResult<TKey, TReturn>(key);
+            _cache[key] = result;
+
+            lock (_lock)
             {
-                lock (_lock)
+                if (_batch == null)
                 {
-                    if (_batch.Count == 0)
-                        Context?.SetNext(ExecuteAsync);
-
-                    _batch.Add(key);
+                    _batch = new List<DataLoaderResult<TKey, TReturn>>();
+                    Context?.SetNext(ExecuteAsync);
+                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Queued loader");
                 }
-
-                var lookup = await _completionSource.Task.ConfigureAwait(false);
-                return lookup[key];
             }
+
+            _batch.Add(result);
+            return result;
         }
 
         /// <summary>
@@ -92,17 +94,17 @@ namespace DataLoader
         /// </summary>
         public async Task<Task> ExecuteAsync()
         {
-            List<TKey> batch;
-            TaskCompletionSource<ILookup<TKey, TReturn>> tcs;
-            lock (_lock)
-            {
-                batch = Interlocked.Exchange(ref _batch, new List<TKey>());
-                tcs = Interlocked.Exchange(ref _completionSource, new TaskCompletionSource<ILookup<TKey, TReturn>>());
-            }
+            List<DataLoaderResult<TKey, TReturn>> batch;
+            lock (_lock) batch = Interlocked.Exchange(ref _batch, null);
 
             Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Fetching batch of {batch.Count} items");
-            var lookup = await _fetchDelegate(batch).ConfigureAwait(false);
-            return Task.Run(() => tcs.SetResult(lookup));
+            var lookup = await _fetchDelegate(batch.Select(x => x.Key)).ConfigureAwait(false);
+            return Task.Run(() =>
+            {
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Completing {batch.Count} items");;
+                foreach (var result in batch)
+                    result.Complete(lookup);
+            });
         }
     }
 }

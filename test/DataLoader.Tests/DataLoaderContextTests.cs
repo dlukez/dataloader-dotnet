@@ -103,44 +103,44 @@ namespace DataLoader.Tests
             contexts.ShouldBeUnique();
         }
 
-        [Fact]
-        public void DataLoaderContext_Run_TriggersConsecutiveLoads()
-        {
-            var loadCount = 0;
+        // [Fact]
+        // public void DataLoaderContext_Run_TriggersConsecutiveLoads()
+        // {
+        //     var loadCount = 0;
 
-            var loader = new DataLoader<int, int>(async ids =>
-            {
-                await Task.Delay(150);
-                loadCount++;
-                return ids.ToLookup(id => id);
-            });
+        //     var loader = new DataLoader<int, int>(async ids =>
+        //     {
+        //         await Task.Delay(150);
+        //         loadCount++;
+        //         return ids.ToLookup(id => id);
+        //     });
 
-            var task = DataLoaderContext.Run(async () =>
-            {
-                var one = await loader.LoadAsync(1);
-                var two = await loader.LoadAsync(2);
-                var three = await loader.LoadAsync(3);
+        //     var task = DataLoaderContext.Run(async () =>
+        //     {
+        //         var one = await loader.LoadAsync(1);
+        //         var two = await loader.LoadAsync(2);
+        //         var three = await loader.LoadAsync(3);
 
-                var fourfivesix = await Task.WhenAll(
-                    loader.LoadAsync(4),
-                    loader.LoadAsync(5),
-                    loader.LoadAsync(6)
-                );
+        //         var fourfivesix = await Task.WhenAll(
+        //             loader.LoadAsync(4),
+        //             loader.LoadAsync(5),
+        //             loader.LoadAsync(6)
+        //         );
 
-                var t7 = loader.LoadAsync(7);
-                var t8 = loader.LoadAsync(8);
-                var t9 = loader.LoadAsync(9);
-                Thread.Sleep(200);
+        //         var t7 = loader.LoadAsync(7);
+        //         var t8 = loader.LoadAsync(8);
+        //         var t9 = loader.LoadAsync(9);
+        //         Thread.Sleep(200);
 
-                var ten = await loader.LoadAsync(10);
-                t7.IsCompleted.ShouldBeTrue();
-                t8.IsCompleted.ShouldBeTrue();
-                t9.IsCompleted.ShouldBeTrue();
-            });
+        //         var ten = await loader.LoadAsync(10);
+        //         t7.IsCompleted.ShouldBeTrue();
+        //         t8.IsCompleted.ShouldBeTrue();
+        //         t9.IsCompleted.ShouldBeTrue();
+        //     });
 
-            Should.CompleteIn(task, TimeSpan.FromSeconds(5));
-            loadCount.ShouldBe(5);
-        }
+        //     Should.CompleteIn(task, TimeSpan.FromSeconds(5));
+        //     loadCount.ShouldBe(5);
+        // }
 
         [Fact]
         public void DataLoaderContext_Run_HandlesUnrelatedAwaits()

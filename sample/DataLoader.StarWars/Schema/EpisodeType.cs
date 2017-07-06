@@ -16,9 +16,9 @@ namespace DataLoader.StarWars.Schema
             Field("id", e => e.EpisodeId);
             Field("name", e => e.Name);
 
-            Field<ListGraphType<CharacterInterface>>()
-                .Name("characters")
-                .Resolve(ctx => ctx.GetDataLoader(async ids =>
+            FieldAsync<ListGraphType<CharacterInterface>>(
+                name: "characters",
+                resolve: async ctx => await ctx.GetDataLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
 
