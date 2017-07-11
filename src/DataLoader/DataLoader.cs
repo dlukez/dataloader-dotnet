@@ -9,11 +9,96 @@ using System.Threading.Tasks;
 namespace DataLoader
 {
     /// <summary>
-    /// Provides functionality for loading data.
+    /// Represents a pending data load operation.
+    /// </summary>
+    public interface IDataLoader
+    {
+        Task ExecuteAsync();
+    }
+
+    /// <summary>
+    /// Wraps an arbitrary query and integrates it into the loading chain.
+    /// </summary>
+    public interface IDataLoader<T> : IDataLoader
+    {
+        Task<T> LoadAsync();
+    }
+
+
+    /// <summary>
+    /// Collects and loads keys in batches.
     /// </summary>
     public interface IDataLoader<TKey, TReturn> : IDataLoader
     {
-        DataLoaderResult<TKey, TReturn> LoadAsync(TKey key);
+        Task<IEnumerable<TReturn>> LoadAsync(TKey key);
+    }
+
+    /// <summary>
+    /// Wraps an arbitrary query and integrates it into the loading chain.
+    /// </summary>
+    public class DataLoader<T> : IDataLoader<T>
+    {
+        private readonly DataLoaderContext _boundContext;
+        private readonly Func<Task<T>> _fetchDelegate;
+        private TaskCompletionSource<T> _tcs;
+
+        /// <summary>
+        /// Creates a new <see cref="DataLoader{T}"/>.
+        /// </summary>
+        public DataLoader(Func<Task<T>> fetchDelegate) : this(fetchDelegate, null)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="DataLoader{T}"/> bound to the specified context.
+        /// </summary>
+        internal DataLoader(Func<Task<T>> fetchDelegate, DataLoaderContext boundContext)
+        {
+            _fetchDelegate = fetchDelegate;
+            _boundContext = boundContext;
+        }
+
+        /// <summary>
+        /// Gets the context visible to the loader which is either the loader is
+        /// bound to if available, otherwise the current ambient context.
+        /// </summary>
+        /// <seealso cref="DataLoaderContext.Current"/>
+        public DataLoaderContext Context => _boundContext ?? DataLoaderContext.Current;
+
+        // /// <summary>
+        // /// Gets or sets whether the loader will execute immediately or be added to the queue
+        // /// when the <see cref="LoadAsync"/> method is called.
+        // /// </summary>
+        // /// <remarks>
+        // /// If true, the corresponding Task will still be added to the load queue to guarantee
+        // /// that subsequent loaders are executed in their proper order.
+        // /// </remarks>
+        // public bool ExecuteImmediately { get; set; } = true;
+
+        /// <summary>
+        /// Loads data using the configured fetch delegate.
+        /// </summary>
+        public Task<T> LoadAsync()
+        {
+            if (_tcs == null && Interlocked.CompareExchange(ref _tcs, new TaskCompletionSource<T>(), null) == null)
+                Context?.Enqueue(this);
+
+            return _tcs.Task;
+        }
+
+        /// <summary>
+        /// Executes the fetch delegate and resolves the promise.
+        /// </summary>
+        public Task ExecuteAsync()
+        {
+            var tcs = Interlocked.Exchange(ref _tcs, new TaskCompletionSource<T>());
+            return _fetchDelegate().ContinueWith(
+                task => tcs.SetResult(task.Result),
+                CancellationToken.None,
+                TaskContinuationOptions.ExecuteSynchronously,
+                Context._taskScheduler);
+        }
+
     }
 
     /// <summary>
@@ -30,14 +115,11 @@ namespace DataLoader
     /// </remarks>
     public class DataLoader<TKey, TReturn> : IDataLoader<TKey, TReturn>
     {
-        private static readonly Task<Task> s_completedWrappedTask = Task.FromResult(Task.CompletedTask);
-        private readonly object _lock = new object();
-
-        private List<DataLoaderResult<TKey, TReturn>> _batch;
         private readonly DataLoaderContext _boundContext;
-        private readonly ConcurrentDictionary<TKey, DataLoaderResult<TKey, TReturn>> _cache = new ConcurrentDictionary<TKey, DataLoaderResult<TKey, TReturn>>();
-        // private TaskCompletionSource<ILookup<TKey, TReturn>> _completionSource = new TaskCompletionSource<ILookup<TKey, TReturn>>();
-        private Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> _fetchDelegate;
+        private readonly ConcurrentDictionary<TKey, Task<IEnumerable<TReturn>>> _cache = new ConcurrentDictionary<TKey, Task<IEnumerable<TReturn>>>();
+        private readonly Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> _fetchDelegate;
+        private List<TKey> _batch;
+        private TaskCompletionSource<ILookup<TKey, TReturn>> _tcs = new TaskCompletionSource<ILookup<TKey, TReturn>>();
 
         /// <summary>
         /// Creates a new <see cref="DataLoader{TKey,TReturn}"/>.
@@ -68,43 +150,34 @@ namespace DataLoader
         /// Each requested key is collected into a batch so that they can be fetched in a single call.
         /// When data for a key is loaded, it will be cached and used to fulfil any subsequent requests for the same key.
         /// </remarks>
-        public DataLoaderResult<TKey, TReturn> LoadAsync(TKey key)
+        public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
         {
             if (_cache.TryGetValue(key, out var task)) return task;
 
-            var result = new DataLoaderResult<TKey, TReturn>(key);
-            _cache[key] = result;
+            if (_batch == null && Interlocked.CompareExchange(ref _batch, new List<TKey>(), null) == null)
+                Context?.Enqueue(this);
 
-            lock (_lock)
-            {
-                if (_batch == null)
-                {
-                    _batch = new List<DataLoaderResult<TKey, TReturn>>();
-                    Context?.SetNext(ExecuteAsync);
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Queued loader");
-                }
-            }
-
-            _batch.Add(result);
-            return result;
+            _batch.Add(key);
+            return (_cache[key] = _tcs.Task.ContinueWith(
+                t => t.Result[key],
+                CancellationToken.None,
+                TaskContinuationOptions.ExecuteSynchronously,
+                Context._taskScheduler));
         }
 
         /// <summary>
         /// Fetches the current batch and resolves previously handed out promises.
         /// </summary>
-        public async Task<Task> ExecuteAsync()
+        public Task ExecuteAsync()
         {
-            List<DataLoaderResult<TKey, TReturn>> batch;
-            lock (_lock) batch = Interlocked.Exchange(ref _batch, null);
-
+            var batch = Interlocked.Exchange(ref _batch, null);
+            var tcs = Interlocked.Exchange(ref _tcs, new TaskCompletionSource<ILookup<TKey, TReturn>>());
             Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Fetching batch of {batch.Count} items");
-            var lookup = await _fetchDelegate(batch.Select(x => x.Key)).ConfigureAwait(false);
-            return Task.Run(() =>
+            return _fetchDelegate(batch).ContinueWith(task =>
             {
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Completing {batch.Count} items");;
-                foreach (var result in batch)
-                    result.Complete(lookup);
-            });
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Completing {batch.Count} items");
+                tcs.SetResult(task.Result);
+            }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, Context._taskScheduler);
         }
     }
 }

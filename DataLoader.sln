@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLoader.StarWars", "samp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLoader", "src\DataLoader\DataLoader.csproj", "{94870F79-F4CD-4128-A613-38214FFAEA90}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL", "..\graphql-dotnet\src\GraphQL\GraphQL.csproj", "{093B25D5-4506-425E-B25E-7C68B3B2F0B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,18 @@ Global
 		{94870F79-F4CD-4128-A613-38214FFAEA90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94870F79-F4CD-4128-A613-38214FFAEA90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94870F79-F4CD-4128-A613-38214FFAEA90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Debug|x64.Build.0 = Debug|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Debug|x86.Build.0 = Debug|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Release|x64.ActiveCfg = Release|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Release|x64.Build.0 = Release|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Release|x86.ActiveCfg = Release|Any CPU
+		{093B25D5-4506-425E-B25E-7C68B3B2F0B2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

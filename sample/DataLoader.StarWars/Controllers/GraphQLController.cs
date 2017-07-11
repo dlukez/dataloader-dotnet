@@ -12,7 +12,6 @@ namespace DataLoader.StarWars.Controllers
     [Route("api/graphql")]
     public class GraphQLController : Controller
     {
-        private static int _queryNumber;
         private readonly StarWarsSchema _schema;
         private readonly IDocumentExecuter _executer;
 
@@ -22,6 +21,7 @@ namespace DataLoader.StarWars.Controllers
             _executer = executer;
         }
 
+        private static int _queryNumber;
         [HttpPost]
         public async Task<ExecutionResult> Post([FromBody] GraphQLRequest request)
         {
@@ -38,8 +38,11 @@ namespace DataLoader.StarWars.Controllers
             }));
 
             sw.Stop();
-            if (result.Errors != null) Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Error executing query {queryNumber}: {result.Errors.Aggregate("", (s, e) => s + Environment.NewLine + e.ToString())}");
-            else Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Executed query {queryNumber} ({sw.ElapsedMilliseconds}ms)");
+
+            var msg = result.Errors != null
+                ? $"Error executing query {queryNumber}: {result.Errors.Aggregate("", (s, e) => s + Environment.NewLine + e.ToString())}"
+                : $"Executed query {queryNumber} ({sw.ElapsedMilliseconds}ms)";
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - {msg}");
 
             return result;
         }

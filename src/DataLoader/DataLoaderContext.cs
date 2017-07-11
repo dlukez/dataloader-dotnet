@@ -27,8 +27,9 @@ namespace DataLoader
     /// </remarks>
     public sealed class DataLoaderContext : IDisposable
     {
-        private ConcurrentQueue<Func<Task<Task>>> _queue = new ConcurrentQueue<Func<Task<Task>>>();
         private readonly DataLoaderFactory _factory;
+        internal TaskFactory _taskFactory;
+        internal DataLoaderTaskScheduler _taskScheduler;
 
         /// <summary>
         /// Creates a new instance of a context.
@@ -39,6 +40,8 @@ namespace DataLoader
         internal DataLoaderContext()
         {
             _factory = new DataLoaderFactory(this);
+            _taskScheduler = new DataLoaderTaskScheduler();
+            _taskFactory = new TaskFactory(_taskScheduler);
         }
 
         /// <summary>
@@ -47,38 +50,18 @@ namespace DataLoader
         public DataLoaderFactory Factory => _factory;
 
         /// <summary>
-        /// Attaches a delegate to the end of the task chain.
+        /// Provides access to the internal task queue.
         /// </summary>
-        internal void SetNext(Func<Task<Task>> func) => _queue.Enqueue(func);
+        internal DataLoaderTaskScheduler Scheduler => _taskScheduler;
 
         /// <summary>
-        /// Asynchronously executes loaders until there are none remaining.
+        /// Queues a task to be executed.
         /// </summary>
-        /// <remarks>
-        /// Loaders will fetch exclusively (i.e. one at a time) but complete concurrently. This allows us
-        /// to execute the results efficiently and avoids hitting the DB with multiple parallel requests,
-        /// which usually hurts performance.
-        /// </remarks>
-        internal async void Execute()
+        /// <param name="task"></param>
+        internal void Enqueue(IDataLoader loader)
         {
-            if (_queue.Count == 0) return;
-
-            var tasks = new List<Task>();
-            while (_queue.Count > 0 || tasks.Count > 0)
-            {
-                if (_queue.Count > 0)
-                {
-                    var localQueue = Interlocked.Exchange(ref _queue, new ConcurrentQueue<Func<Task<Task>>>());
-                    while (localQueue.TryDequeue(out var func))
-                    {
-                        var completion = await func().ConfigureAwait(false);
-                        tasks.Add(completion);
-                    }
-                }
-
-                var completed = await Task.WhenAny(tasks).ConfigureAwait(false);
-                tasks.Remove(completed);
-            }
+            ThrowIfDisposed();
+            _taskFactory.StartNew(() => loader.ExecuteAsync());
         }
 
         /// <summary>
@@ -89,7 +72,19 @@ namespace DataLoader
         /// <summary>
         /// Disposes of the context. No further loaders/continuations will be attached.
         /// </summary>
-        public void Dispose() => IsDisposed = !IsDisposed ? true : throw new ObjectDisposedException(GetType().Name);
+        public void Dispose()
+        {
+            ThrowIfDisposed();
+            IsDisposed = true;
+        }
+
+        /// <summary>
+        /// Verifies that the context has not been disposed of.
+        /// </summary>
+        private void ThrowIfDisposed()
+        {
+            if (IsDisposed) throw new ObjectDisposedException(GetType().Name);
+        }
 
 #region Ambient Context
 
@@ -128,6 +123,11 @@ namespace DataLoader
         /// <summary>
         /// Runs code within a new loader context before firing any pending loaders.
         /// </summary>
+        public static void Run(Action action) => Run(_ => action());
+
+        /// <summary>
+        /// Runs code within a new loader context before firing any pending loaders.
+        /// </summary>
         public static async Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
         {
             if (func == null) throw new ArgumentNullException();
@@ -135,9 +135,7 @@ namespace DataLoader
             using (var loadCtx = new DataLoaderContext())
             using (new DataLoaderContextSwitcher(loadCtx))
             {
-                var task = func(loadCtx);
-                loadCtx.Execute();
-                return await task.ConfigureAwait(false);
+                return await loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap().ConfigureAwait(false);
             }
         }
 
@@ -151,9 +149,19 @@ namespace DataLoader
             using (var loadCtx = new DataLoaderContext())
             using (new DataLoaderContextSwitcher(loadCtx))
             {
-                var task = func(loadCtx);
-                loadCtx.Execute();
-                await task.ConfigureAwait(false);
+                await loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap().ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// Runs code within a new loader context before firing any pending loaders.
+        /// </summary>
+        public static async void Run(Action<DataLoaderContext> action)
+        {
+            using (var loadCtx = new DataLoaderContext())
+            using (new DataLoaderContextSwitcher(loadCtx))
+            {
+                await loadCtx._taskFactory.StartNew(() => action(loadCtx)).ConfigureAwait(false);
             }
         }
 
@@ -176,7 +184,6 @@ namespace DataLoader
 
         public void Dispose()
         {
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Disposing of ambient context");
             DataLoaderContext.SetLoaderContext(_prevLoadCtx);
         }
     }

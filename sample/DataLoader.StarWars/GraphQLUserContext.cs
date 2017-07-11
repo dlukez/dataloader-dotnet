@@ -13,6 +13,10 @@ namespace DataLoader.StarWars
         public StarWarsContext DataContext { get; }
         public DataLoaderContext LoadContext { get; }
 
+        public GraphQLUserContext() : this(null, new StarWarsContext().WithNoTracking())
+        {
+        }
+
         public GraphQLUserContext(DataLoaderContext loadContext) : this(loadContext, new StarWarsContext().WithNoTracking())
         {
         }

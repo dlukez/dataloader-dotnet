@@ -11,13 +11,13 @@ namespace DataLoader
     /// <summary>
     /// Represents the result of a deferred load operation.
     /// </summary>
-    public class DataLoaderResult<TKey, TReturn>
+    public class DeferredResult<TKey, TReturn>
     {
         private readonly Queue<Action> _continuations = new Queue<Action>();
         private readonly TKey _key;
         private IEnumerable<TReturn> _value;
 
-        internal DataLoaderResult(TKey key)
+        internal DeferredResult(TKey key)
         {
             _key = key;
         }
@@ -38,11 +38,11 @@ namespace DataLoader
         /// <summary>
         /// Provides support for awaiting the result.
         /// </summary>
-        public struct DataLoaderResultAwaiter : INotifyCompletion
+        public struct DataLoaderResultAwaiter : ICriticalNotifyCompletion
         {
-            private DataLoaderResult<TKey, TReturn> _deferred;
+            private DeferredResult<TKey, TReturn> _deferred;
 
-            internal DataLoaderResultAwaiter(DataLoaderResult<TKey, TReturn> deferred)
+            internal DataLoaderResultAwaiter(DeferredResult<TKey, TReturn> deferred)
             {
                 _deferred = deferred;
             }
@@ -51,7 +51,11 @@ namespace DataLoader
 
             public IEnumerable<TReturn> GetResult() => _deferred._value;
 
+            [SecuritySafeCritical]
             public void OnCompleted(Action continuation) => _deferred._continuations.Enqueue(continuation);
+
+            [SecurityCritical]
+            public void UnsafeOnCompleted(Action continuation) => OnCompleted(continuation);
         }
     }
 }

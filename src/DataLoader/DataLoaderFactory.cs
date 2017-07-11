@@ -31,7 +31,7 @@ namespace DataLoader
         /// </summary>
         public IDataLoader<TReturn> GetOrCreateLoader<TReturn>(object key, Func<Task<TReturn>> fetchDelegate)
         {
-            return (IDataLoader<TReturn>)_cache.GetOrAdd(key, _ => new DataLoaderRoot<TReturn>(fetchDelegate, _loadContext));
+            return (IDataLoader<TReturn>)_cache.GetOrAdd(key, _ => new DataLoader<TReturn>(fetchDelegate, _loadContext));
         }
     }
 }
