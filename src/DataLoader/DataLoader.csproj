@@ -10,7 +10,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.3.0" />
+		<PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
 		<PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+		<PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
 		<PackageReference Include="System.ValueTuple" Version="4.3.0" />
 	</ItemGroup>
 </Project>

@@ -44,6 +44,7 @@ namespace DataLoader.StarWars
         {
             return (GraphQLUserContext)context.UserContext;
         }
+
         public static StarWarsContext GetDataContext<T>(this ResolveFieldContext<T> context)
         {
             return context.GetUserContext().DataContext;
@@ -51,7 +52,8 @@ namespace DataLoader.StarWars
 
         public static DataLoaderContext GetLoadContext<T>(this ResolveFieldContext<T> context)
         {
-            return context.GetUserContext().LoadContext;
+            return DataLoaderContext.Current;
+            // return context.GetUserContext().LoadContext;
         }
 
         public static IDataLoader<IEnumerable<TReturn>> GetDataLoader<TSource, TReturn>(
@@ -60,8 +62,8 @@ namespace DataLoader.StarWars
             return context.GetLoadContext().Factory.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
         }
 
-        public static IDataLoader<int, TReturn> GetDataLoader<TSource, TReturn>(
-            this ResolveFieldContext<TSource> context, Func<IEnumerable<int>, Task<ILookup<int, TReturn>>> fetchDelegate)
+        public static IDataLoader<int, IEnumerable<TReturn>> GetDataLoader<TSource, TReturn>(
+            this ResolveFieldContext<TSource> context, Func<IEnumerable<int>, Task<IDictionary<int, IEnumerable<TReturn>>>> fetchDelegate)
         {
             return context.GetLoadContext().Factory.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
         }

@@ -27,7 +27,7 @@ namespace DataLoader.StarWars.Controllers
         {
             var queryNumber = Interlocked.Increment(ref _queryNumber);
             Console.WriteLine();
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - Running query {queryNumber}...");
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Running query {queryNumber}...");
             var sw = Stopwatch.StartNew();
 
             var result = await DataLoaderContext.Run(loadCtx => _executer.ExecuteAsync(_ =>
@@ -42,7 +42,7 @@ namespace DataLoader.StarWars.Controllers
             var msg = result.Errors != null
                 ? $"Error executing query {queryNumber}: {result.Errors.Aggregate("", (s, e) => s + Environment.NewLine + e.ToString())}"
                 : $"Executed query {queryNumber} ({sw.ElapsedMilliseconds}ms)";
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(2, ' ')} - {msg}");
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - {msg}");
 
             return result;
         }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+using System.Collections.Generic;
 
 namespace DataLoader.Tests
 {
@@ -108,11 +109,11 @@ namespace DataLoader.Tests
         {
             var loadCount = 0;
 
-            var loader = new DataLoader<int, int>(async ids =>
+            var loader = new BatchDataLoader<int, IEnumerable<int>>(async ids =>
             {
                 await Task.Delay(150);
                 loadCount++;
-                return ids.ToLookup(id => id);
+                return ids.ToDictionary(id => id, id => Enumerable.Range(0, id));
             });
 
             var task = DataLoaderContext.Run(async () =>
@@ -147,11 +148,12 @@ namespace DataLoader.Tests
         {
             var loadCount = 0;
 
-            var loader = new DataLoader<int, int>(async ids =>
+            var loader = new BatchDataLoader<int, IEnumerable<int>>(async ids =>
             {
                 await Task.Delay(100);
                 loadCount++;
-                return ids.ToLookup(id => id);
+                var test = ids.ToLookup(id => id);
+                return test.ToDictionary(src => src.Key, src => src.AsEnumerable());
             });
 
             var task = DataLoaderContext.Run(async () =>

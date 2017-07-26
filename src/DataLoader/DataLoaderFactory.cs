@@ -8,30 +8,33 @@ namespace DataLoader
 {
     public class DataLoaderFactory
     {
-        private readonly ConcurrentDictionary<object, IDataLoader> _cache;
-
-        private readonly DataLoaderContext _loadContext;
-
-        public DataLoaderFactory(DataLoaderContext loadContext)
-        {
-            _cache = new ConcurrentDictionary<object, IDataLoader>();
-            _loadContext = loadContext;
-        }
+        private readonly ConcurrentDictionary<object, IDataLoader> _cache = new ConcurrentDictionary<object, IDataLoader>();
+        private readonly DataLoaderContext _context;
 
         /// <summary>
-        /// Retrieves a cached loader for the given key, creating one if none is found.
+        /// Creates a new <see cref="DataLoaderFactory"/> that manages loaders for a given <see cref="DataLoaderContext"/>.
         /// </summary>
-        public IDataLoader<TKey, TReturn> GetOrCreateLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate)
+        public DataLoaderFactory(DataLoaderContext context)
         {
-            return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ => new DataLoader<TKey, TReturn>(fetchDelegate, _loadContext));
+            _context = context;
         }
 
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
         /// </summary>
         public IDataLoader<TReturn> GetOrCreateLoader<TReturn>(object key, Func<Task<TReturn>> fetchDelegate)
+            where TReturn : class
         {
-            return (IDataLoader<TReturn>)_cache.GetOrAdd(key, _ => new DataLoader<TReturn>(fetchDelegate, _loadContext));
+            return (IDataLoader<TReturn>)_cache.GetOrAdd(key, _ => new BasicDataLoader<TReturn>(fetchDelegate, _context));
+        }
+
+        /// <summary>
+        /// Retrieves a cached loader for the given key, creating one if none is found.
+        /// </summary>
+        public IDataLoader<TKey, TReturn> GetOrCreateLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<IDictionary<TKey, TReturn>>> fetchDelegate)
+            where TReturn : class
+        {
+            return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ => new BatchDataLoader<TKey, TReturn>(fetchDelegate, _context));
         }
     }
 }
