@@ -18,26 +18,26 @@ namespace DataLoader.StarWars.Schema
 
             FieldAsync<ListGraphType<CharacterInterface>>(
                 name: "friends",
-                resolve: async ctx => await ctx.GetDataLoader(async ids =>
+                resolve: async ctx => await ctx.GetBatchLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
-                        return (await db.Friendships
+                        var result = db.Friendships
                                 .Where(f => ids.Contains(f.DroidId))
-                                .Select(f => new {Key = f.DroidId, f.Human})
-                                .ToListAsync())
-                            .ToLookup(x => x.Key, x => x.Human);
+                                .GroupBy(f => f.DroidId, f => f.Human)
+                                .ToDictionaryAsync(g => g.Key, g => g.AsEnumerable());
+                        return await result;
                     }).LoadAsync(ctx.Source.DroidId));
 
             FieldAsync<ListGraphType<EpisodeType>>(
                 name: "appearsIn",
-                resolve: async ctx => await ctx.GetDataLoader(async ids =>
+                resolve: async ctx => await ctx.GetBatchLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
-                        return (await db.DroidAppearances
+                        var result = db.DroidAppearances
                                 .Where(da => ids.Contains(da.DroidId))
-                                .Select(da => new {Key = da.DroidId, da.Episode})
-                                .ToListAsync())
-                            .ToLookup(x => x.Key, x => x.Episode);
+                                .GroupBy(da => da.DroidId, da => da.Episode)
+                                .ToDictionaryAsync(g => g.Key, g => g.AsEnumerable());
+                        return await result;
                     }).LoadAsync(ctx.Source.DroidId));
         }
     }

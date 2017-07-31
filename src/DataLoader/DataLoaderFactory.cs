@@ -22,7 +22,7 @@ namespace DataLoader
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
         /// </summary>
-        public IDataLoader<TReturn> GetOrCreateLoader<TReturn>(object key, Func<Task<TReturn>> fetchDelegate)
+        public IDataLoader<TReturn> GetBasicLoader<TReturn>(object key, Func<Task<TReturn>> fetchDelegate)
             where TReturn : class
         {
             return (IDataLoader<TReturn>)_cache.GetOrAdd(key, _ => new BasicDataLoader<TReturn>(fetchDelegate, _context));
@@ -31,7 +31,7 @@ namespace DataLoader
         /// <summary>
         /// Retrieves a cached loader for the given key, creating one if none is found.
         /// </summary>
-        public IDataLoader<TKey, TReturn> GetOrCreateLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<IDictionary<TKey, TReturn>>> fetchDelegate)
+        public IDataLoader<TKey, TReturn> GetBatchLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<Dictionary<TKey, TReturn>>> fetchDelegate)
             where TReturn : class
         {
             return (IDataLoader<TKey, TReturn>)_cache.GetOrAdd(key, _ => new BatchDataLoader<TKey, TReturn>(fetchDelegate, _context));

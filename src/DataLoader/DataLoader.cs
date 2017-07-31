@@ -15,7 +15,7 @@ namespace DataLoader
     /// </summary>
     public interface IDataLoader
     {
-        Task FetchAndCompleteAsync();
+        void Execute();
     }
 
     /// <summary>
@@ -42,7 +42,7 @@ namespace DataLoader
         private readonly object _lock = new object();
         private readonly DataLoaderContext _boundContext;
         private readonly Func<Task<T>> _fetchDelegate;
-        private BasicDataLoaderResult _result;
+        private TaskCompletionSource<T> _source;
 
         /// <summary>
         /// Creates a new <see cref="BasicDataLoader{T}"/>.
@@ -70,70 +70,48 @@ namespace DataLoader
         /// <summary>
         /// Loads data using the configured fetch delegate.
         /// </summary>
-        public async Task<T> LoadAsync()
+        public Task<T> LoadAsync()
         {
-            BasicDataLoaderResult result;
+            Task<T> task = _source?.Task;
 
             lock (_lock)
             {
-                if (_result == null)
+                if (task == null)
                 {
-                    _result = new BasicDataLoaderResult();
-                    Context.Enqueue(this);
+                    _source = new TaskCompletionSource<T>();
+                    task = _source.Task;
+                    Context.EnqueueLoader(this);
                 }
-
-                result = _result;
             }
 
-            return await result;
+            return task;
         }
 
         /// <summary>
         /// Executes the fetch delegate and resolves the promise.
         /// </summary>
-        public Task FetchAndCompleteAsync()
+        public async void Execute()
         {
-            BasicDataLoaderResult result;
+            TaskCompletionSource<T> tcs;
 
             lock (_lock)
             {
-                result = _result;
-                _result = null;
+                tcs = _source;
+                if (tcs == null) return;
+                _source = new TaskCompletionSource<T>();
             }
 
-            return _fetchDelegate().ContinueWith(
-                t => result.Complete(t.Result),
-                CancellationToken.None,
-                TaskContinuationOptions.ExecuteSynchronously,
-                Context.TaskScheduler);
-        }
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Fetching basic query");
+            var result = await _fetchDelegate();
 
-        /// <summary>
-        /// Represents the result of a basic load operation.
-        /// </summary>
-        private class BasicDataLoaderResult : ICriticalNotifyCompletion
-        {
-            private readonly ConcurrentQueue<Action> _continuations = new ConcurrentQueue<Action>();
-            private T _value;
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Completing basic query");
+            tcs.SetResult(result);
 
-            public BasicDataLoaderResult GetAwaiter() => this;
-
-            public bool IsCompleted => _value != null;
-
-            public T GetResult() => _value ?? throw new InvalidOperationException();
-
-            [SecuritySafeCritical]
-            public void OnCompleted(Action continuation) => _continuations.Enqueue(continuation);
-
-            [SecurityCritical]
-            public void UnsafeOnCompleted(Action continuation) => OnCompleted(continuation);
-
-            public void Complete(T value)
-            {
-                _value = value ?? throw new ArgumentNullException();
-                while (_continuations.TryDequeue(out var continuation))
-                    continuation();
-            }
+            //  _fetchDelegate().ContinueWith(task =>
+            // {
+            //     Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Completing basic query");
+            //     tcs.SetResult(task.Result);
+            // }, CancellationToken.None, TaskContinuationOptions.None, Context.Scheduler);
         }
     }
 
@@ -153,22 +131,22 @@ namespace DataLoader
     {
         private readonly object _lock = new object();
         private readonly DataLoaderContext _boundContext;
-        private readonly Func<IEnumerable<TKey>, Task<IDictionary<TKey, TReturn>>> _fetchDelegate;
-
-        private readonly ConcurrentDictionary<TKey, TReturn> _cache = new ConcurrentDictionary<TKey, TReturn>();
-        private Batch _batch;
+        private readonly Func<IEnumerable<TKey>, Task<Dictionary<TKey, TReturn>>> _fetchDelegate;
+        private readonly ConcurrentDictionary<TKey, Task<TReturn>> _cache = new ConcurrentDictionary<TKey, Task<TReturn>>();
+        // private volatile Dictionary<TKey, TaskCompletionSource<TReturn>> _tcs;
+        private volatile Tuple<TaskCompletionSource<Dictionary<TKey, TReturn>>, HashSet<TKey>> _batch;
 
         /// <summary>
         /// Creates a new <see cref="BatchDataLoader{TKey,TReturn}"/>.
         /// </summary>
-        public BatchDataLoader(Func<IEnumerable<TKey>, Task<IDictionary<TKey, TReturn>>> fetchDelegate) : this(fetchDelegate, null)
+        public BatchDataLoader(Func<IEnumerable<TKey>, Task<Dictionary<TKey, TReturn>>> fetchDelegate) : this(fetchDelegate, null)
         {
         }
 
         /// <summary>
         /// Creates a new <see cref="BatchDataLoader{TKey,TReturn}"/> bound to the specified context.
         /// </summary>
-        internal BatchDataLoader(Func<IEnumerable<TKey>, Task<IDictionary<TKey, TReturn>>> fetchDelegate, DataLoaderContext context)
+        internal BatchDataLoader(Func<IEnumerable<TKey>, Task<Dictionary<TKey, TReturn>>> fetchDelegate, DataLoaderContext context)
         {
             _boundContext = context;
             _fetchDelegate = fetchDelegate;
@@ -187,117 +165,53 @@ namespace DataLoader
         /// Each requested key is collected into a batch so that they can be fetched in a single call.
         /// When data for a key is loaded, it will be cached and used to fulfil any subsequent requests for the same key.
         /// </remarks>
-        public async Task<TReturn> LoadAsync(TKey key)
+        public Task<TReturn> LoadAsync(TKey key)
         {
-            if (_cache.TryGetValue(key, out var task)) return task;
-
-            BatchItem result;
-
-            lock (_lock)
+            return _cache.GetOrAdd(key, async _ =>
             {
-                if (_batch == null)
+                var batch = _batch;
+
+                lock (_lock)
                 {
-                    _batch = new Batch();
-                    Context.Enqueue(this);
+                    if (batch == null)
+                    {
+                        batch = _batch = Tuple.Create(new TaskCompletionSource<Dictionary<TKey, TReturn>>(), new HashSet<TKey>());
+                        Context.EnqueueLoader(this);
+                    }
+
+                    batch.Item2.Add(key);
                 }
 
-                result = _batch.Add(key);
-            }
-
-            return _cache[key] = await result;
+                var dict = await batch.Item1.Task;
+                return dict.ContainsKey(key) ? dict[key] : null;
+            });
         }
 
         /// <summary>
         /// Fetches the current batch and resolves previously handed out promises.
         /// </summary>
-        public Task FetchAndCompleteAsync()
+        public async void Execute()
         {
-            Batch batch;
+            Tuple<TaskCompletionSource<Dictionary<TKey, TReturn>>, HashSet<TKey>> batch;
+
             lock (_lock)
             {
-                if (_batch == null)
-                    return Task.CompletedTask;
-
                 batch = _batch;
+                if (batch == null) return;
                 _batch = null;
             }
 
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Fetching batch ({batch.Count} keys)");
-            return _fetchDelegate(batch.Keys).ContinueWith(
-                t =>
-                {
-                    Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Completing batch ({batch.Count} keys)");
-                    batch.Complete(t.Result);
-                },
-                CancellationToken.None,
-                TaskContinuationOptions.ExecuteSynchronously,
-                Context.TaskScheduler);
-        }
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Fetching batch ({batch.Item2.Count} keys)");
+            var result = await _fetchDelegate(batch.Item2);
 
-        /// <summary>
-        /// Contains a batch of keys to be fetched and provides methods to complete them asynchronously.
-        /// </summary>
-        private class Batch
-        {
-            private readonly ConcurrentBag<TKey> _keys = new ConcurrentBag<TKey>();
-            private readonly ConcurrentQueue<Action> _continuations = new ConcurrentQueue<Action>();
-            private IDictionary<TKey, TReturn> _value;
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Completing batch ({batch.Item2.Count} keys)");
+            batch.Item1.SetResult(result);
 
-            public int Count => _keys.Count;
-
-            public IEnumerable<TKey> Keys => _keys.AsEnumerable();
-
-            public BatchItem Add(TKey key)
-            {
-                _keys.Add(key);
-                return new BatchItem(key, this);
-            }
-
-            internal bool IsCompleted => _value != null;
-
-            internal TReturn GetResult(TKey key)
-            {
-                if (_value == null)
-                    throw new InvalidOperationException();
-
-                return _value[key];
-            }
-
-            internal void OnCompleted(Action continuation) => _continuations.Enqueue(continuation);
-
-            public void Complete(IDictionary<TKey, TReturn> value)
-            {
-                _value = value ?? throw new ArgumentNullException();
-                while (_continuations.TryDequeue(out var continuation))
-                    continuation();
-            }
-        }
-
-        /// <summary>
-        /// Represents the result of a batch load operation for a given key.
-        /// </summary>
-        private struct BatchItem : ICriticalNotifyCompletion
-        {
-            private readonly TKey _key;
-            private Batch _batch;
-
-            internal BatchItem(TKey key, Batch batch)
-            {
-                _key = key;
-                _batch = batch;
-            }
-
-            public BatchItem GetAwaiter() => this;
-
-            public bool IsCompleted => _batch.IsCompleted;
-
-            public TReturn GetResult() => _batch.GetResult(_key);
-
-            [SecuritySafeCritical]
-            public void OnCompleted(Action continuation) => _batch.OnCompleted(continuation);
-
-            [SecurityCritical]
-            public void UnsafeOnCompleted(Action continuation) => OnCompleted(continuation);
+            // _fetchDelegate(batch.Item2).ContinueWith(task =>
+            // {
+            //     Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Completing batch ({batch.Item2.Count} keys)");
+            //     batch.Item1.SetResult(task.Result);
+            // }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, Context.Scheduler);
         }
     }
 }

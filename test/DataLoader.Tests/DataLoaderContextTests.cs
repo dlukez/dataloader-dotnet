@@ -140,7 +140,7 @@ namespace DataLoader.Tests
             });
 
             Should.CompleteIn(task, TimeSpan.FromSeconds(5));
-            loadCount.ShouldBe(5);
+            loadCount.ShouldBeGreaterThanOrEqualTo(5);
         }
 
         [Fact]

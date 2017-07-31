@@ -18,7 +18,7 @@ namespace DataLoader.StarWars.Schema
 
             FieldAsync<ListGraphType<CharacterInterface>>(
                 name: "characters",
-                resolve: async ctx => await ctx.GetDataLoader(async ids =>
+                resolve: async ctx => await ctx.GetBatchLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
 
@@ -32,9 +32,16 @@ namespace DataLoader.StarWars.Schema
                             .Select(da => new DroidAppearance { EpisodeId = da.EpisodeId, Droid = da.Droid })
                             .ToListAsync<ICharacterAppearance>();
 
-                        await Task.WhenAll(humans, droids);
+                        var results = await Task.WhenAll(humans, droids);
 
-                        return humans.Result.Concat(droids.Result).ToLookup(a => a.EpisodeId, a => a.Character);
+                        var dict = results[0].Concat(results[1])
+                            .GroupBy(ca => ca.EpisodeId, ca => ca.Character)
+                            .ToDictionary(g => g.Key, g => g.AsEnumerable());
+
+                        foreach (var id in ids.Except(dict.Keys))
+                            dict.Add(id, Enumerable.Empty<ICharacter>());
+
+                        return dict;
                     }).LoadAsync(ctx.Source.EpisodeId));
         }
     }

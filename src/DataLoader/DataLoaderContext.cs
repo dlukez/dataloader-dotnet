@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -25,13 +26,11 @@ namespace DataLoader
         private readonly int _id = ++_lastId;
         public int Id => _id;
 
-        private readonly object _lock = new object();
-
-        private readonly DataLoaderTaskScheduler _taskScheduler;
-        private readonly TaskFactory _taskFactory;
-
         private readonly DataLoaderFactory _loaderFactory;
-        private readonly ConcurrentQueue<IDataLoader> _loaderQueue;
+        private readonly DataLoaderTaskScheduler _taskScheduler;
+
+        internal readonly TaskFactory _taskFactory;
+        internal ConcurrentQueue<IDataLoader> _loaderQueue;
 
         /// <summary>
         /// Creates a new instance of a context.
@@ -41,9 +40,8 @@ namespace DataLoader
         /// </remarks>
         internal DataLoaderContext()
         {
-            _loaderQueue = new ConcurrentQueue<IDataLoader>();
             _loaderFactory = new DataLoaderFactory(this);
-
+            _loaderQueue = new ConcurrentQueue<IDataLoader>();
             _taskScheduler = new DataLoaderTaskScheduler(this);
             _taskFactory = new TaskFactory(_taskScheduler);
         }
@@ -54,26 +52,22 @@ namespace DataLoader
         public DataLoaderFactory Factory => _loaderFactory;
 
         /// <summary>
-        /// Exposes a task scheduler intended for scheduling data loader completion tasks.
+        /// Gets a scheduler that should be used for completing load operations.
         /// </summary>
-        public TaskScheduler TaskScheduler => _taskScheduler;
+        public TaskScheduler Scheduler => _taskScheduler;
 
         /// <summary>
-        /// Schedules a loader to be executed.
+        /// Returns a Task that is completed when the next loader is due to execute.
         /// </summary>
-        internal void Enqueue(IDataLoader loader)
+        internal void EnqueueLoader(IDataLoader loader)
         {
-            ThrowIfDisposed();
-            _taskFactory.StartNew(loader.FetchAndCompleteAsync);
-        }
-
-        /// <summary>
-        /// Schedules an action to be executed.
-        /// </summary>
-        internal void Enqueue(Action action)
-        {
-            ThrowIfDisposed();
-            _taskFactory.StartNew(action);
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Queueing loader ({_loaderQueue.Count} loaders in queue, {_taskScheduler.Count} tasks in queue)");
+            _loaderQueue.Enqueue(loader);
+            _taskFactory.StartNew(() =>
+            {
+                if (_loaderQueue.TryDequeue(out var next)) next.Execute();
+                else Debug.Fail("There should always be a loader to be dequeued");
+            });
         }
 
         /// <summary>
@@ -150,9 +144,9 @@ namespace DataLoader
 
             using (var loadCtx = new DataLoaderContext())
             using (new DataLoaderContextSwitcher(loadCtx))
-            using (new SynchronizationContextSwitcher(new DataLoaderSynchronizationContext(loadCtx)))
             {
-                return await loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap().ConfigureAwait(false);
+                var task = loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap();
+                return await task;
             }
         }
 
@@ -165,9 +159,9 @@ namespace DataLoader
 
             using (var loadCtx = new DataLoaderContext())
             using (new DataLoaderContextSwitcher(loadCtx))
-            using (new SynchronizationContextSwitcher(new DataLoaderSynchronizationContext(loadCtx)))
             {
-                await loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap().ConfigureAwait(false);
+                var task = loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap();
+                await task;
             }
         }
 
@@ -180,7 +174,6 @@ namespace DataLoader
 
             using (var loadCtx = new DataLoaderContext())
             using (new DataLoaderContextSwitcher(loadCtx))
-            using (new SynchronizationContextSwitcher(new DataLoaderSynchronizationContext(loadCtx)))
             {
                 loadCtx._taskFactory.StartNew(() => action(loadCtx)).Wait();
             }
