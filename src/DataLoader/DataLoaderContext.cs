@@ -23,13 +23,14 @@ namespace DataLoader
     public sealed class DataLoaderContext : IDisposable
     {
         private static int _lastId = 0;
-        private readonly int _id = ++_lastId;
-        public int Id => _id;
+        public int Id { get; } = ++_lastId;
 
         private readonly DataLoaderFactory _loaderFactory;
         private readonly DataLoaderTaskScheduler _taskScheduler;
+        private readonly ConcurrentExclusiveSchedulerPair _schedulerPair;
+        private readonly TaskFactory _taskFactory;
 
-        internal readonly TaskFactory _taskFactory;
+        internal readonly AsyncAutoResetEvent _autoResetEvent;
         internal ConcurrentQueue<IDataLoader> _loaderQueue;
 
         /// <summary>
@@ -38,10 +39,15 @@ namespace DataLoader
         /// <remarks>
         /// Reserved for internal use only - public consumers should use the static <see cref="Run"/> method.
         /// </remarks>
-        internal DataLoaderContext()
+        private DataLoaderContext()
         {
-            _loaderFactory = new DataLoaderFactory(this);
+            _autoResetEvent = new AsyncAutoResetEvent(true);
+
             _loaderQueue = new ConcurrentQueue<IDataLoader>();
+            _loaderFactory = new DataLoaderFactory(this);
+
+            _schedulerPair = new ConcurrentExclusiveSchedulerPair();
+            
             _taskScheduler = new DataLoaderTaskScheduler(this);
             _taskFactory = new TaskFactory(_taskScheduler);
         }
@@ -54,20 +60,34 @@ namespace DataLoader
         /// <summary>
         /// Gets a scheduler that should be used for completing load operations.
         /// </summary>
-        public TaskScheduler Scheduler => _taskScheduler;
+        public TaskScheduler Scheduler => _schedulerPair.ExclusiveScheduler;
 
         /// <summary>
         /// Returns a Task that is completed when the next loader is due to execute.
         /// </summary>
         internal void EnqueueLoader(IDataLoader loader)
         {
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Queueing loader ({_loaderQueue.Count} loaders in queue, {_taskScheduler.Count} tasks in queue)");
             _loaderQueue.Enqueue(loader);
-            _taskFactory.StartNew(() =>
+
+            _autoResetEvent.WaitAsync().ContinueWith(
+                TriggerLoader,
+                CancellationToken.None,
+                TaskContinuationOptions.RunContinuationsAsynchronously,
+                Scheduler);
+        
+            void TriggerLoader(Task task)
             {
-                if (_loaderQueue.TryDequeue(out var next)) next.Execute();
-                else Debug.Fail("There should always be a loader to be dequeued");
-            });
+                if (_loaderQueue.TryDequeue(out var next)) next.ExecuteAsync();
+                else Debug.Fail("Queue should never be empty at this point.");
+            }
+        }
+
+        /// <summary>
+        /// Signals to the context that a loader has finished fetching, the next waiting loader if one is available.
+        /// </summary>
+        internal void TriggerNext()
+        {
+            _autoResetEvent.Set();
         }
 
         /// <summary>
@@ -82,6 +102,7 @@ namespace DataLoader
         {
             ThrowIfDisposed();
             IsDisposed = true;
+            _taskScheduler.Dispose();
         }
 
         /// <summary>
@@ -138,30 +159,36 @@ namespace DataLoader
         /// <summary>
         /// Runs code within a new loader context before firing any pending loaders.
         /// </summary>
-        public static async Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
+        public static Task<T> Run<T>(Func<DataLoaderContext, Task<T>> func)
         {
             if (func == null) throw new ArgumentNullException();
 
-            using (var loadCtx = new DataLoaderContext())
+            var loadCtx = new DataLoaderContext();
             using (new DataLoaderContextSwitcher(loadCtx))
             {
                 var task = loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap();
-                return await task;
+
+                // task.ContinueWith(delegate { loadCtx._taskScheduler.Complete(); });
+
+                return task;
             }
         }
 
         /// <summary>
         /// Runs code within a new loader context before firing any pending loaders.
         /// </summary>
-        public static async Task Run(Func<DataLoaderContext, Task> func)
+        public static Task Run(Func<DataLoaderContext, Task> func)
         {
             if (func == null) throw new ArgumentNullException();
 
-            using (var loadCtx = new DataLoaderContext())
+            var loadCtx = new DataLoaderContext();
             using (new DataLoaderContextSwitcher(loadCtx))
             {
                 var task = loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap();
-                await task;
+
+                // task.ContinueWith(delegate { loadCtx._taskScheduler.Complete(); });
+
+                return task;
             }
         }
 
@@ -172,10 +199,12 @@ namespace DataLoader
         {
             if (action == null) throw new ArgumentNullException();
 
-            using (var loadCtx = new DataLoaderContext())
+            var loadCtx = new DataLoaderContext();
             using (new DataLoaderContextSwitcher(loadCtx))
             {
-                loadCtx._taskFactory.StartNew(() => action(loadCtx)).Wait();
+                action(loadCtx);
+                // loadCtx._taskScheduler.ProcessUntilEmpty();
+                // loadCtx._taskScheduler.Complete();
             }
         }
 

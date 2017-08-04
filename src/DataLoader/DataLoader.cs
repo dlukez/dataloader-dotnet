@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +16,7 @@ namespace DataLoader
     /// </summary>
     public interface IDataLoader
     {
-        void Execute();
+        Task ExecuteAsync();
     }
 
     /// <summary>
@@ -72,17 +73,17 @@ namespace DataLoader
         /// </summary>
         public Task<T> LoadAsync()
         {
-            Task<T> task = _source?.Task;
-
-            lock (_lock)
+            var shouldEnqueue = false;
+            if (_source == null)
             {
-                if (task == null)
-                {
-                    _source = new TaskCompletionSource<T>();
-                    task = _source.Task;
-                    Context.EnqueueLoader(this);
-                }
+                var next = new TaskCompletionSource<T>();
+                shouldEnqueue = Interlocked.CompareExchange(ref _source, next, null) == null;
             }
+
+            var task = _source.Task;
+
+            if (shouldEnqueue)
+                Context.EnqueueLoader(this);
 
             return task;
         }
@@ -90,56 +91,42 @@ namespace DataLoader
         /// <summary>
         /// Executes the fetch delegate and resolves the promise.
         /// </summary>
-        public async void Execute()
+        public Task ExecuteAsync()
         {
-            TaskCompletionSource<T> tcs;
+            var tcs = Interlocked.Exchange(ref _source, null);
+            if (tcs == null) return Task.CompletedTask;
 
-            lock (_lock)
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Fetching basic");
+            return _fetchDelegate().ContinueWith(
+                Complete,
+                CancellationToken.None,
+                TaskContinuationOptions.ExecuteSynchronously,
+                Context.Scheduler);
+
+            void Complete(Task<T> task)
             {
-                tcs = _source;
-                if (tcs == null) return;
-                _source = new TaskCompletionSource<T>();
+                Context.TriggerNext();
+                tcs.SetResult(task.Result);
             }
-
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Fetching basic query");
-            var result = await _fetchDelegate();
-
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Completing basic query");
-            tcs.SetResult(result);
-
-            //  _fetchDelegate().ContinueWith(task =>
-            // {
-            //     Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Completing basic query");
-            //     tcs.SetResult(task.Result);
-            // }, CancellationToken.None, TaskContinuationOptions.None, Context.Scheduler);
         }
     }
 
     /// <summary>
     /// Collects and loads keys in batches.
     /// </summary>
-    /// <remarks>
-    /// When a call is made to a load method, each key is stored and a task is handed back that represents the future result.
-    /// The request is deferred until the loader is invoked, which can occur in the following circumstances:
-    /// <list type="bullet">
-    /// <item>The delegate supplied to <see cref="o:DataLoaderContext.Run"/> returned.</item>
-    /// <item><see cref="DataLoaderContext.Process"/> was explicitly called on the governing <see cref="DataLoaderContext"/>.</item>
-    /// <item>The loader was invoked explicitly by calling <see cref="FetchAndCompleteAsync"/>.</item>
-    /// </list>
-    /// </remarks>
     public class BatchDataLoader<TKey, TReturn> : IDataLoader<TKey, TReturn> where TReturn : class
     {
         private readonly object _lock = new object();
         private readonly DataLoaderContext _boundContext;
         private readonly Func<IEnumerable<TKey>, Task<Dictionary<TKey, TReturn>>> _fetchDelegate;
         private readonly ConcurrentDictionary<TKey, Task<TReturn>> _cache = new ConcurrentDictionary<TKey, Task<TReturn>>();
-        // private volatile Dictionary<TKey, TaskCompletionSource<TReturn>> _tcs;
-        private volatile Tuple<TaskCompletionSource<Dictionary<TKey, TReturn>>, HashSet<TKey>> _batch;
+        private volatile ConcurrentDictionary<TKey, TaskCompletionSource<TReturn>> _batch;
 
         /// <summary>
         /// Creates a new <see cref="BatchDataLoader{TKey,TReturn}"/>.
         /// </summary>
-        public BatchDataLoader(Func<IEnumerable<TKey>, Task<Dictionary<TKey, TReturn>>> fetchDelegate) : this(fetchDelegate, null)
+        public BatchDataLoader(Func<IEnumerable<TKey>, Task<Dictionary<TKey, TReturn>>> fetchDelegate)
+            : this(fetchDelegate, null)
         {
         }
 
@@ -167,51 +154,50 @@ namespace DataLoader
         /// </remarks>
         public Task<TReturn> LoadAsync(TKey key)
         {
-            return _cache.GetOrAdd(key, async _ =>
+            return _cache.GetOrAdd(key, _ =>
             {
-                var batch = _batch;
-
-                lock (_lock)
+                var nextBatch = _batch;
+                var shouldEnqueue = false;
+                if (nextBatch == null)
                 {
-                    if (batch == null)
-                    {
-                        batch = _batch = Tuple.Create(new TaskCompletionSource<Dictionary<TKey, TReturn>>(), new HashSet<TKey>());
-                        Context.EnqueueLoader(this);
-                    }
-
-                    batch.Item2.Add(key);
+                    nextBatch = new ConcurrentDictionary<TKey, TaskCompletionSource<TReturn>>();
+                    shouldEnqueue = Interlocked.CompareExchange(ref _batch, nextBatch, null) == null;
                 }
 
-                var dict = await batch.Item1.Task;
-                return dict.ContainsKey(key) ? dict[key] : null;
+                var tcs = new TaskCompletionSource<TReturn>();
+                nextBatch[key] = tcs;
+
+                if (shouldEnqueue)
+                    Context.EnqueueLoader(this);
+
+                return tcs.Task;
             });
         }
 
         /// <summary>
         /// Fetches the current batch and resolves previously handed out promises.
         /// </summary>
-        public async void Execute()
+        public Task ExecuteAsync()
         {
-            Tuple<TaskCompletionSource<Dictionary<TKey, TReturn>>, HashSet<TKey>> batch;
+            var batch = Interlocked.Exchange(ref _batch, null);
+            if (batch == null) return Task.CompletedTask;
 
-            lock (_lock)
+            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Fetching batch ({batch.Count} keys)");
+            return _fetchDelegate(batch.Keys).ContinueWith(
+                Complete,
+                CancellationToken.None,
+                TaskContinuationOptions.ExecuteSynchronously,
+                Context.Scheduler);
+
+            void Complete(Task<Dictionary<TKey, TReturn>> task)
             {
-                batch = _batch;
-                if (batch == null) return;
-                _batch = null;
+                Context.TriggerNext();
+                foreach (var kvp in batch)
+                {
+                    task.Result.TryGetValue(kvp.Key, out var value);
+                    kvp.Value.SetResult(value);
+                }
             }
-
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Fetching batch ({batch.Item2.Count} keys)");
-            var result = await _fetchDelegate(batch.Item2);
-
-            Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Completing batch ({batch.Item2.Count} keys)");
-            batch.Item1.SetResult(result);
-
-            // _fetchDelegate(batch.Item2).ContinueWith(task =>
-            // {
-            //     Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId.ToString().PadLeft(2, ' ')} / Task {Task.CurrentId.ToString().PadLeft(3, ' ')} - Completing batch ({batch.Item2.Count} keys)");
-            //     batch.Item1.SetResult(task.Result);
-            // }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, Context.Scheduler);
         }
     }
 }
