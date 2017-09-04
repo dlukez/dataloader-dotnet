@@ -1,33 +1,32 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace DataLoader
 {
     /// <summary>
-    /// Batches multiple loads for individual items into a single request.
+    /// Batches multiple loads into a single request, where each is expected to return multiple values for the given.
     /// </summary>
-    public sealed class BatchDataLoader<TKey, TReturn> : DataLoaderBase<ILookup<TKey, TReturn>>, IDataLoader<TKey, TReturn>
+    internal sealed class CollectionDataLoader<TKey, TReturn> : DataLoaderBase<ILookup<TKey, TReturn>>, IDataLoader<TKey, IEnumerable<TReturn>>
     {
+        private readonly object _lock = new object();
         private readonly Dictionary<TKey, Task<IEnumerable<TReturn>>> _cache = new Dictionary<TKey, Task<IEnumerable<TReturn>>>();
         private readonly Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> _fetchDelegate;
         private HashSet<TKey> _batch = new HashSet<TKey>();
 
         /// <summary>
-        /// Creates a new <see cref="BatchDataLoader{TKey,TReturn}"/>.
+        /// Creates a new <see cref="CollectionDataLoader{TKey,TReturn}"/>.
         /// </summary>
-        public BatchDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate) : this(fetchDelegate, null)
+        public CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate) : this(fetchDelegate, null)
         {
         }
 
         /// <summary>
-        /// Creates a new <see cref="BatchDataLoader{TKey,TReturn}"/> bound to a specific context.
+        /// Creates a new <see cref="CollectionDataLoader{TKey,TReturn}"/> bound to a specific context.
         /// </summary>
-        internal BatchDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate, DataLoaderContext context) : base(context)
+        internal CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate, DataLoaderContext context) : base(context)
         {
             _fetchDelegate = fetchDelegate;
         }
@@ -41,20 +40,22 @@ namespace DataLoader
         /// </remarks>
         public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
         {
-            lock (_cache)
+            lock (_lock)
             {
                 if (_cache.TryGetValue(key, out var task)) return task;
                 _batch.Add(key);
-                return (_cache[key] = Completion.ContinueWith(SelectResultItemForKey, key));
+                return (_cache[key] = Completion.ContinueWith(
+                    SelectKeyFromTaskResult
+                    , key
+                    , CancellationToken.None
+                    , TaskContinuationOptions.None
+                    , TaskScheduler.Default));
             }
         }
 
-        /// <summary>
-        /// Retrieves a value from the task's result, for the given key (passed via the state parameter).
-        /// </summary>
-        static IEnumerable<TReturn> SelectResultItemForKey(Task<ILookup<TKey, TReturn>> task, object state)
+        static IEnumerable<TReturn> SelectKeyFromTaskResult(Task<ILookup<TKey, TReturn>> task, object key)
         {
-            return task.Result[(TKey)state];
+            return task.Result[(TKey)key];
         }
 
         /// <summary>
@@ -63,9 +64,9 @@ namespace DataLoader
         /// </summary>
         public override Task<ILookup<TKey, TReturn>> Fetch()
         {
-            var batch = Interlocked.Exchange(ref _batch, new HashSet<TKey>());
-            Logger.WriteLine($"Fetching batch of {typeof(TReturn).Name} ({batch.Count} keys)");
-            return _fetchDelegate(batch);
+            HashSet<TKey> currentBatch;
+            lock (_lock) currentBatch = Interlocked.Exchange(ref _batch, new HashSet<TKey>());
+            return _fetchDelegate(currentBatch);
         }
     }
 }

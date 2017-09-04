@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,10 +6,10 @@ namespace DataLoader
 {
     /// <summary>
     /// Wraps a user-supplied delegate and integrates it into the loader
-    /// pipeline so that it may be scheduled and completed appropriately
-    /// with respect to the rest of the pipeline.
+    /// pipeline so that it may be scheduled and completed appropriately,
+    /// with respect to other loaders in the pipeline.
     /// </summary>
-    public sealed class RootDataLoader<T> : DataLoaderBase<T>, IDataLoader<T>
+    internal sealed class RootDataLoader<T> : DataLoaderBase<T>, IDataLoader<T>
     {
         private Func<Task<T>> _fetchDelegate;
 
@@ -41,10 +37,6 @@ namespace DataLoader
         /// Invokes the user-specified fetch delegate configured in the constructor.
         /// </summary>
         /// <returns></returns>
-        public override Task<T> Fetch()
-        {
-            Logger.WriteLine($"Fetching root {typeof(T).GenericTypeArguments.Last().Name}");
-            return _fetchDelegate();
-        }
+        public override Task<T> Fetch() => _fetchDelegate();
     }
 }

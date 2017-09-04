@@ -1,44 +1,32 @@
 {
     // See https://go.microsoft.com/fwlink/?LinkId=733558
     // for the documentation about the tasks.json format
-    "version": "0.1.0",
-    "command": "dotnet",
-    "isShellCommand": true,
-    "showOutput": "silent",
-    "args": [],
+    "version": "2.0.0",
     "tasks": [
         {
             "taskName": "build",
-            "args": [
-                "sample/DataLoader.StarWars/DataLoader.StarWars.csproj"
-            ],
-            "isBuildCommand": true,
+            "command": "dotnet build",
+            "type": "shell",
+            "group": "build",
+            "presentation":{
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
             "problemMatcher": "$msCompile"
-        },
-        {
-            "taskName": "setup",
-            "suppressTaskName": true,
-            "args": [
-                "ef",
-                "database",
-                "update"
-            ]
         },
         {
             "taskName": "test",
-            "args": [
-                "test/DataLoader.Tests/DataLoader.Tests.csproj"
-            ],
-            "isTestCommand": true,
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "taskName": "rebuild",
-            "suppressTaskName": true,
-            "args": [
-                "build",
-                "--no-incremental"
-            ],
+            "command": "dotnet test -v normal test/DataLoader.Tests/DataLoader.Tests.csproj",
+            "type": "shell",
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
             "problemMatcher": "$msCompile"
         }
     ]

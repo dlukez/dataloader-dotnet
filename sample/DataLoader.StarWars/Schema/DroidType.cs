@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,26 +18,26 @@ namespace DataLoader.StarWars.Schema
             Field(d => d.PrimaryFunction);
             Interface<CharacterInterface>();
 
-            FieldAsync<ListGraphType<CharacterInterface>>(
+            Field<ListGraphType<CharacterInterface>>(
                 name: "friends",
-                resolve: async ctx => await ctx.GetDataLoader(async ids =>
+                resolve: ctx => ctx.GetDataLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
                         return (await db.Friendships
                                 .Where(f => ids.Contains(f.DroidId))
-                                .Select(f => new {Key = f.DroidId, f.Human})
+                                .Select(f => new { Key = f.DroidId, f.Human })
                                 .ToListAsync())
                             .ToLookup(x => x.Key, x => x.Human);
                     }).LoadAsync(ctx.Source.DroidId));
 
-            FieldAsync<ListGraphType<EpisodeType>>(
+            Field<ListGraphType<EpisodeType>>(
                 name: "appearsIn",
-                resolve: async ctx => await ctx.GetDataLoader(async ids =>
+                resolve: ctx => ctx.GetDataLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
                         return (await db.DroidAppearances
                                 .Where(da => ids.Contains(da.DroidId))
-                                .Select(da => new {Key = da.DroidId, da.Episode})
+                                .Select(da => new { Key = da.DroidId, da.Episode })
                                 .ToListAsync())
                             .ToLookup(x => x.Key, x => x.Episode);
                     }).LoadAsync(ctx.Source.DroidId));

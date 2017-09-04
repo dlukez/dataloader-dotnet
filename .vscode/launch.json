@@ -6,11 +6,11 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/sample/DataLoader.StarWars/bin/Debug/netcoreapp1.1/DataLoader.StarWars.dll",
+            "program": "${workspaceRoot}/sample/DataLoader.StarWars/bin/Debug/netcoreapp2.0/DataLoader.StarWars.dll",
             "args": [],
             "cwd": "${workspaceRoot}/sample/DataLoader.StarWars",
             "stopAtEntry": false,
-            "justMyCode": false,
+            "justMyCode": true,
             "launchBrowser": {
                 "enabled": true,
                 "args": "${auto-detect-url}",

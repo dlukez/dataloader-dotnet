@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,25 +18,27 @@ namespace DataLoader.StarWars.Schema
             Field("id", e => e.EpisodeId);
             Field("name", e => e.Name);
 
-            FieldAsync<ListGraphType<CharacterInterface>>(
+            Field<ListGraphType<CharacterInterface>>(
                 name: "characters",
-                resolve: async ctx => await ctx.GetDataLoader(async ids =>
+                resolve: ctx => ctx.GetDataLoader(async ids =>
                     {
                         var db = ctx.GetDataContext();
 
-                        var humans = db.HumanAppearances
+                        var humansTask = db.HumanAppearances
                             .Where(ha => ids.Contains(ha.EpisodeId))
-                            .Select(ha => new HumanAppearance { EpisodeId = ha.EpisodeId, Human = ha.Human })
-                            .ToListAsync<ICharacterAppearance>();
+                            .Select(ha => (ICharacterAppearance) new HumanAppearance { EpisodeId = ha.EpisodeId, Human = ha.Human })
+                            .ToListAsync();
 
-                        var droids = db.DroidAppearances
+                        var droidsTask = db.DroidAppearances
                             .Where(da => ids.Contains(da.EpisodeId))
-                            .Select(da => new DroidAppearance { EpisodeId = da.EpisodeId, Droid = da.Droid })
-                            .ToListAsync<ICharacterAppearance>();
+                            .Select(da => (ICharacterAppearance) new DroidAppearance { EpisodeId = da.EpisodeId, Droid = da.Droid })
+                            .ToListAsync();
 
-                        await Task.WhenAll(humans, droids);
+                        await Task.WhenAll(humansTask, droidsTask);
 
-                        return humans.Result.Concat(droids.Result).ToLookup(a => a.EpisodeId, a => a.Character);
+                        return humansTask.Result
+                            .Concat(droidsTask.Result)
+                            .ToLookup(a => a.EpisodeId, a => a.Character);
                     }).LoadAsync(ctx.Source.EpisodeId));
         }
     }

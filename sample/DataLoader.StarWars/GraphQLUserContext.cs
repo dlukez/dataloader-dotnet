@@ -54,13 +54,19 @@ namespace DataLoader.StarWars
             return context.GetUserContext().LoadContext;
         }
 
-        public static IDataLoader<IEnumerable<TReturn>> GetDataLoader<TSource, TReturn>(
-            this ResolveFieldContext<TSource> context, Func<Task<IEnumerable<TReturn>>> fetchDelegate)
+        public static IDataLoader<TReturn> GetDataLoader<TSource, TReturn>(
+            this ResolveFieldContext<TSource> context, Func<Task<TReturn>> fetchDelegate)
         {
             return context.GetLoadContext().Factory.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
         }
 
         public static IDataLoader<int, TReturn> GetDataLoader<TSource, TReturn>(
+            this ResolveFieldContext<TSource> context, Func<IEnumerable<int>, Task<Dictionary<int, TReturn>>> fetchDelegate)
+        {
+            return context.GetLoadContext().Factory.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);
+        }
+
+        public static IDataLoader<int, IEnumerable<TReturn>> GetDataLoader<TSource, TReturn>(
             this ResolveFieldContext<TSource> context, Func<IEnumerable<int>, Task<ILookup<int, TReturn>>> fetchDelegate)
         {
             return context.GetLoadContext().Factory.GetOrCreateLoader(context.FieldDefinition, fetchDelegate);

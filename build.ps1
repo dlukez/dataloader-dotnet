@@ -14,3 +14,4 @@ Invoke-BuildStep { dotnet pack src/DataLoader/DataLoader.csproj --include-symbol
 
 # End
 exit
+

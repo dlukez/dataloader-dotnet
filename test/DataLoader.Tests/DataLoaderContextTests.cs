@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shouldly;
 using Xunit;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
 namespace DataLoader.Tests
 {
@@ -18,11 +17,20 @@ namespace DataLoader.Tests
         }
 
         [Fact]
+        public async Task DataLoaderContext_Run_SetsCurrent()
+        {
+            await DataLoaderContext.Run(() =>
+            {
+                DataLoaderContext.Current.ShouldNotBeNull();
+                return Task.CompletedTask;
+            });
+        }
+
+        [Fact]
         public async Task DataLoaderContext_Run_UnsetsCurrent()
         {
-            var task = DataLoaderContext.Run(() => Task.Delay(100));
+            await DataLoaderContext.Run(() => Task.CompletedTask);
             DataLoaderContext.Current.ShouldBeNull();
-            await task;
         }
 
         [Fact]
@@ -30,7 +38,7 @@ namespace DataLoader.Tests
         {
             await DataLoaderContext.Run(async outerCtx =>
             {
-                var task = DataLoaderContext.Run(async innerCtx =>
+                await DataLoaderContext.Run(async innerCtx =>
                 {
                     innerCtx.ShouldNotBe(outerCtx);
                     innerCtx.ShouldBe(DataLoaderContext.Current);
@@ -39,7 +47,6 @@ namespace DataLoader.Tests
                 });
 
                 DataLoaderContext.Current.ShouldBe(outerCtx);
-                await task;
             });
         }
 
@@ -48,7 +55,7 @@ namespace DataLoader.Tests
         {
             var checkpoints = 0;
 
-            await DataLoaderContext.Run(async () =>
+            await DataLoaderContext.Run(async _ =>
             {
                 var ctx = DataLoaderContext.Current;
 
@@ -80,88 +87,83 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public void DataLoaderContext_Run_AllowsParallelContexts()
+        public async Task DataLoaderContext_Run_AllowsParallelContexts()
         {
             const int n = 2;
             var barrier = new Barrier(n);
             var contexts = new ConcurrentBag<DataLoaderContext>();
 
-            Action<int> action = _ =>
+            Func<Task> action = async () =>
             {
-                DataLoaderContext.Run(ctx =>
+                await DataLoaderContext.Run(ctx =>
                 {
                     barrier.SignalAndWait();
                     ctx.ShouldBe(DataLoaderContext.Current);
                     contexts.Add(DataLoaderContext.Current);
                     return Task.FromResult(1);
-                }).Wait();
+                });
             };
 
-            var result = Parallel.For(0, n, action);
-            result.IsCompleted.ShouldBeTrue();
+            var t1 = Task.Run(action);
+            var t2 = Task.Run(action);
+
+            await Task.WhenAll(t1, t2);
+
             contexts.Count.ShouldBe(n);
             contexts.ShouldBeUnique();
         }
 
         [Fact]
-        public void DataLoaderContext_Run_TriggersConsecutiveLoads()
+        public async Task DataLoaderContext_Run_TriggersConsecutiveLoads()
         {
             var loadCount = 0;
 
-            var loader = new DataLoader<int, int>(async ids =>
+            await DataLoaderContext.Run(async ctx =>
             {
-                await Task.Delay(150);
-                loadCount++;
-                return ids.ToLookup(id => id);
-            });
+                var loader = ctx.Factory.GetOrCreateLoader<int, int>(
+                    "somekey",
+                    async ids =>
+                    {
+                        await Task.Delay(100);
+                        loadCount++;
+                        return ids.ToDictionary(id => id);
+                    });
 
-            var task = DataLoaderContext.Run(async () =>
-            {
-                var one = await loader.LoadAsync(1);
-                var two = await loader.LoadAsync(2);
-                var three = await loader.LoadAsync(3);
+                var one = await loader.LoadAsync(1); // 1
+                var two = await loader.LoadAsync(2); // 2
+                var three = await loader.LoadAsync(3); // 3
 
-                var fourfivesix = await Task.WhenAll(
+                var fourfivesix = await Task.WhenAll( // 4
                     loader.LoadAsync(4),
                     loader.LoadAsync(5),
                     loader.LoadAsync(6)
                 );
-
-                var t7 = loader.LoadAsync(7);
-                var t8 = loader.LoadAsync(8);
-                var t9 = loader.LoadAsync(9);
-                Thread.Sleep(200);
-
-                var ten = await loader.LoadAsync(10);
-                t7.IsCompleted.ShouldBeTrue();
-                t8.IsCompleted.ShouldBeTrue();
-                t9.IsCompleted.ShouldBeTrue();
             });
 
-            Should.CompleteIn(task, TimeSpan.FromSeconds(5));
-            loadCount.ShouldBe(5);
+            loadCount.ShouldBe(4);
         }
 
         [Fact]
-        public void DataLoaderContext_Run_HandlesUnrelatedAwaits()
+        public async Task DataLoaderContext_Run_HandlesUnrelatedAwaits()
         {
             var loadCount = 0;
 
-            var loader = new DataLoader<int, int>(async ids =>
+            await DataLoaderContext.Run(async ctx =>
             {
-                await Task.Delay(100);
-                loadCount++;
-                return ids.ToLookup(id => id);
-            });
+                var loader = ctx.Factory.GetOrCreateLoader<int, int>(
+                    "somekey",
+                    async ids =>
+                    {
+                        await Task.Delay(50);
+                        loadCount++;
+                        return ids.ToDictionary(id => id);
+                    });
 
-            var task = DataLoaderContext.Run(async () =>
-            {
                 var one = await loader.LoadAsync(1);
-                await Task.Delay(100);
+                await Task.Delay(50);
                 var two = await loader.LoadAsync(2);
             });
 
-            Should.CompleteIn(task, TimeSpan.FromSeconds(5));
             loadCount.ShouldBe(2);
         }
     }

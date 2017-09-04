@@ -49,29 +49,37 @@ namespace DataLoader
             _boundContext = boundContext;
         }
 
+        public string FetchResultTypeName => GetType().Name.Split(new [] { "DataLoader" }, StringSplitOptions.None).First().ToLower() + " of " + typeof(TFetchResult).GenericTypeArguments.Last().Name;
+
         /// <summary>
         /// Executes the <see cref="Fetch"/> method implemented by the derived type,
-        /// before completing the <see cref="Completion"/> promise task.
+        /// before setting the result on the <see cref="Completion"/> task.
         /// </summary>
         /// <remarks>
-        /// Once the fetch portion of the operation returns, the <see cref="Context"/>
-        /// is signaled, informing it that it may execute the next loader. In general,
-        /// it is a good idea to minimize database contention by not running multiple
-        /// queries in parallel.
+        /// Currently only one loader is permitted to be fetching at a time (at least, per loader context).
+        /// Parallel requests to the database are usually counter-productive and create unnecessary contention.
+        /// As soon as a fetch completes, the next waiting loader will be signaled. This allows us to keep loading
+        /// data simultaneously in the background while we process the current items.
         /// </remarks>
-        public Task ExecuteAsync()
+        public void Trigger()
         {
-            return Fetch().ContinueWith(
-                (task, state) =>
+            Fetch().ContinueWith((task, state) =>
                 {
-                    // Fetch again as soon as the call has returned. This should help 
-                    // minimize contention on the DB while continuously providing data
-                    // to keep the CPU busy and minimize response time.
+                    // Signal the next pending loader to fetch more data before we complete our promise task
+                    // since then we have to wait for all the continuations to finish executing synchronously.
+                    // We may as well pull more data over the network and keep the DB working in the meantime.
                     Context.SignalNext();
-                    Logger.WriteLine($"Completing {typeof(TFetchResult).GenericTypeArguments.Last().Name}");
+
+                    // Complete the promise task - continuations should run synchronously.
                     ((TaskCompletionSource<TFetchResult>)state).SetResult(task.Result);
+
+                    // Then flush any loaders that were called from the continuations.
                     Context.FlushLoadersOnThread();
-                }, Interlocked.Exchange(ref _completionSource, CreateNewLazyCompletionSource()).Value);
+                }
+                , Interlocked.Exchange(ref _completionSource, CreateNewLazyCompletionSource()).Value
+                , CancellationToken.None
+                , TaskContinuationOptions.ExecuteSynchronously
+                , TaskScheduler.Default);
         }
 
         /// <summary>
@@ -79,7 +87,7 @@ namespace DataLoader
         /// </summary>
         private void Prepare()
         {
-            Context.QueueLoader(this);   
+            Context.QueueLoader(this);
         }
 
         /// <summary>

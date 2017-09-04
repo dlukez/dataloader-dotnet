@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
+using System.Collections.Generic;
 
 namespace DataLoader.StarWars.Migrations
 {
-    public partial class Create : Migration
+    public partial class InitialSetup : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -10,10 +12,10 @@ namespace DataLoader.StarWars.Migrations
                 name: "Droids",
                 columns: table => new
                 {
-                    DroidId = table.Column<int>(nullable: false)
-                        .Annotation("Autoincrement", true),
-                    Name = table.Column<string>(nullable: true),
-                    PrimaryFunction = table.Column<string>(nullable: true)
+                    DroidId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    PrimaryFunction = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -24,10 +26,10 @@ namespace DataLoader.StarWars.Migrations
                 name: "Episodes",
                 columns: table => new
                 {
-                    EpisodeId = table.Column<int>(nullable: false)
-                        .Annotation("Autoincrement", true),
-                    Name = table.Column<string>(nullable: true),
-                    Year = table.Column<string>(nullable: true)
+                    EpisodeId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Year = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -38,10 +40,10 @@ namespace DataLoader.StarWars.Migrations
                 name: "Humans",
                 columns: table => new
                 {
-                    HumanId = table.Column<int>(nullable: false)
-                        .Annotation("Autoincrement", true),
-                    HomePlanet = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: true)
+                    HumanId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    HomePlanet = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -52,10 +54,10 @@ namespace DataLoader.StarWars.Migrations
                 name: "DroidAppearances",
                 columns: table => new
                 {
-                    DroidAppearanceId = table.Column<int>(nullable: false)
-                        .Annotation("Autoincrement", true),
-                    DroidId = table.Column<int>(nullable: false),
-                    EpisodeId = table.Column<int>(nullable: false)
+                    DroidAppearanceId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    DroidId = table.Column<int>(type: "INTEGER", nullable: false),
+                    EpisodeId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,10 +80,10 @@ namespace DataLoader.StarWars.Migrations
                 name: "Friendships",
                 columns: table => new
                 {
-                    FriendshipId = table.Column<int>(nullable: false)
-                        .Annotation("Autoincrement", true),
-                    DroidId = table.Column<int>(nullable: false),
-                    HumanId = table.Column<int>(nullable: false)
+                    FriendshipId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    DroidId = table.Column<int>(type: "INTEGER", nullable: false),
+                    HumanId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -104,10 +106,10 @@ namespace DataLoader.StarWars.Migrations
                 name: "HumanAppearances",
                 columns: table => new
                 {
-                    HumanAppearanceId = table.Column<int>(nullable: false)
-                        .Annotation("Autoincrement", true),
-                    EpisodeId = table.Column<int>(nullable: false),
-                    HumanId = table.Column<int>(nullable: false)
+                    HumanAppearanceId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    EpisodeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    HumanId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 namespace DataLoader
 {
     /// <summary>
@@ -5,10 +8,7 @@ namespace DataLoader
     /// </summary>
     public interface IDataLoader
     {
-        /// <summary>
-        /// Executes the load operation.
-        /// </summary>
-        Task ExecuteAsync();
+        void Trigger();
     }
 
     /// <summary>
@@ -22,8 +22,8 @@ namespace DataLoader
     /// <summary>
     /// Represents a loader that takes a single key parameter.
     /// </summary>
-    public interface IDataLoader<TKey, TReturn> : IDataLoader
+    public interface IDataLoader<TKey, TReturn>
     {
-        Task<IEnumerable<TReturn>> LoadAsync(TKey key);
+        Task<TReturn> LoadAsync(TKey key);
     }
 }

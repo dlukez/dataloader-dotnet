@@ -32,7 +32,7 @@ namespace DataLoader
             } 
         }
 
-        public bool Set() 
+        public void Set() 
         { 
             TaskCompletionSource<bool> toRelease = null;
             
@@ -43,12 +43,7 @@ namespace DataLoader
             }
 
             if (toRelease != null)
-            {
                 toRelease.SetResult(true);
-                return true;
-            }
-            
-            return false;
         }
     }
 }
