@@ -1,8 +1,12 @@
-# Setup
 $ErrorActionPreference = "Stop"
+
+# Setup
 if (-not $env:Configuration) { $env:Configuration = "Release" }
-if (-not $env:BuildRunner) { $env:PackageVersion = (gitversion | ConvertFrom-Json).NuGetVersionV2 }
 function Invoke-BuildStep { param([scriptblock]$cmd) & $cmd; if ($LASTEXITCODE -ne 0) { exit 1 } }
+
+# Run GitVersion
+if (-not $env:BuildRunner) { $env:PackageVersion = (gitversion | ConvertFrom-Json).NuGetVersionV2 }
+else { Invoke-Expression "$env:GitVersion /output buildserver" }
 
 # Run build
 Invoke-BuildStep { dotnet restore src/DataLoader/DataLoader.csproj }
