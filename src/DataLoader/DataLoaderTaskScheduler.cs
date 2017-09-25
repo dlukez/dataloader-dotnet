@@ -4,10 +4,16 @@ using System.Threading.Tasks;
 
 namespace DataLoader
 {
+    /// <summary>
+    /// A custom task scheduler that executes tasks in the correct synchronization context.
+    /// </summary>
     internal class DataLoaderTaskScheduler : TaskScheduler
     {
         private DataLoaderContext _context;
 
+        /// <summary>
+        /// Creates a new <see cref="DataLoaderTaskScheduler"/>.
+        /// </summary>
         public DataLoaderTaskScheduler(DataLoaderContext context)
         {
             _context = context;

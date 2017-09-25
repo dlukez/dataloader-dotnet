@@ -29,14 +29,15 @@ namespace DataLoader
         }
 
         /// <summary>
-        /// Schedules the loader to fire and returns a <see cref="Task{T}"/> representing the pending result.
+        /// Schedules the loader to fire.
         /// </summary>
+        /// <returns>A <see cref="Task{T}"/> representing the future result.</returns>
         public Task<T> LoadAsync() => Completion;
 
         /// <summary>
         /// Invokes the user-specified fetch delegate configured in the constructor.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The result of the fetch delegate.</returns>
         public override Task<T> Fetch() => _fetchDelegate();
     }
 }

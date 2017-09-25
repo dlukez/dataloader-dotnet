@@ -14,7 +14,8 @@ namespace DataLoader
     public abstract class DataLoaderBase<TFetchResult> : IDataLoader
     {
         /// <summary>
-        /// To be implemented in derived classes to fire the query and begin loading.
+        /// To be implemented in derived classes to execute the relevant query/request.
+        /// The result is used to complete the <see cref="Completion"/> task.
         /// </summary>
         public abstract Task<TFetchResult> Fetch();
 
@@ -29,15 +30,22 @@ namespace DataLoader
         private DataLoaderContext _boundContext;
 
         /// <summary>
-        /// Represents the result of the fetch operation.
+        /// Represents the result of the next fetch operation.
         /// </summary>
-        protected Task<TFetchResult> Completion => _completionSource.Value.Task;
+        protected Task<TFetchResult> Completion
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return _completionSource.Value.Task;
+            }
+        }
         private Lazy<TaskCompletionSource<TFetchResult>> _completionSource;
 
         /// <summary>
         /// Creates a new loader instance.
         /// </summary>
-        public DataLoaderBase() : this(null) {}
+        public DataLoaderBase() : this(null) { }
 
         /// <summary>
         /// Creates a new loader instance bound to a specific context.
@@ -48,8 +56,6 @@ namespace DataLoader
             _completionSource = CreateNewLazyCompletionSource();
             _boundContext = boundContext;
         }
-
-        public string FetchResultTypeName => GetType().Name.Split(new [] { "DataLoader" }, StringSplitOptions.None).First().ToLower() + " of " + typeof(TFetchResult).GenericTypeArguments.Last().Name;
 
         /// <summary>
         /// Executes the <see cref="Fetch"/> method implemented by the derived type,
@@ -63,11 +69,11 @@ namespace DataLoader
         /// </remarks>
         public void Trigger()
         {
+            ThrowIfDisposed();
             Fetch().ContinueWith((task, state) =>
                 {
-                    // Signal the next pending loader to fetch more data before we complete our promise task
-                    // since then we have to wait for all the continuations to finish executing synchronously.
-                    // We may as well pull more data over the network and keep the DB working in the meantime.
+                    // Signal the next ready loader before completing.
+                    // We want to keep fetching data while we process our results.
                     Context.SignalNext();
 
                     // Complete the promise task - continuations should run synchronously.
@@ -98,10 +104,45 @@ namespace DataLoader
         private Lazy<TaskCompletionSource<TFetchResult>> CreateNewLazyCompletionSource()
         {
             return new Lazy<TaskCompletionSource<TFetchResult>>(() =>
+                {
+                    Prepare();
+                    return new TaskCompletionSource<TFetchResult>();
+                });
+        }
+
+        protected bool IsDisposed { get; private set; }
+
+        /// <summary>
+        /// Disposes of the loader, suggesting that it should no longer be used.
+        /// </summary>
+        /// <remarks>
+        /// <para>Loaders obtained from a context will automatically by disposed when the context is disposed.
+        /// Upon disposal, the current task (represented by the <see cref="Completion"/> property) will be
+        /// canceled and any future attempts to trigger the loader will result in an exception.</para>
+        /// <para>Implementations deriving from this type should be careful not to return cached results
+        /// after disposal, unless that is the intended behaviour.</para>
+        /// </remarks>
+        public void Dispose()
+        {
+            if (!IsDisposed)
             {
-                Prepare();
-                return new TaskCompletionSource<TFetchResult>();
-            });
+                IsDisposed = true;
+                if (_completionSource.IsValueCreated && !IsDisposed)
+                {
+                    _completionSource.Value.TrySetCanceled();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks that the loader hasn't been disposed, otherwise it throws an exception.
+        /// </summary>
+        protected void ThrowIfDisposed()
+        {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
         }
     }
 }

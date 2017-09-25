@@ -120,7 +120,7 @@ namespace DataLoader.Tests
 
             await DataLoaderContext.Run(async ctx =>
             {
-                var loader = ctx.Factory.GetOrCreateLoader<int, int>(
+                var loader = ctx.GetOrCreateLoader<int, int>(
                     "somekey",
                     async ids =>
                     {
@@ -150,7 +150,7 @@ namespace DataLoader.Tests
 
             await DataLoaderContext.Run(async ctx =>
             {
-                var loader = ctx.Factory.GetOrCreateLoader<int, int>(
+                var loader = ctx.GetOrCreateLoader<int, int>(
                     "somekey",
                     async ids =>
                     {

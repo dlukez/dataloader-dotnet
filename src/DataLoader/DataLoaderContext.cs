@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +28,9 @@ namespace DataLoader
     public sealed class DataLoaderContext : IDisposable
     {
         private readonly ThreadLocal<Queue<IDataLoader>> _localQueue = new ThreadLocal<Queue<IDataLoader>>(() => new Queue<IDataLoader>());
+        private readonly ConcurrentDictionary<object, IDataLoader> _loaderCache = new ConcurrentDictionary<object, IDataLoader>();
         private readonly AsyncAutoResetEvent _fetchLock = new AsyncAutoResetEvent(true);
+        private readonly TaskFactory _taskFactory;
 
         /// <summary>
         /// Creates a new instance of a context.
@@ -35,15 +40,10 @@ namespace DataLoader
         /// </remarks>
         internal DataLoaderContext()
         {
-            Factory = new DataLoaderFactory(this);
             SyncContext = new DataLoaderSynchronizationContext(this);
             TaskScheduler = new DataLoaderTaskScheduler(this);
+            _taskFactory = new TaskFactory(CancellationToken.None, TaskCreationOptions.None, TaskContinuationOptions.None, TaskScheduler);
         }
-
-        /// <summary>
-        /// Provides methods for obtaining loader instances in this context.
-        /// </summary>
-        public DataLoaderFactory Factory { get; }
 
         /// <summary>
         /// Gets the synchronization context associated with this context.
@@ -100,18 +100,54 @@ namespace DataLoader
         /// </summary>
         public void Dispose()
         {
-            ThrowIfDisposed();
-            IsDisposed = true;
+            if (!IsDisposed)
+            {
+                IsDisposed = true;
+                foreach (var loader in _loaderCache.Values)
+                {
+                    loader.Dispose();
+                }
+            }
         }
 
         /// <summary>
-        /// Verifies that the context has not been disposed of.
+        /// Verifies that the context has not been disposed of and throws an exception if so.
         /// </summary>
         private void ThrowIfDisposed()
         {
             if (IsDisposed)
+            {
                 throw new ObjectDisposedException(GetType().Name);
+            }
         }
+
+        #region Loader Factory
+
+        /// <summary>
+        /// Gets or creates a loader instance for the given key.
+        /// </summary>
+        public IDataLoader<TReturn> GetOrCreateLoader<TReturn>(object key, Func<Task<TReturn>> fetchDelegate)
+        {
+            return (IDataLoader<TReturn>)_loaderCache.GetOrAdd(key, _ => new RootDataLoader<TReturn>(fetchDelegate, this));
+        }
+
+        /// <summary>
+        /// Gets or creates a loader instance for the given key.
+        /// </summary>
+        public IDataLoader<TKey, TReturn> GetOrCreateLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<Dictionary<TKey, TReturn>>> fetchDelegate)
+        {
+            return (IDataLoader<TKey, TReturn>)_loaderCache.GetOrAdd(key, _ => new ObjectDataLoader<TKey, TReturn>(fetchDelegate, this));
+        }
+
+        /// <summary>
+        /// Gets or creates a loader instance for the given key.
+        /// </summary>
+        public IDataLoader<TKey, IEnumerable<TReturn>> GetOrCreateLoader<TKey, TReturn>(object key, Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate)
+        {
+            return (IDataLoader<TKey, IEnumerable<TReturn>>)_loaderCache.GetOrAdd(key, _ => new CollectionDataLoader<TKey, TReturn>(fetchDelegate, this));
+        }
+
+        #endregion
 
         #region Ambient Context
 
@@ -156,9 +192,7 @@ namespace DataLoader
             using (var loadCtx = new DataLoaderContext())
             using (new DataLoaderContextSwitcher(loadCtx))
             {
-                var task = Task.Factory.StartNew(() => func(loadCtx), CancellationToken.None, TaskCreationOptions.LongRunning, loadCtx.TaskScheduler).Unwrap();
-                // loadCtx.FlushLoadersOnThread();
-                return await task.ConfigureAwait(false);
+                return await loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap().ConfigureAwait(false);
             }
         }
 
@@ -172,36 +206,28 @@ namespace DataLoader
             using (var loadCtx = new DataLoaderContext())
             using (new DataLoaderContextSwitcher(loadCtx))
             {
-                var task = Task.Factory.StartNew(() => func(loadCtx), CancellationToken.None, TaskCreationOptions.LongRunning, loadCtx.TaskScheduler).Unwrap();
-                // loadCtx.FlushLoadersOnThread();
-                await task.ConfigureAwait(false);
+                await loadCtx._taskFactory.StartNew(() => func(loadCtx)).Unwrap().ConfigureAwait(false);
             }
         }
 
         #endregion
 
         /// <summary>
-        /// Temporarily switches out the current DataLoaderContext and its associated
-        /// SynchronisationContext, then restores the previous ones when disposed.
+        /// Temporarily switches out the current DataLoaderContext until disposed.
         /// </summary>
         private class DataLoaderContextSwitcher : IDisposable
         {
             private readonly DataLoaderContext _prevLoadCtx;
-            private readonly SynchronizationContext _prevSyncCtx;
 
             public DataLoaderContextSwitcher(DataLoaderContext loadCtx)
             {
                 _prevLoadCtx = DataLoaderContext.Current;
                 DataLoaderContext.SetLoaderContext(loadCtx);
-
-                _prevSyncCtx = SynchronizationContext.Current;
-                SynchronizationContext.SetSynchronizationContext(loadCtx.SyncContext);
             }
 
             public void Dispose()
             {
                 DataLoaderContext.SetLoaderContext(_prevLoadCtx);
-                SynchronizationContext.SetSynchronizationContext(_prevSyncCtx);
             }
         }
 
