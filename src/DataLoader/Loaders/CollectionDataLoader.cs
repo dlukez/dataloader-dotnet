@@ -19,14 +19,16 @@ namespace DataLoader
         /// <summary>
         /// Creates a new <see cref="CollectionDataLoader{TKey,TReturn}"/>.
         /// </summary>
-        public CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate) : this(fetchDelegate, null)
+        public CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate)
+            : this(fetchDelegate, null)
         {
         }
 
         /// <summary>
         /// Creates a new <see cref="CollectionDataLoader{TKey,TReturn}"/> bound to a specific context.
         /// </summary>
-        internal CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate, DataLoaderContext context) : base(context)
+        internal CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate, DataLoaderContext context)
+            : base(context)
         {
             _fetchDelegate = fetchDelegate;
         }

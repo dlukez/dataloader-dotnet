@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataLoader
@@ -16,14 +15,16 @@ namespace DataLoader
         /// <summary>
         /// Creates a new <see cref="RootDataLoader{T}"/>.
         /// </summary>
-        public RootDataLoader(Func<Task<T>> fetchDelegate) : this(fetchDelegate, null)
+        public RootDataLoader(Func<Task<T>> fetchDelegate)
+            : this(fetchDelegate, null)
         {
         }
 
         /// <summary>
         /// Creates a new <see cref="RootDataLoader{T}"/> bound to a specific context.
         /// </summary>
-        internal RootDataLoader(Func<Task<T>> fetchDelegate, DataLoaderContext context) : base(context)
+        internal RootDataLoader(Func<Task<T>> fetchDelegate, DataLoaderContext context)
+            : base(context)
         {
             _fetchDelegate = fetchDelegate;
         }

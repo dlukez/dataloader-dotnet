@@ -5,20 +5,20 @@
     <DefaultExcludesInProjectFolder>wwwroot\node_modules\**;$(DefaultExcludesInProjectFolder)</DefaultExcludesInProjectFolder>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/DataLoader/DataLoader.csproj"/>
+    <ProjectReference Include="../../src/DataLoader/DataLoader.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Faker.NETCore" Version="1.0.1"/>
-    <PackageReference Include="GraphQL" Version="0.17.3"/>
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0"/>
-    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.0"/>
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.0"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.0"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.0" PrivateAssets="all"/>
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0"/>
+    <PackageReference Include="Faker.NETCore" Version="1.0.1" />
+    <PackageReference Include="GraphQL" Version="0.17.3" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0"/>
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
   </ItemGroup>
 </Project>
