@@ -1,18 +1,18 @@
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 
 namespace DataLoader
 {
     /// <summary>
-    /// Represents a data loader that should be triggered explicitly.
+    /// Represents a loader that can be triggered explicitly.
     /// </summary>
-    public interface IDataLoader
+    public interface IDataLoader : IDisposable
     {
         void Trigger();
     }
 
     /// <summary>
-    /// Represents a basic loader with no parameters.
+    /// Represents a loader that has no parameters.
     /// </summary>
     public interface IDataLoader<T>
     {
@@ -20,7 +20,7 @@ namespace DataLoader
     }
 
     /// <summary>
-    /// Represents a loader that takes a single key parameter.
+    /// Represents a loader that retrieves a result for the given key.
     /// </summary>
     public interface IDataLoader<TKey, TReturn>
     {

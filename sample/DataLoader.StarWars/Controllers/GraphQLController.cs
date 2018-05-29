@@ -38,7 +38,6 @@ namespace DataLoader.StarWars.Controllers
             }));
 
             sw.Stop();
-
             var msg = result.Errors != null
                 ? $"Error executing query {queryNumber}: {result.Errors.Aggregate("", (s, e) => s + Environment.NewLine + e.ToString())}"
                 : $"Executed query {queryNumber} ({sw.ElapsedMilliseconds}ms)";

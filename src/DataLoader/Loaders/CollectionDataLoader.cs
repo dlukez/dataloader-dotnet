@@ -19,14 +19,16 @@ namespace DataLoader
         /// <summary>
         /// Creates a new <see cref="CollectionDataLoader{TKey,TReturn}"/>.
         /// </summary>
-        public CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate) : this(fetchDelegate, null)
+        public CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate)
+            : this(fetchDelegate, null)
         {
         }
 
         /// <summary>
         /// Creates a new <see cref="CollectionDataLoader{TKey,TReturn}"/> bound to a specific context.
         /// </summary>
-        internal CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate, DataLoaderContext context) : base(context)
+        internal CollectionDataLoader(Func<IEnumerable<TKey>, Task<ILookup<TKey, TReturn>>> fetchDelegate, DataLoaderContext context)
+            : base(context)
         {
             _fetchDelegate = fetchDelegate;
         }
@@ -38,14 +40,16 @@ namespace DataLoader
         /// Each requested key is collected into a batch so that they can be fetched in a single call.
         /// When data for a key is loaded, it will be cached and used to fulfil any subsequent requests for the same key.
         /// </remarks>
+        /// <returns>The future result matching the given key.</returns>
         public Task<IEnumerable<TReturn>> LoadAsync(TKey key)
         {
+            ThrowIfDisposed();
             lock (_lock)
             {
                 if (_cache.TryGetValue(key, out var task)) return task;
                 _batch.Add(key);
                 return (_cache[key] = Completion.ContinueWith(
-                    SelectKeyFromTaskResult
+                    (t, state) => t.Result[(TKey)state]
                     , key
                     , CancellationToken.None
                     , TaskContinuationOptions.None
@@ -53,15 +57,10 @@ namespace DataLoader
             }
         }
 
-        static IEnumerable<TReturn> SelectKeyFromTaskResult(Task<ILookup<TKey, TReturn>> task, object key)
-        {
-            return task.Result[(TKey)key];
-        }
-
         /// <summary>
-        /// Invokes the user-specified fetch delegate configured in the constructor,
-        /// passing it the current set of keys to be loaded.
+        /// Invokes the user-specified fetch delegate specified in the constructor.
         /// </summary>
+        /// <returns>The result of the fetch delegate.</returns>
         public override Task<ILookup<TKey, TReturn>> Fetch()
         {
             HashSet<TKey> currentBatch;

@@ -11,13 +11,13 @@ namespace DataLoader.Tests
     public class DataLoaderContextTests
     {
         [Fact]
-        public void DataLoaderContext_Current_IsNullByDefault()
+        public void Current_IsNullByDefault()
         {
             DataLoaderContext.Current.ShouldBeNull();
         }
 
         [Fact]
-        public async Task DataLoaderContext_Run_SetsCurrent()
+        public async Task SetsCurrent()
         {
             await DataLoaderContext.Run(() =>
             {
@@ -27,14 +27,14 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public async Task DataLoaderContext_Run_UnsetsCurrent()
+        public async Task UnsetsCurrent()
         {
             await DataLoaderContext.Run(() => Task.CompletedTask);
             DataLoaderContext.Current.ShouldBeNull();
         }
 
         [Fact]
-        public async Task DataLoaderContext_Run_CanBeNested()
+        public async Task CanBeNested()
         {
             await DataLoaderContext.Run(async outerCtx =>
             {
@@ -51,7 +51,7 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public async Task DataLoaderContext_Run_FlowsCurrentContext()
+        public async Task FlowsLikeSyncContext()
         {
             var checkpoints = 0;
 
@@ -59,35 +59,34 @@ namespace DataLoader.Tests
             {
                 var ctx = DataLoaderContext.Current;
 
-                // Test with `Task.Yield`.
+                // Should flow over `Task.Yield`
                 await Task.Yield();
                 DataLoaderContext.Current.ShouldBe(ctx);
                 checkpoints++; // 1
 
-                // Test with `Task.Delay`.
+                // Should flow over `Task.Delay`
                 await Task.Delay(100);
                 DataLoaderContext.Current.ShouldBe(ctx);
                 checkpoints++; // 2
 
-                // Test with `Task.Run`.
-                await Task.Run(() => DataLoaderContext.Current.ShouldBe(ctx));
+                // Shouldn't flow into Task.Run
+                await Task.Run(() => DataLoaderContext.Current.ShouldBe(null));
+                DataLoaderContext.Current.ShouldBe(ctx);
                 checkpoints++; // 3
 
-                // Test with `Thread`.
-                var thread = new Thread(() =>
-                {
-                    DataLoaderContext.Current.ShouldBe(ctx);
-                    checkpoints++; // 4
-                });
+                // Shouldn't flow into a new Thread
+                var thread = new Thread(() => { DataLoaderContext.Current.ShouldBe(null); });
                 thread.Start();
                 thread.Join();
+                DataLoaderContext.Current.ShouldBe(ctx);
+                checkpoints++; // 4
             });
 
             checkpoints.ShouldBe(4);
         }
 
         [Fact]
-        public async Task DataLoaderContext_Run_AllowsParallelContexts()
+        public async Task AllowsParallelContexts()
         {
             const int n = 2;
             var barrier = new Barrier(n);
@@ -106,7 +105,6 @@ namespace DataLoader.Tests
 
             var t1 = Task.Run(action);
             var t2 = Task.Run(action);
-
             await Task.WhenAll(t1, t2);
 
             contexts.Count.ShouldBe(n);
@@ -114,13 +112,13 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public async Task DataLoaderContext_Run_TriggersConsecutiveLoads()
+        public async Task TriggersConsecutiveLoads()
         {
             var loadCount = 0;
 
             await DataLoaderContext.Run(async ctx =>
             {
-                var loader = ctx.Factory.GetOrCreateLoader<int, int>(
+                var loader = ctx.GetOrCreateLoader<int, int>(
                     "somekey",
                     async ids =>
                     {
@@ -129,11 +127,10 @@ namespace DataLoader.Tests
                         return ids.ToDictionary(id => id);
                     });
 
-                var one = await loader.LoadAsync(1); // 1
-                var two = await loader.LoadAsync(2); // 2
-                var three = await loader.LoadAsync(3); // 3
-
-                var fourfivesix = await Task.WhenAll( // 4
+                var one = await loader.LoadAsync(1);
+                var two = await loader.LoadAsync(2);
+                var three = await loader.LoadAsync(3);
+                var fourfivesix = await Task.WhenAll(
                     loader.LoadAsync(4),
                     loader.LoadAsync(5),
                     loader.LoadAsync(6)
@@ -144,13 +141,13 @@ namespace DataLoader.Tests
         }
 
         [Fact]
-        public async Task DataLoaderContext_Run_HandlesUnrelatedAwaits()
+        public async Task HandlesUnrelatedAwaits()
         {
             var loadCount = 0;
 
             await DataLoaderContext.Run(async ctx =>
             {
-                var loader = ctx.Factory.GetOrCreateLoader<int, int>(
+                var loader = ctx.GetOrCreateLoader<int, int>(
                     "somekey",
                     async ids =>
                     {
@@ -165,6 +162,40 @@ namespace DataLoader.Tests
             });
 
             loadCount.ShouldBe(2);
+        }
+
+        [Fact]
+        public void RespectsAlreadyCancelledToken()
+        {
+            var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            var didRun = false;
+            var task = DataLoaderContext.Run(token =>
+            {
+                didRun = true;
+                return null;
+            }, cts.Token);
+
+            didRun.ShouldBe(false);
+            task.IsCanceled.ShouldBe(true);
+        }
+
+        [Fact]
+        public void CanBeCancelled()
+        {
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(50);
+
+            var didRun = false;
+            var task = DataLoaderContext.Run(async token =>
+            {
+                didRun = true;
+                await Task.Delay(300, token);
+            }, cts.Token);
+
+            didRun.ShouldBeTrue();
+            task.ShouldThrow<TaskCanceledException>();
         }
     }
 }

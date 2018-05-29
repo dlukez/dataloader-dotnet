@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataLoader
 {
     internal class DataLoaderTaskScheduler : TaskScheduler
     {
-        private DataLoaderContext _context;
+        private readonly DataLoaderContext _context;
 
         public DataLoaderTaskScheduler(DataLoaderContext context)
         {
@@ -15,10 +16,7 @@ namespace DataLoader
 
         protected override IEnumerable<Task> GetScheduledTasks() => throw new NotImplementedException();
 
-        protected override void QueueTask(Task task)
-        {
-            _context.SyncContext.Post(_ => TryExecuteTask(task), null);
-        }
+        protected override void QueueTask(Task task) => _context.SyncContext.Post(_ => TryExecuteTask(task), null);
 
         protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued) => TryExecuteTask(task);
     }
